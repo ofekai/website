@@ -3,17 +3,16 @@ export const site = {
   url: 'https://www.ofektaiwan.com',
   email: 'contact@ofektaiwan.com',
   linkedin: 'https://www.linkedin.com/company/ofekglobal',
+  title: 'Ofek | Trusted Insights into Frontier Compute Manufacturing',
+  description:
+    'Ofek partners with top S&P 100 companies to optimize technology-focused manufacturing operations in Taiwan, drawing on deep supply-chain knowledge and HeatVision, our real-time manufacturing intelligence platform.',
+  ogImage: '/images/Banner.png',
 } as const;
 
-/**
- * Phase 1 keeps every nav item as-is for parity, including `#resources`, which
- * has no matching element in the document. Phase 2 removes it.
- */
 export const navLinks = [
   { label: 'ABOUT US', href: '#about' },
   { label: 'CONSULTING', href: '#consulting' },
   { label: 'HeatVision®', href: '#heatVision' },
-  { label: 'RESOURCES', href: '#resources' },
   { label: 'PARTNERS', href: '#partners' },
   { label: 'TALK TO US', href: '#contact' },
 ] as const;

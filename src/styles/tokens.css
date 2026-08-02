@@ -1,0 +1,96 @@
+/* ==========================================================================
+   Design tokens — primitives, then semantic aliases that components consume.
+   Loaded first in the cascade (`@layer tokens, reset, base, components, utilities`)
+   so every later layer can rely on these custom properties existing.
+   ========================================================================== */
+
+@layer tokens;
+
+@layer tokens {
+  :root {
+    /* --- Color primitives --- */
+    --teal-400: #6fc2c3;
+    --teal-500: #4da7a8;
+    --teal-600: #2d7d7e;
+
+    --ink-900: #1a1b1f;
+    --ink-500: #4b4e53;
+    --ink-300: #9ca3af;
+    --ink-150: #b8b8b8;
+    --ink-100: #d9d9d9;
+
+    /* --- Color, semantic --- */
+    --color-bg: #fff;
+    --color-surface-dark: var(--ink-900);
+    --color-text: var(--ink-500);
+    --color-text-muted: var(--ink-300);
+    --color-accent: var(--teal-500);
+    --color-accent-hover: var(--teal-400);
+    --color-accent-active: var(--teal-600);
+    --color-hairline: rgb(255 255 255 / 20%);
+    --color-focus: var(--teal-600);
+
+    /* --- Type, fluid scale ---
+       Only the two sizes the plan calls out (hero, section title) need to be
+       fluid; the rest are fixed rungs on the same ladder. */
+    --step--1: 0.75rem; /* 12px — copyright */
+    --step-0: 0.875rem; /* 14px — nav links, button label */
+    --step-1: 1rem; /* 16px — body copy */
+    --step-2: 1.25rem; /* 20px — hero subtitle, card text (desktop) */
+    --step-3: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem); /* 28px -> 40px — section titles */
+    --step-4: clamp(2rem, 1.3rem + 2.75vw, 3.5rem); /* 32px -> 56px — hero title */
+
+    /* --- Space ---
+       4px base scale plus the handful of semantic slots the plan names. */
+    --space-1: 0.25rem; /* 4px */
+    --space-2: 0.5rem; /* 8px */
+    --space-3: 0.75rem; /* 12px */
+    --space-4: 1rem; /* 16px */
+    --space-5: 1.5rem; /* 24px */
+    --space-6: 2rem; /* 32px */
+    --space-7: 2.5rem; /* 40px */
+    --space-8: 3rem; /* 48px */
+    --space-9: 4rem; /* 64px */
+    --space-10: 5rem; /* 80px */
+    --space-11: 6rem; /* 96px */
+    --space-12: 7.5rem; /* 120px */
+
+    --gutter: clamp(1.25rem, 5vw, 3rem);
+    --section-y: clamp(4rem, 8vw, 7.5rem);
+    --container: 1200px;
+    --measure: 68ch;
+
+    /* --- Shape --- */
+    --radius-md: 8px;
+    --card-notch: clamp(24px, 4vw, 64px);
+    --rule-thick: 10px;
+    --nav-h: 92px;
+    --nav-h-scrolled: 84px;
+
+    /* --- Motion --- */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --dur-fast: 150ms;
+    --dur-base: 300ms;
+    --dur-slow: 600ms;
+    --dur-reveal: 1200ms;
+    --stagger: 60ms;
+  }
+
+  /* Neutralizes every duration/stagger token from one place. Components that
+     read --dur-* and --stagger (today's reveal transition, Phase 5's Motion
+     entries) automatically go inert without per-component overrides. */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --dur-fast: 1ms;
+      --dur-base: 1ms;
+      --dur-slow: 1ms;
+      --dur-reveal: 1ms;
+      --stagger: 0ms;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}

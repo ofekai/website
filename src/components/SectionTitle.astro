@@ -9,7 +9,7 @@ const { light, bold } = Astro.props;
 
 {/* The literal space between the spans is load-bearing today; `.title-bold`
     also carries margin-left. Phase 3 moves this spacing fully into CSS. */}
-<div class="main-title">
+<h2 class="main-title">
   <span class="title-light">{light}</span>{' '}
   <span class="title-bold">{bold}</span>
-</div>
+</h2>

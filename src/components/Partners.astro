@@ -2,10 +2,10 @@
 import SectionTitle from './SectionTitle.astro';
 
 const partners = [
-  { src: '/images/logo_Annapurna.png', class: 'logo-item logo-item-amazon' },
-  { src: '/images/logo_Hipcam.png', class: 'logo-item' },
-  { src: '/images/logo_Goldtek.png', class: 'logo-item' },
-  { src: '/images/logo_Accton.png', class: 'logo-item' },
+  { src: '/images/logo_Annapurna.png', alt: 'Annapurna Labs', class: 'logo-item logo-item-amazon' },
+  { src: '/images/logo_Hipcam.png', alt: 'Hipcam', class: 'logo-item' },
+  { src: '/images/logo_Goldtek.png', alt: 'Goldtek', class: 'logo-item' },
+  { src: '/images/logo_Accton.png', alt: 'Accton', class: 'logo-item' },
 ];
 ---
 
@@ -13,7 +13,7 @@ const partners = [
   <div class="container text-center">
     <SectionTitle light="WHO" bold="WE TEAM UP WITH" />
     <div class="partners-logo-flex" data-reveal="down">
-      {partners.map((p) => <div class={p.class}><img src={p.src} alt="" /></div>)}
+      {partners.map((p) => <div class={p.class}><img src={p.src} alt={p.alt} /></div>)}
     </div>
   </div>
 </section>

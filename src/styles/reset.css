@@ -1,0 +1,41 @@
+/* ==========================================================================
+   Reset — element-level normalization, no project-specific values.
+   ========================================================================== */
+
+@layer reset;
+
+@layer reset {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+    display: block;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+  }
+
+  ol,
+  ul {
+    list-style: none;
+  }
+}

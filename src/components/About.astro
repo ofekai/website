@@ -33,7 +33,7 @@ const features = [
       {
         features.map(({ icon, text }, i) => (
           <div class="feature-card" data-reveal="right" style={`--reveal-delay: ${i * 200}ms`}>
-            <div class="feature-num"><img src={icon} alt="" /></div>
+            <div class="feature-num"><img src={icon} alt="" aria-hidden="true" /></div>
             <div class="feature-label">{text}</div>
           </div>
         ))

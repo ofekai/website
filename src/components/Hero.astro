@@ -1,20 +1,25 @@
 ---
+import { Picture } from 'astro:assets';
 import ButtonOutline from './ButtonOutline.astro';
+import heroBanner from '../assets/images/Banner.png';
+import IconArrow from '../icons/arrow.svg';
 ---
 
 {/* Real <img> layer rather than `.bg-hero { background-image }`: it is the
-    genuine LCP element, `fetchpriority` applies to it, and Phase 6 has
-    something concrete to parallax. Phase 4 replaces this with <Picture>. */}
+    genuine LCP element, `fetchpriority` applies to it. Phase 6 parallaxes it. */}
 <section class="hero">
   <div class="hero-media">
-    <img
-      src="/images/Banner.png"
+    <Picture
+      src={heroBanner}
+      formats={['avif', 'webp']}
+      fallbackFormat="png"
+      widths={[640, 960, 1280, 1600, 1920, 2560]}
+      sizes="100vw"
       alt=""
       aria-hidden="true"
-      width="2880"
-      height="1600"
+      loading="eager"
       fetchpriority="high"
-      decoding="async"
+      decoding="sync"
     />
   </div>
   <div class="hero-scrim" aria-hidden="true"></div>
@@ -29,6 +34,6 @@ import ButtonOutline from './ButtonOutline.astro';
   </div>
 
   <div class="hero-scroll container">
-    <a href="#about" aria-label="Scroll to About Us"><img class="floating-arrow" src="/images/ic_arrow.svg" alt="" aria-hidden="true" /></a>
+    <a href="#about" aria-label="Scroll to About Us"><IconArrow class="floating-arrow" aria-hidden="true" /></a>
   </div>
 </section>

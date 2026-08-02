@@ -1,11 +1,16 @@
 ---
+import { Image } from 'astro:assets';
 import { navLinks } from '../data/site';
+import logoOfek from '../assets/images/Logo_Ofek.png';
+import logoOfekDark from '../assets/images/Logo_Ofek_o.png';
 ---
 
 <nav id="navbar" class="navbar">
   <div class="nav-container container">
-    <div class="logo"><img src="/images/Logo_Ofek.png" alt="Ofek" /></div>
-    <div class="logo-dark"><img src="/images/Logo_Ofek_o.png" alt="" aria-hidden="true" /></div>
+    <div class="logo"><Image src={logoOfek} alt="Ofek" width={100} height={50} densities={[1, 2]} /></div>
+    <div class="logo-dark">
+      <Image src={logoOfekDark} alt="" aria-hidden="true" width={75} height={38} densities={[1, 2]} />
+    </div>
     <button
       class="menu-toggle"
       id="menu-toggle"

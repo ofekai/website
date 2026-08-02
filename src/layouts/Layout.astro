@@ -1,7 +1,9 @@
 ---
-import { Font } from 'astro:assets';
+import { Font, getImage } from 'astro:assets';
 import '../styles/global.css';
 import { site, addresses } from '../data/site';
+import heroBanner from '../assets/images/Banner.png';
+import logoOfek from '../assets/images/Logo_Ofek.png';
 
 interface Props {
   title?: string;
@@ -11,14 +13,21 @@ interface Props {
 const { title = site.title, description = site.description } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(site.ogImage, Astro.site);
+
+// Both are processed here (rather than reused from the components that
+// render heroBanner/logoOfek elsewhere) because these need a single static
+// URL for meta tags/JSON-LD, not a responsive <Image>/<Picture>.
+const ogImage = await getImage({ src: heroBanner, width: 1200, format: 'jpeg' });
+const ogImageURL = new URL(ogImage.src, Astro.site);
+
+const logoImage = await getImage({ src: logoOfek, width: 300, format: 'png' });
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: site.name,
   url: site.url,
-  logo: new URL('/images/Logo_Ofek.png', Astro.site).href,
+  logo: new URL(logoImage.src, Astro.site).href,
   address: addresses,
   contactPoint: {
     '@type': 'ContactPoint',

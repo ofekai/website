@@ -176,9 +176,9 @@
     position: absolute;
     inset: 0;
     z-index: -2;
-    /* Dominant colour of the banner, so the hero never flashes white before
-       the image decodes. Phase 4 refines this alongside <Picture>. */
-    background-color: #2b2d31;
+    /* Dominant colour of the banner (mean RGB via sharp stats), so the hero
+       never flashes white before the AVIF/WebP decodes. */
+    background-color: #2b2b2b;
   }
 
   .hero-media img {
@@ -322,7 +322,9 @@
     position: absolute;
     right: -0.42em;
     top: -0.3em;
-    background: url('/images/Ofek_arrow.svg') no-repeat center / contain;
+    background:
+      url("data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%20%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M13.0579%205.56718C12.4425%206.4291%2011.2442%208.0943%2010.3951%209.26755C6.98657%2013.9772%206%2015.3747%206%2015.4931C6%2015.7436%206.59085%2016.4876%206.78977%2016.4876C6.90191%2016.4876%207.60857%2016.3423%208.36029%2016.1647C9.1119%2015.9872%2010.2776%2015.7181%2010.9506%2015.5669L12.1744%2015.2919L14.5107%2017.6459L16.8469%2020L17.4032%2019.7066C17.7091%2019.5451%2017.9774%2019.3977%2017.9994%2019.3787C18.0214%2019.3598%2017.4707%2015.9647%2016.7756%2011.8339C15.8296%206.21151%2015.47%204.30138%2015.345%204.23553C15.2533%204.18717%2014.9529%204.11443%2014.6775%204.07384L14.1769%204L13.0579%205.56718Z%22%20fill%3D%22%234DA7A8%22%2F%3E%20%3C%2Fsvg%3E")
+      no-repeat center / contain;
   }
 
   .description {
@@ -570,7 +572,7 @@
     line-height: 1.6;
   }
 
-  .footer-loction > img {
+  .footer-loction > svg {
     width: 16px;
     margin-right: 8px;
     margin-top: 0.15em;
@@ -605,7 +607,7 @@
     margin-block-start: var(--space-6);
   }
 
-  .footer-links-grid img {
+  .icon-linkedin {
     width: 32px;
   }
 

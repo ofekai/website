@@ -1,5 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import SectionTitle from './SectionTitle.astro';
+import taipei101 from '../assets/images/img_taipei101_2.png';
+import iconConsultant from '../assets/images/ic_consultant.png';
+import iconHeatVision from '../assets/images/heatVision.png';
 ---
 
 <section id="consulting" class="section expertise-section bg-expertise">
@@ -10,12 +14,12 @@ import SectionTitle from './SectionTitle.astro';
         next to a CSS `background-image`, with the real <img> commented out.
         It is now a composed layer on grid columns 1-5. */}
     <div class="expertise-media">
-      <img
-        src="/images/img_taipei101_2.png"
+      <Image
+        src={taipei101}
         alt=""
         aria-hidden="true"
-        width="959"
-        height="1568"
+        widths={[640, 960]}
+        sizes="640px"
         loading="lazy"
         decoding="async"
       />
@@ -23,7 +27,9 @@ import SectionTitle from './SectionTitle.astro';
 
     <div class="card-outer" id="heatVision">
       <div class="diagonal-card diagonal-card-1" data-reveal="left">
-        <div class="card-img"><img src="/images/ic_consultant.png" alt="" aria-hidden="true" /></div>
+        <div class="card-img">
+          <Image src={iconConsultant} alt="" aria-hidden="true" width={86} height={86} densities={[1, 2]} />
+        </div>
         <div class="outer">
           <h3 class="card-title">Consulting</h3>
           <p class="card-text">
@@ -34,7 +40,9 @@ import SectionTitle from './SectionTitle.astro';
         </div>
       </div>
       <div class="diagonal-card diagonal-card-2" data-reveal="left">
-        <div class="card-img"><img src="/images/heatVision.png" alt="" aria-hidden="true" /></div>
+        <div class="card-img">
+          <Image src={iconHeatVision} alt="" aria-hidden="true" width={86} height={86} densities={[1, 2]} />
+        </div>
         <div class="outer">
           <h3 class="card-title">HeatVision<sup>&reg;</sup></h3>
           <p class="card-text">

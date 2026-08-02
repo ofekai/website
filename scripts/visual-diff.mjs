@@ -30,6 +30,8 @@ const PROJECT_ROOT = path.join(SCRIPT_DIR, '..');
 const DIST_DIR = path.join(PROJECT_ROOT, 'dist');
 const LEGACY_DIR = path.join(PROJECT_ROOT, '_legacy');
 const PUBLIC_IMAGES_DIR = path.join(PROJECT_ROOT, 'public', 'images');
+const ASSET_IMAGES_DIR = path.join(PROJECT_ROOT, 'src', 'assets', 'images');
+const ICONS_DIR = path.join(PROJECT_ROOT, 'src', 'icons');
 const OUT_DIR = path.join(PROJECT_ROOT, '.visual-diff');
 
 const WIDTHS = [1440, 1200, 1100, 1000, 900, 868, 768, 425];
@@ -46,7 +48,18 @@ function staticServer(rootDir, { legacyImageFallback = false } = {}) {
     if (reqPath === '/') reqPath = '/index.html';
     let filePath = path.join(rootDir, reqPath);
     if (legacyImageFallback && reqPath.startsWith('/images/') && !existsSync(filePath)) {
-      filePath = path.join(PUBLIC_IMAGES_DIR, reqPath.replace(/^\/images\//, ''));
+      const name = reqPath.replace(/^\/images\//, '');
+      // Phase 4 moved optimizable rasters to src/assets/images/ and icons to
+      // src/icons/ (stripping the `_green` suffix on the collapsed pairs) —
+      // check both so this legacy-vs-new comparison keeps working.
+      const candidates = [
+        path.join(PUBLIC_IMAGES_DIR, name),
+        path.join(ASSET_IMAGES_DIR, name),
+      ];
+      if (/^ic_/.test(name)) {
+        candidates.push(path.join(ICONS_DIR, name.replace(/^ic_/, '').replace(/_green\.svg$/, '.svg')));
+      }
+      filePath = candidates.find((c) => existsSync(c)) ?? filePath;
     }
     try {
       const data = await readFile(filePath);

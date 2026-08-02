@@ -1,15 +1,22 @@
 ---
+import { Image } from 'astro:assets';
 import SectionTitle from './SectionTitle.astro';
+import logoAnnapurna from '../assets/images/logo_Annapurna.png';
+import logoHipcam from '../assets/images/logo_Hipcam.png';
+import logoGoldtek from '../assets/images/logo_Goldtek.png';
+import logoAccton from '../assets/images/logo_Accton.png';
 
 // All four files are 114px tall, but the ink inside them measures 95 / 61 / 53
 // / 114px respectively. `--logo-scale` normalises the rendered ink height
 // against `--logo-band`: single-line wordmarks land on a common cap height,
 // the two multi-line lockups sit slightly taller so they don't read as small.
+// `height` is half the shared 114px source height so `densities={[1, 2]}`
+// never has to upscale past the original asset.
 const partners = [
-  { src: '/images/logo_Annapurna.png', alt: 'Annapurna Labs', scale: 0.9 },
-  { src: '/images/logo_Hipcam.png', alt: 'Hipcam', scale: 0.93 },
-  { src: '/images/logo_Goldtek.png', alt: 'Goldtek', scale: 1.08 },
-  { src: '/images/logo_Accton.png', alt: 'Accton', scale: 0.95 },
+  { src: logoAnnapurna, alt: 'Annapurna Labs', scale: 0.9 },
+  { src: logoHipcam, alt: 'Hipcam', scale: 0.93 },
+  { src: logoGoldtek, alt: 'Goldtek', scale: 1.08 },
+  { src: logoAccton, alt: 'Accton', scale: 0.95 },
 ];
 ---
 
@@ -20,7 +27,7 @@ const partners = [
       {
         partners.map((p) => (
           <div class="logo-item" style={`--logo-scale: ${p.scale}`}>
-            <img src={p.src} alt={p.alt} />
+            <Image src={p.src} alt={p.alt} height={57} densities={[1, 2]} />
           </div>
         ))
       }

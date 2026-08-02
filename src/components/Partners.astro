@@ -1,36 +1,76 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import SectionTitle from './SectionTitle.astro';
 import logoAnnapurna from '../assets/images/logo_Annapurna.png';
 import logoHipcam from '../assets/images/logo_Hipcam.png';
 import logoGoldtek from '../assets/images/logo_Goldtek.png';
 import logoAccton from '../assets/images/logo_Accton.png';
+import logoInventec from '../assets/images/logo_Inventec.svg';
+import logoAWS from '../assets/images/logo_AWS.svg';
 
-// All four files are 114px tall, but the ink inside them measures 95 / 61 / 53
-// / 114px respectively. `--logo-scale` normalises the rendered ink height
-// against `--logo-band`: single-line wordmarks land on a common cap height,
-// the two multi-line lockups sit slightly taller so they don't read as small.
-// `height` is half the shared 114px source height so `densities={[1, 2]}`
-// never has to upscale past the original asset.
-const partners = [
-  { src: logoAnnapurna, alt: 'Annapurna Labs', scale: 0.9 },
-  { src: logoHipcam, alt: 'Hipcam', scale: 0.93 },
-  { src: logoGoldtek, alt: 'Goldtek', scale: 1.08 },
-  { src: logoAccton, alt: 'Accton', scale: 0.95 },
+// Exact blue lockup supplied in the design reference. Wikimedia Commons hosts
+// the published SVG under CC BY-SA 3.0; keeping it remote avoids committing a
+// separately licensed copy to this repository.
+const logoUSI = 'https://upload.wikimedia.org/wikipedia/commons/7/7e/USI_Logo_blue_1200x750_20230808.svg';
+
+// The files use very different aspect ratios and amounts of internal whitespace.
+// `--logo-scale` optically normalises their visible marks inside a shared band.
+type Partner = {
+  alt: string;
+  scale: number;
+  local?: ImageMetadata;
+  remote?: string;
+};
+
+const partners: Partner[] = [
+  { local: logoAnnapurna, alt: 'Annapurna Labs', scale: 0.98 },
+  { local: logoHipcam, alt: 'Hipcam', scale: 1.05 },
+  { local: logoGoldtek, alt: 'Goldtek', scale: 1.08 },
+  { local: logoAccton, alt: 'Accton', scale: 1 },
+  { remote: logoUSI, alt: 'USI', scale: 1.05 },
+  { local: logoInventec, alt: 'Inventec', scale: 1.12 },
+  { local: logoAWS, alt: 'Amazon Web Services', scale: 0.88 },
 ];
+
+const groups = [false, true];
 ---
 
 <section id="partners" class="section partners-section" data-section>
   <div class="container grid">
-    <SectionTitle light="WHO" bold="WE TEAM UP WITH" class="partners-title" />
-    <div class="partners-strip" data-reveal-group>
+    <SectionTitle light="TRUSTED" bold="PARTNERS" class="partners-title" />
+    <div
+      class="partners-strip"
+      data-reveal="line"
+      role="region"
+      aria-label="Trusted partners. Focus to pause the moving logos."
+      tabindex="0"
+    >
+      <div class="partners-track">
       {
-        partners.map((p) => (
-          <div class="logo-item" data-reveal="rise" style={`--logo-scale: ${p.scale}`}>
-            <Image src={p.src} alt={p.alt} height={57} densities={[1, 2]} />
+        groups.map((duplicate) => (
+          <div class="partners-group" role={duplicate ? undefined : 'list'} aria-hidden={duplicate ? 'true' : undefined}>
+            {partners.map((p) => (
+              <div class="logo-item" role={duplicate ? undefined : 'listitem'} style={`--logo-scale: ${p.scale}`}>
+                {p.remote ? (
+                  <img
+                    src={p.remote}
+                    alt={duplicate ? '' : p.alt}
+                    width="240"
+                    height="120"
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  />
+                ) : p.local ? (
+                  <Image src={p.local} alt={duplicate ? '' : p.alt} height={100} />
+                ) : null}
+              </div>
+            ))}
           </div>
         ))
       }
+      </div>
     </div>
   </div>
 </section>

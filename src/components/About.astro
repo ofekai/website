@@ -1,8 +1,10 @@
 ---
+import { Image } from 'astro:assets';
 import SectionTitle from './SectionTitle.astro';
 import IconData from '../icons/data.svg';
 import IconLanguage from '../icons/language.svg';
 import IconCooperate from '../icons/cooperate.svg';
+import logoOfekDark from '../assets/images/Logo_Ofek_o.png';
 
 const features = [
   {
@@ -24,6 +26,9 @@ const features = [
   <div class="about-intro-band">
     <div class="container about-intro">
       <SectionTitle light="US," bold="IN A NUTSHELL" />
+      <div class="about-brand-mark" data-reveal="rise">
+        <Image src={logoOfekDark} alt="Ofek" width={150} height={75} />
+      </div>
       <p class="description" data-reveal="rise">
         Founded in 2020, Ofek partners with top S&P 100 companies to optimize their technology-focused
         manufacturing operations in Taiwan through tailored consultancy services. Drawing on deep

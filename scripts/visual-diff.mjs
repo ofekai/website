@@ -193,6 +193,124 @@ async function checkNavigation(browser, url) {
   return problems;
 }
 
+/** Proves the desktop landing state keeps its logo and that the hero's two
+ * visual planes travel in opposite directions during the first viewport. */
+async function checkHeroLayering(browser, url) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  const problems = [];
+  await page.goto(url, { waitUntil: 'networkidle' });
+
+  const landingLogo = await page.evaluate(() => ({
+    light: Number(getComputedStyle(document.querySelector('.logo')).opacity),
+    dark: Number(getComputedStyle(document.querySelector('.logo-dark')).opacity),
+  }));
+  if (landingLogo.light < 0.9 || landingLogo.dark > 0.1) {
+    problems.push('white desktop logo is not visible in the landing state');
+  }
+
+  await page.evaluate(() => window.scrollTo(0, window.innerHeight * 0.5));
+  await page.waitForTimeout(150);
+  const layers = await page.evaluate(() => {
+    const y = (selector) => {
+      const transform = getComputedStyle(document.querySelector(selector)).transform;
+      return transform === 'none' ? 0 : new DOMMatrix(transform).m42;
+    };
+    return { imageY: y('.hero-media img'), contentY: y('.hero-content') };
+  });
+  if (layers.imageY < 10 || layers.contentY > -10) {
+    problems.push(`hero layers do not separate during scroll (image=${layers.imageY}, content=${layers.contentY})`);
+  }
+
+  await context.close();
+  return problems;
+}
+
+/** Proves the partner rail contains one accessible seven-logo set plus one
+ * decorative duplicate, moves left under normal motion, and settles into a
+ * single static set for visitors who request reduced motion. */
+async function checkPartnerMarquee(browser, url) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  const problems = [];
+  await page.goto(url, { waitUntil: 'networkidle' });
+  await page.locator('#partners').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1200);
+
+  const revealState = await page.evaluate(() => {
+    const read = (selector) => {
+      const element = document.querySelector(selector);
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return {
+        opacity: Number(style.opacity),
+        clipPath: style.clipPath,
+        top: rect.top,
+        bottom: rect.bottom,
+      };
+    };
+    return {
+      viewportHeight: innerHeight,
+      title: read('.partners-title'),
+      strip: read('.partners-strip'),
+      underline: (() => {
+        const style = getComputedStyle(document.querySelector('.partners-title'), '::after');
+        return { width: style.width, height: style.height, backgroundColor: style.backgroundColor };
+      })(),
+    };
+  });
+  const remainsClipped = (value) => value.includes('100%');
+  if (
+    revealState.title.opacity < 0.99 ||
+    revealState.strip.opacity < 0.99 ||
+    remainsClipped(revealState.title.clipPath) ||
+    remainsClipped(revealState.strip.clipPath) ||
+    revealState.underline.width !== '96px' ||
+    revealState.underline.height !== '3px' ||
+    revealState.underline.backgroundColor === 'rgba(0, 0, 0, 0)'
+  ) {
+    problems.push(`partner reveal remains hidden after entering the viewport (${JSON.stringify(revealState)})`);
+  }
+
+  const initial = await page.evaluate(() => {
+    const track = document.querySelector('.partners-track');
+    const transform = getComputedStyle(track).transform;
+    return {
+      groups: document.querySelectorAll('.partners-group').length,
+      primaryLogos: document.querySelectorAll('.partners-group:not([aria-hidden="true"]) .logo-item').length,
+      duplicateLogos: document.querySelectorAll('.partners-group[aria-hidden="true"] .logo-item').length,
+      hasAws: Boolean(document.querySelector('.partners-group:not([aria-hidden="true"]) img[alt="Amazon Web Services"]')),
+      animationName: getComputedStyle(track).animationName,
+      x: transform === 'none' ? 0 : new DOMMatrix(transform).m41,
+    };
+  });
+  await page.waitForTimeout(300);
+  const laterX = await page.evaluate(() => {
+    const transform = getComputedStyle(document.querySelector('.partners-track')).transform;
+    return transform === 'none' ? 0 : new DOMMatrix(transform).m41;
+  });
+
+  if (initial.groups !== 2 || initial.primaryLogos !== 7 || initial.duplicateLogos !== 7 || !initial.hasAws) {
+    problems.push(`partner rail structure is incomplete (${JSON.stringify(initial)})`);
+  }
+  if (initial.animationName !== 'partners-marquee' || laterX >= initial.x - 1) {
+    problems.push(`partner rail does not move continuously left (before=${initial.x}, after=${laterX})`);
+  }
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.waitForTimeout(50);
+  const reduced = await page.evaluate(() => ({
+    animationName: getComputedStyle(document.querySelector('.partners-track')).animationName,
+    duplicateDisplay: getComputedStyle(document.querySelector('.partners-group[aria-hidden="true"]')).display,
+  }));
+  if (reduced.animationName !== 'none' || reduced.duplicateDisplay !== 'none') {
+    problems.push(`reduced-motion partner fallback is not static (${JSON.stringify(reduced)})`);
+  }
+
+  await context.close();
+  return problems;
+}
+
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
@@ -239,6 +357,8 @@ async function main() {
 
   const noJsProblems = await checkNoJs(browser, url);
   const navigationProblems = await checkNavigation(browser, url);
+  const heroProblems = await checkHeroLayering(browser, url);
+  const partnerProblems = await checkPartnerMarquee(browser, url);
 
   await browser.close();
   distServer.close();
@@ -258,11 +378,19 @@ async function main() {
   console.log('\n=== Navigation interactions ===');
   console.log(navigationProblems.length ? navigationProblems.join('\n') : 'mobile menu, focus, active state and progress pass');
 
+  console.log('\n=== Hero layering ===');
+  console.log(heroProblems.length ? heroProblems.join('\n') : 'landing logo and differential image/text scroll pass');
+
+  console.log('\n=== Partner rail ===');
+  console.log(partnerProblems.length ? partnerProblems.join('\n') : 'seven-logo continuous marquee and reduced-motion fallback pass');
+
   const failed =
     overflow.some((r) => r.overflow > 0) ||
     issues.length > 0 ||
     noJsProblems.length > 0 ||
-    navigationProblems.length > 0;
+    navigationProblems.length > 0 ||
+    heroProblems.length > 0 ||
+    partnerProblems.length > 0;
   process.exit(failed ? 1 : 0);
 }
 

@@ -30,14 +30,15 @@ The previous technical-grid direction is superseded. The design now combines:
       headline typography and a thin outline CTA.
 - [x] Add finite load motion, restrained image depth on scroll, content fade on exit, and a fully
       static reduced-motion state.
-- [x] Hide the desktop logo over the opening hero and reveal it in the compact white scrolled nav;
-      keep a visible logo on mobile.
+- [x] Keep the white Ofek logo visible over the opening hero, then switch to the dark logo in the
+      compact white scrolled navigation.
 - [x] Rebuild About as a white editorial intro band followed by a pale-grey three-column feature
       band with rules instead of cards.
 - [x] Rebuild Expertise as alternating full-width image/content bands: a light Consulting stripe
       and reversed dark HeatVision stripe.
-- [x] Keep Partners as a compact technical logo rail with consistent optical sizing and
-      grayscale-to-brand interaction.
+- [x] Present Partners under a two-line “Trusted Partners” heading as a larger continuous
+      right-to-left logo rail, with consistent optical sizing, grayscale-to-brand interaction,
+      pause-on-hover, and a static reduced-motion grid.
 - [x] Keep the footer as a clean charcoal closing stripe with the existing information and mailto
       flow.
 

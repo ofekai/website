@@ -1,0 +1,37 @@
+---
+import SectionTitle from './SectionTitle.astro';
+---
+
+<section id="consulting" class="section expertise-section bg-expertise">
+  <div class="container">
+    <div class="grid-3">
+      <SectionTitle light="OUR" bold="EXPERTISE AND INTELLIGENCE" />
+      {/* Empty in the legacy markup: the <img> was commented out but the div
+          still reserves 640px. Phase 3 composes this layer properly. */}
+      <div class="img_taipei101"></div>
+      <div class="card-outer" id="heatVision">
+        <div class="diagonal-card-1" data-reveal="left">
+          <div class="card-img"><img src="/images/ic_consultant.png" alt="" /></div>
+          <div class="outer">
+            <h4 class="card-title">Consulting</h4>
+            <p class="card-text">
+              We leverage our technical knowledge and local ecosystem insights to drive manufacturing
+              improvements. Building long-term partnerships based on trust and transparency, creating
+              lasting value.
+            </p>
+          </div>
+        </div>
+        <div class="diagonal-card-2" data-reveal="left">
+          <div class="card-img"><img src="/images/heatVision.png" alt="" /></div>
+          <div class="outer">
+            <h4 class="card-title">HeatVision </h4>
+            <p class="card-text">
+              Our software brings real-time clarity from manufacturing to data center through big data
+              analytics and machine learning, anticipating failures and eliminating the underlying causes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

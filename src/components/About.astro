@@ -1,0 +1,43 @@
+---
+import SectionTitle from './SectionTitle.astro';
+
+const features = [
+  {
+    icon: '/images/ic_data_green.svg',
+    text: 'To build on our expertise, we harness big data and machine learning—the engine behind HeatVision®—to continuously refine the gears that drive precise production control.',
+  },
+  {
+    icon: '/images/ic_language_green.svg',
+    text: 'Our multilingual team, fluent in Mandarin, English, and several other languages, enables smooth collaboration between global customers and manufacturing counterparts.',
+  },
+  {
+    icon: '/images/ic_cooperate_green.svg',
+    text: "We prioritize, always, what's best for our partner, creating lasting value.",
+  },
+];
+---
+
+<section id="about" class="section about-section" data-reveal="up">
+  <div class="container grid-2">
+    <div class="text-content">
+      <SectionTitle light="US," bold="IN A NUTSHELL" />
+      <p class="description">
+        Founded in 2020, Ofek partners with top S&P 100 companies to optimize their technology-focused
+        manufacturing operations in Taiwan through tailored consultancy services. Drawing on deep
+        knowledge of Taiwan&rsquo;s supply chain and our engineering expertise, we build strong relationships
+        with local manufacturers, helping partners navigate technical, cultural, and regional challenges
+        for smoother operations.
+      </p>
+    </div>
+    <div class="feature-grid">
+      {
+        features.map(({ icon, text }, i) => (
+          <div class="feature-card" data-reveal="right" style={`--reveal-delay: ${i * 200}ms`}>
+            <div class="feature-num"><img src={icon} alt="" /></div>
+            <div class="feature-label">{text}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

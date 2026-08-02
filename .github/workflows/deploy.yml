@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+# NOT ACTIVE until the Pages source is switched from branch-serving to
+# "GitHub Actions" in Settings → Pages. After the first Actions run, re-check
+# that the custom domain is still www.ofektaiwan.com and that "Enforce HTTPS"
+# is still ticked — switching the source can silently clear both.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let an in-flight deploy finish rather than cancelling it mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Build
+        uses: withastro/action@v6
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

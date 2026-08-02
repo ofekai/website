@@ -1,0 +1,24 @@
+---
+import { navLinks } from '../data/site';
+---
+
+<nav id="navbar" class="navbar">
+  <div class="nav-container">
+    <div class="logo"><img src="/images/Logo_Ofek.png" alt="" /></div>
+    <div class="logo-dark"><img src="/images/Logo_Ofek_o.png" alt="" /></div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open Menu">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="icon"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+    <div class="nav-links" id="nav-links">
+      {navLinks.map(({ label, href }) => <a href={href}>{label}</a>)}
+    </div>
+  </div>
+</nav>

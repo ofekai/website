@@ -1,23 +1,27 @@
 /* ==========================================================================
-   Phase 2: tokenized, semantically corrected version of the Phase 1 parity
-   port. Layout is unchanged from Phase 1 except where noted below —
-   Phase 3 owns the editorial-grid rework.
+   Phase 3: composition elevation.
 
-   Structural/a11y changes made here:
-   - `.bg-expertise` no longer pins a fixed `height`; `min-height` lets the
-     box grow with content instead of clipping it.
-   - The `®` glyph is no longer a `left: 122px`-positioned `::after` hack —
-     it is now a real `<sup>` in Expertise.astro's markup.
-   - `.logo`/`.logo-dark` no longer carry font-size/font-weight/letter-spacing:
-     both wrap an `<img>` with no text content, so those declarations were
-     dead weight.
-   - Weight remap: Lato ships 100/300/400/700/900 only, so 200/500/600 were
-     always synthesized fake bold. `.title-light` 200->300, `.title-bold` and
-     `.card-title` ->700, `.nav-links` 500->400.
-   - Dead rules removed: `.sub-title`, `.partners-label`, `.push-down` (unused
-     in markup), and the `grid-template-columns` overrides on `.grid-2`,
-     `.grid-3`, `.feature-grid` (all three are `display: flex`, so those rules
-     never did anything).
+   The brand language is unchanged — teal #4DA7A8, ink #1A1B1F, Lato, the
+   diagonal clip-path cards, the split light/bold uppercase headings. What
+   changed is the *composition*: a single 12-column editorial grid on
+   --container replaces the ad-hoc `.grid-2 { width: 800px }` / `.card-outer
+   { padding-left: 30% }` / `.partners-logo-flex { width: 80% }` layout, and
+   vertical rhythm comes from --section-y rather than four hand-tuned
+   breakpoints.
+
+   Tokens Phase 2 defined and left unused are all wired here:
+   - --gutter      page padding on every .container, and the basis of --grid-gap
+   - --section-y   vertical rhythm of every section and of the footer
+   - --measure     caps the About description and feature copy at a readable line
+   - --rule-thick  the teal seam under card 1 *and* card 2's overlap, one number
+   - --card-notch  the diagonal notch, in fixed px so the angle is 45deg at
+                   every viewport instead of scaling with `polygon(7% 0, ...)`
+
+   Removed magic numbers: `.bg-expertise { min-height: 1170px }`,
+   `.card-outer { padding-left: 30% }` + `.diagonal-card-1 { margin-left: 120px }`,
+   `border-bottom: 10px` / `margin-top: -10px` written out twice, and the
+   `.grid-3 .img_taipei101 { width: 640px }` spacer that reserved room for a
+   commented-out image.
    ========================================================================== */
 
 @import './tokens.css';
@@ -39,13 +43,28 @@
     color: var(--color-text);
   }
 
-  .container {
-    margin: 0 auto;
-  }
-
   :focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
+  }
+
+  /* --- The editorial grid -------------------------------------------------
+     `.container` owns the page rail: a --container-wide content box with
+     --gutter of air on each side. `.grid` lays 12 equal columns inside it.
+     Every section, the nav and the footer share this one rail, so the logo,
+     the hero headline, each section title and the footer brand all start on
+     the same vertical line at every width. */
+  .container {
+    width: 100%;
+    max-width: calc(var(--container) + var(--gutter) * 2);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
   }
 }
 
@@ -55,14 +74,15 @@
     position: fixed;
     width: 100%;
     z-index: 1000;
-    padding: 1.25rem 1.5rem;
+    padding-block: 1.25rem;
     color: white;
-    transition: all var(--dur-base) ease;
+    transition:
+      background-color var(--dur-base) ease,
+      box-shadow var(--dur-base) ease,
+      padding var(--dur-base) ease;
   }
 
   .nav-container {
-    max-width: var(--container);
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -101,7 +121,7 @@
   .nav-scrolled {
     background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 1rem 1.5rem;
+    padding-block: 1rem;
     color: #000000;
   }
 
@@ -135,44 +155,80 @@
     height: 1.5rem;
   }
 
-  /* --- Hero --- */
+  /* --- Hero ---------------------------------------------------------------
+     The banner is a real <img> layer rather than a CSS background-image, so
+     the browser can treat it as the LCP candidate it actually is (and honour
+     `fetchpriority`), Phase 4 can swap it for <Picture> in place, and Phase 6
+     has a concrete element to parallax. `isolation: isolate` keeps the two
+     negative-z layers inside the hero's own stacking context. */
   .hero {
-    min-height: 100vh;
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    text-align: center;
-    padding: 0 1.5rem;
-    position: relative;
+    padding-block: calc(var(--nav-h) + var(--space-8)) calc(var(--space-12) + var(--space-6));
   }
 
-  .bg-hero {
-    background-image: url('/images/Banner.png');
-    background-size: cover;
-    background-position: center;
+  .hero-media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    /* Dominant colour of the banner, so the hero never flashes white before
+       the image decodes. Phase 4 refines this alongside <Picture>. */
+    background-color: #2b2d31;
+  }
+
+  .hero-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Two gradients: a left-to-right wash that buys contrast for the headline
+     on the grid's left rail, and a foot vignette that seats the scroll
+     indicator and the section boundary below it. */
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(
+        100deg,
+        rgb(26 27 31 / 72%) 0%,
+        rgb(26 27 31 / 44%) 38%,
+        rgb(26 27 31 / 8%) 72%,
+        rgb(26 27 31 / 0%) 100%
+      ),
+      linear-gradient(to top, rgb(26 27 31 / 45%) 0%, rgb(26 27 31 / 0%) 30%);
   }
 
   .hero-content {
-    display: flex;
-    justify-content: left;
-    flex-direction: column;
+    grid-column: 1 / 9;
     color: white;
-    max-width: 1000px;
+  }
+
+  /* Eyebrow. Deliberately a rule and not a word: every string on this page is
+     byte-identical to the legacy markup, so there is no copy to put here. */
+  .hero-content::before {
+    content: '';
+    display: block;
+    inline-size: var(--space-10);
+    block-size: 2px;
+    background: var(--color-accent);
+    margin-block-end: var(--space-6);
   }
 
   .hero-title {
     font-size: var(--step-4);
     font-weight: 400;
-    margin-bottom: 1.5rem;
-    text-align: left;
-  }
-
-  .hero-subtitle {
-    font-size: var(--step-2);
-    font-weight: 300;
-    margin-bottom: 2.5rem;
-    opacity: 0.9;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin-block-end: var(--space-7);
   }
 
   .btn-outline {
@@ -201,11 +257,14 @@
     height: 1.2rem;
   }
 
-  .scroll-indicator {
+  /* On the same rail as the headline and the CTA, not centred in the
+     viewport — `left: 0; right: 0` plus the container's max-width and auto
+     inline margins reproduce the rail while absolutely positioned. */
+  .hero-scroll {
     position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    bottom: var(--space-8);
     color: white;
   }
 
@@ -226,55 +285,43 @@
     }
   }
 
-  /* --- Other sections --- */
+  /* --- Section shell --- */
   .section {
-    padding: 6rem 0;
-    overflow-x: hidden;
+    padding-block: var(--section-y);
+    overflow-x: clip;
   }
 
-  .grid-2 {
-    width: 800px;
-    max-width: 90%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .grid-3 {
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  .grid-3 .img_taipei101 {
-    width: 640px;
-    max-width: 640px;
-  }
-
+  /* --- Section title --- */
   .main-title {
     font-size: var(--step-3);
-    margin: 1.5rem 0;
-    text-align: center;
+    line-height: 1.15;
+    text-align: left;
+    color: var(--ink-900);
+    margin-block-end: var(--space-7);
   }
 
   .main-title .title-light {
-    font-size: var(--step-3);
     position: relative;
     font-weight: 300;
   }
 
+  /* Phase 2 kept the gap as a literal text node plus `margin-left: 12px`.
+     The text node stays (screen readers need the word boundary) but the
+     visual gap is now em-based, so it tracks the fluid --step-3 size and
+     leaves room for the arrow glyph at every width. See plan risk R3. */
   .main-title .title-bold {
-    font-size: var(--step-3);
     font-weight: 700;
-    margin-left: 12px;
+    margin-inline-start: 0.28em;
   }
 
   .title-light::after {
     display: inline-flex;
     content: '';
-    width: 24px;
-    height: 24px;
+    inline-size: 0.55em;
+    block-size: 0.55em;
     position: absolute;
-    right: -20px;
-    top: -12px;
+    right: -0.42em;
+    top: -0.3em;
     background: url('/images/Ofek_arrow.svg') no-repeat center / contain;
   }
 
@@ -282,83 +329,148 @@
     font-size: var(--step-1);
     color: var(--color-text);
     line-height: 1.8;
+    max-width: var(--measure);
+  }
+
+  /* --- About --------------------------------------------------------------
+     Asymmetric split: the intro holds columns 1-5, the feature list holds
+     7-12, and column 6 is left empty as the seam between them. Replaces
+     `.grid-2 { width: 800px; max-width: 90% }`, which centred an 800px block
+     regardless of viewport and left the feature cards floating inside it. */
+  .about-grid {
+    row-gap: var(--space-9);
+    align-items: start;
+  }
+
+  .about-intro {
+    grid-column: 1 / 6;
   }
 
   .feature-grid {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    width: 100%;
+    grid-column: 7 / -1;
   }
 
   .feature-card {
-    display: flex;
-    justify-content: flex-start;
-    background: white;
-    padding: 2rem 0px;
+    display: grid;
+    grid-template-columns: var(--feature-icon) 1fr;
+    column-gap: var(--space-5);
+    align-items: start;
+    padding-block: var(--space-6);
+    border-block-start: 1px solid var(--color-hairline-ink);
+    --feature-icon: 40px;
+  }
+
+  .feature-card:last-child {
+    border-block-end: 1px solid var(--color-hairline-ink);
   }
 
   .feature-num {
-    width: 48px;
-    height: 100%;
-    flex-shrink: 0;
-    margin-right: 24px;
+    inline-size: var(--feature-icon);
+    /* Optically centres the icon on the first line of copy rather than
+       hanging it off the text's cap height (line-height is 1.8em). */
+    margin-block-start: calc((1.8em - var(--feature-icon)) / 2);
   }
 
   .feature-label {
     font-size: var(--step-1);
     font-weight: 400;
+    line-height: 1.8;
+    max-width: var(--measure);
   }
 
+  /* --- Expertise ----------------------------------------------------------
+     The Taipei 101 photograph is a real <img> on the grid (columns 1-5)
+     instead of a `background-image` behind an empty 640px spacer div, so it
+     scales with the grid and can be optimised in Phase 4.
+
+     The card stack occupies the same grid row and spans the full 12 columns,
+     with each card placed on its own span: card 1 on 5-12, card 2 on 4-11.
+     That single declaration replaces `padding-left: 30%` + `margin-left:
+     120px`, which between ~1045px and ~1200px squeezed the cards into a
+     narrow column, and it keeps the two-card offset proportional to the grid
+     rather than to a fixed pixel value. */
   .bg-expertise {
-    position: relative;
-    min-height: 1170px;
     background-color: var(--color-surface-dark);
-    background-size: 640px;
-    background-position: center;
     color: white;
-    padding: 60px 0 180px;
-    background-image: url('/images/img_taipei101_2.png');
-    background-position: 0% 0%;
-    background-repeat: no-repeat;
+  }
+
+  .bg-expertise .main-title {
+    color: white;
+  }
+
+  .expertise-grid {
+    row-gap: var(--space-10);
+  }
+
+  .expertise-grid .main-title {
+    grid-column: 1 / -1;
+  }
+
+  .expertise-media {
+    position: relative;
+    grid-column: 1 / 6;
+    grid-row: 2;
+    align-self: stretch;
+    min-block-size: 420px;
+    overflow: hidden;
+  }
+
+  .expertise-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 55% 40%;
   }
 
   .card-outer {
-    margin-top: 70px;
-    padding-left: 30%;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    align-content: start;
+  }
+
+  .diagonal-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-6);
+    align-items: center;
+    padding: var(--card-pad-y) var(--card-pad-x);
+    border: 1px solid var(--color-hairline);
+    /* Fixed-px notch via clamp: the diagonal is a true 45deg at every
+       viewport, so the two cards' angles agree. `polygon(7% 0, ...)` made the
+       angle a function of card width and the two never matched. */
+    --card-pad-y: clamp(2.5rem, 5.5vw, 5.5rem);
+    --card-pad-x: clamp(1.75rem, 4vw, 4.5rem);
   }
 
   .diagonal-card-1 {
+    /* Paint order is declared, not inherited from whatever transform happens
+       to be on the element. Phase 1 relied on an unconditional
+       `translate3d(0,0,0)` to reproduce AOS's stacking context; an explicit
+       z-index pair gives the same result identically with JS on, JS off and
+       under prefers-reduced-motion. */
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 800px;
+    z-index: 1;
+    grid-column: 5 / -1;
+    grid-row: 1;
     background: var(--ink-100);
-    padding: 110px 72px;
-    border: 1px solid var(--color-hairline);
-    clip-path: polygon(7% 0, 100% 0%, 100% 100%, 0 100%, 0 13%);
-    border-bottom: solid 10px var(--color-accent);
-    margin-left: 120px;
-  }
-
-  .diagonal-card-1 .outer {
-    margin-left: 24px;
+    clip-path: polygon(var(--card-notch) 0, 100% 0, 100% 100%, 0 100%, 0 var(--card-notch));
+    border-block-end: var(--rule-thick) solid var(--color-accent);
   }
 
   .diagonal-card-2 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 800px;
+    position: relative;
+    z-index: 0;
+    grid-column: 4 / 12;
+    grid-row: 2;
     background: var(--ink-150);
-    padding: 110px 72px;
-    border: 1px solid var(--color-hairline);
-    margin-top: -10px;
-  }
-
-  .diagonal-card-2 .outer {
-    margin-left: 24px;
+    /* Exactly the depth of card 1's teal rule: the two cards meet on the
+       seam instead of leaving a gap or double-drawing an edge. */
+    margin-block-start: calc(var(--rule-thick) * -1);
   }
 
   .card-title {
@@ -377,6 +489,7 @@
     font-size: var(--step-2);
     font-weight: 300;
     color: var(--color-text);
+    max-width: var(--measure);
   }
 
   .card-img {
@@ -389,49 +502,64 @@
     display: block;
   }
 
-  /* Partners */
-  .partners-logo-flex {
-    width: 80%;
-    margin: 0 auto;
-    padding-top: 40px;
-    display: flex;
-    justify-content: space-around;
+  /* --- Partners -----------------------------------------------------------
+     All four source files are 114px tall, but the ink inside them is not:
+     Goldtek's wordmark fills 53px of it, Accton's mark fills all 114. Scaling
+     them to a common *box* width — what `space-around` across four different
+     widths did — therefore rendered them at optical heights from 35px to
+     76px. Each logo now gets a --logo-scale that normalises the ink, and an
+     equal-column grid replaces `space-around`, whose half-size end spaces
+     never aligned the strip with anything else on the page. */
+  .partners-title {
+    grid-column: 1 / -1;
+  }
+
+  .partners-strip {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    row-gap: var(--space-8);
     align-items: center;
-    flex-wrap: wrap;
+    margin-block-start: var(--space-6);
+    --logo-band: clamp(3.25rem, 4.4vw, 4rem);
   }
 
   .logo-item {
-    width: 210px;
-  }
-
-  .logo-item-amazon {
-    width: 317px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .logo-item img {
-    width: 100%;
+    inline-size: auto;
+    block-size: calc(var(--logo-band) * var(--logo-scale, 1));
+    max-inline-size: 100%;
+    object-fit: contain;
   }
 
-  /* Footer */
+  /* --- Footer -------------------------------------------------------------
+     Same 12 columns as every section above it: brand on 1-6, contact on 8-12,
+     copyright full-width under a hairline. Replaces `padding: 100px 10%` plus
+     `justify-content: space-between` on a flex row, which put the footer on a
+     different rail from the rest of the page at every width. */
   .footer {
     background: var(--color-surface-dark);
     color: white;
-    padding: 100px 10% 4px;
+    padding-block: var(--section-y) var(--space-6);
+  }
+
+  .footer-grid {
+    row-gap: var(--space-9);
+  }
+
+  .footer-brand {
+    grid-column: 1 / 7;
   }
 
   .footer-logo {
     width: 150px;
-    margin-bottom: 24px;
-  }
-
-  .footer-grid {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-
-  .footer-brand {
-    max-width: 600px;
+    margin-bottom: var(--space-5);
   }
 
   .footer-loction {
@@ -439,74 +567,100 @@
     color: var(--color-text-muted);
     margin: 8px 0;
     font-size: 13px;
+    line-height: 1.6;
   }
 
   .footer-loction > img {
     width: 16px;
     margin-right: 8px;
+    margin-top: 0.15em;
+    flex-shrink: 0;
   }
 
   .footer-links-grid {
-    width: 100%;
-    max-width: 330px;
+    grid-column: 8 / -1;
     display: flex;
-    justify-content: flex-end;
-    align-content: flex-end;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .footer-header {
     color: #ffffff;
-    font-size: 40px;
+    font-size: var(--step-3);
+    line-height: 1.15;
     text-transform: uppercase;
-  }
-
-  .footer-link-outer {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 16px;
-  }
-
-  .footer-links-grid img {
-    width: 32px;
+    margin-block-end: var(--space-4);
   }
 
   .footer-email {
     color: #ffffff;
     font-size: var(--step-2);
     font-weight: normal;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-5);
     display: block;
   }
 
+  .footer-link-outer {
+    display: block;
+    margin-block-start: var(--space-6);
+  }
+
+  .footer-links-grid img {
+    width: 32px;
+  }
+
   .copyright {
-    padding-top: 60px;
-    margin-bottom: 8px;
+    grid-column: 1 / -1;
+    border-block-start: 1px solid var(--color-hairline);
+    padding-block-start: var(--space-6);
     font-size: var(--step--1);
     text-align: left;
     color: #fff;
   }
 
-  /* RWD */
-  @media (max-width: 1044px) {
+  /* --- Responsive ---------------------------------------------------------
+     Three breakpoints instead of four, and each one now changes column spans
+     rather than re-tuning pixel paddings. */
+
+  /* Below this the five-column photo panel no longer leaves the cards a
+     usable measure, so the cards take the full rail and the photo drops. This
+     is the range (1045-1200px in the old CSS) where the card column used to
+     collapse. */
+  @media (max-width: 1000px) {
+    .expertise-media {
+      display: none;
+    }
+
+    .diagonal-card-1 {
+      grid-column: 3 / -1;
+    }
+
+    .diagonal-card-2 {
+      grid-column: 1 / 11;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .about-intro,
+    .feature-grid {
+      grid-column: 1 / -1;
+    }
+
+    .about-grid {
+      row-gap: var(--space-7);
+    }
+
+    .hero-content {
+      grid-column: 1 / -1;
+    }
+
+    .footer-brand,
     .footer-links-grid {
-      margin-top: 24px;
-      width: 100%;
-      max-width: 330px;
-      display: flex;
-      justify-content: flex-start;
-      align-content: flex-start;
-      flex-wrap: wrap;
-      flex-direction: column;
+      grid-column: 1 / -1;
     }
 
-    .card-outer {
-      padding-left: 10%;
-    }
-
-    .footer-link-outer {
-      justify-content: flex-start;
+    .footer-grid {
+      row-gap: var(--space-8);
     }
   }
 
@@ -535,92 +689,37 @@
     .nav-links a {
       color: #111827;
     }
-
-    .diagonal-card-1 {
-      margin-left: 0px;
-      padding: 60px 60px;
-    }
-
-    .diagonal-card-2 {
-      margin-left: 0px;
-      padding: 60px 60px;
-    }
-
-    .partners-logo-flex {
-      width: 60%;
-    }
-
-    .logo-item {
-      margin-top: 24px;
-    }
   }
 
   @media (max-width: 768px) {
-    .footer-header {
-      font-size: 32px;
-    }
-
-    .footer-email {
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .diagonal-card-1 {
-      display: block;
-      margin-left: 0px;
-      padding: 40px 40px;
-    }
-
+    .diagonal-card-1,
     .diagonal-card-2 {
-      display: block;
-      margin-left: 0px;
-      padding: 40px 40px;
+      grid-column: 1 / -1;
     }
 
-    .card-outer {
-      padding: 0 4%;
+    .diagonal-card {
+      grid-template-columns: 1fr;
+      row-gap: var(--space-5);
+      align-items: start;
     }
 
     .card-text {
       font-size: var(--step-1);
-      font-weight: 300;
-      color: var(--color-text);
     }
 
-    .diagonal-card-1 .outer {
-      margin: 0;
-    }
-
-    .diagonal-card-2 .outer {
-      margin: 0;
-    }
-
-    .card-title {
-      margin: 24px 0;
-    }
-
-    .bg-expertise {
-      background-image: none;
-    }
-
-    .partners-logo-flex {
-      width: 80%;
+    .partners-strip {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 425px) {
+  @media (max-width: 480px) {
     .feature-card {
-      justify-content: center;
-      flex-direction: column;
+      grid-template-columns: 1fr;
+      row-gap: var(--space-4);
     }
 
     .feature-num {
-      flex-shrink: 1;
-      margin: 0 auto;
-    }
-
-    .logo-item {
-      margin-top: 32px;
+      margin-block-start: 0;
     }
   }
 }
@@ -631,18 +730,14 @@
    Initial states are gated on `html.js` so the page renders fully visible
    when JS is off or the module fails to load, and on `no-preference` so
    reduced-motion users never get a hidden initial state at all.
-   Offsets mirror AOS's defaults (100px) for Phase 1 parity; Phase 5 retunes.
+
+   Phase 1's unconditional `[data-reveal] { transform: translate3d(0,0,0) }`
+   is gone. It existed only to reproduce the stacking context AOS left behind,
+   which is what hid all but a stub of card 1's teal rule. The expertise cards
+   now declare their paint order with z-index (see .diagonal-card-1), so the
+   three renders — JS on, JS off, reduced motion — are identical without it.
    ========================================================================== */
 @layer utilities {
-  /* Applied unconditionally — not gated on `html.js` or on a motion preference.
-     A zero transform is visually inert, but it creates the stacking context that
-     AOS used to create, and the .diagonal-card-2 / .diagonal-card-1 overlap
-     depends on it (see the note below). Gating this would give reduced-motion
-     and no-JS visitors a different design from everyone else. */
-  [data-reveal] {
-    transform: translate3d(0, 0, 0);
-  }
-
   @media (prefers-reduced-motion: no-preference) {
     html.js [data-reveal] {
       opacity: 0;
@@ -675,13 +770,6 @@
       transform: perspective(2500px) rotateX(-100deg);
     }
 
-    /* translate3d(0,0,0) rather than `none` is deliberate. AOS left a
-       zero-transform on every animated element, and a non-`none` transform
-       creates a stacking context — which is why .diagonal-card-2 currently
-       paints over .diagonal-card-1 and hides all but the right-hand stub of
-       its 10px teal border-bottom. `none` would remove that stacking context
-       and reveal the full bar, i.e. change the design. Phase 3 reworks this
-       overlap intentionally; until then, parity wins. */
     html.js [data-reveal].is-revealed {
       opacity: 1;
       transform: translate3d(0, 0, 0);

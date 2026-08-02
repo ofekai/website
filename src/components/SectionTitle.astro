@@ -2,14 +2,16 @@
 interface Props {
   light: string;
   bold: string;
+  class?: string;
 }
 
-const { light, bold } = Astro.props;
+const { light, bold, class: className } = Astro.props;
 ---
 
-{/* The literal space between the spans is load-bearing today; `.title-bold`
-    also carries margin-left. Phase 3 moves this spacing fully into CSS. */}
-<h2 class="main-title">
+{/* The gap between the two spans is CSS (`.title-bold { margin-inline-start }`),
+    not the text node — Astro 7 strips whitespace with JSX rules, see plan risk
+    R3. The `{' '}` stays only so screen readers still hear a word boundary. */}
+<h2 class:list={['main-title', className]}>
   <span class="title-light">{light}</span>{' '}
   <span class="title-bold">{bold}</span>
 </h2>

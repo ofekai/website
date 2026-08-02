@@ -28,6 +28,10 @@
     --color-accent-hover: var(--teal-400);
     --color-accent-active: var(--teal-600);
     --color-hairline: rgb(255 255 255 / 20%);
+    /* Light-surface counterpart to --color-hairline. Phase 3's About section
+       separates the feature cards with rules on a white background, where the
+       white hairline is invisible. */
+    --color-hairline-ink: rgb(26 27 31 / 14%);
     --color-focus: var(--teal-600);
 
     /* --- Type, fluid scale ---
@@ -59,6 +63,9 @@
     --section-y: clamp(4rem, 8vw, 7.5rem);
     --container: 1200px;
     --measure: 68ch;
+    /* Column gap of the 12-column editorial grid. Half the page gutter, so the
+       outer margin always reads as wider than any gap inside the grid. */
+    --grid-gap: calc(var(--gutter) / 2);
 
     /* --- Shape --- */
     --radius-md: 8px;

@@ -1,19 +1,29 @@
 ---
 import SectionTitle from './SectionTitle.astro';
 
+// All four files are 114px tall, but the ink inside them measures 95 / 61 / 53
+// / 114px respectively. `--logo-scale` normalises the rendered ink height
+// against `--logo-band`: single-line wordmarks land on a common cap height,
+// the two multi-line lockups sit slightly taller so they don't read as small.
 const partners = [
-  { src: '/images/logo_Annapurna.png', alt: 'Annapurna Labs', class: 'logo-item logo-item-amazon' },
-  { src: '/images/logo_Hipcam.png', alt: 'Hipcam', class: 'logo-item' },
-  { src: '/images/logo_Goldtek.png', alt: 'Goldtek', class: 'logo-item' },
-  { src: '/images/logo_Accton.png', alt: 'Accton', class: 'logo-item' },
+  { src: '/images/logo_Annapurna.png', alt: 'Annapurna Labs', scale: 0.9 },
+  { src: '/images/logo_Hipcam.png', alt: 'Hipcam', scale: 0.93 },
+  { src: '/images/logo_Goldtek.png', alt: 'Goldtek', scale: 1.08 },
+  { src: '/images/logo_Accton.png', alt: 'Accton', scale: 0.95 },
 ];
 ---
 
 <section id="partners" class="section partners-section">
-  <div class="container text-center">
-    <SectionTitle light="WHO" bold="WE TEAM UP WITH" />
-    <div class="partners-logo-flex" data-reveal="down">
-      {partners.map((p) => <div class={p.class}><img src={p.src} alt={p.alt} /></div>)}
+  <div class="container grid">
+    <SectionTitle light="WHO" bold="WE TEAM UP WITH" class="partners-title" />
+    <div class="partners-strip" data-reveal="down">
+      {
+        partners.map((p) => (
+          <div class="logo-item" style={`--logo-scale: ${p.scale}`}>
+            <img src={p.src} alt={p.alt} />
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

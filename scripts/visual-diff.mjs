@@ -71,6 +71,32 @@ const FREEZE_CSS = `
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
 `;
 
+/**
+ * A fullPage screenshot never scrolls the page for real, so `loading="lazy"`
+ * images below the fold are still unresolved when the capture happens and
+ * come out blank. Walk the page once, then wait for every <img> to decode.
+ */
+async function scrollThrough(page) {
+  await page.evaluate(async () => {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const step = window.innerHeight;
+    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await sleep(60);
+    }
+    // Settle at the bottom before returning to the top: a lazy <img> that is
+    // out of viewport again may never resolve `decode()`, so wait for the
+    // loads while they are still in view, and cap the wait either way.
+    const pending = [...document.images].filter((i) => !i.complete);
+    await Promise.race([
+      Promise.all(pending.map((i) => i.decode().catch(() => {}))),
+      sleep(4000),
+    ]);
+    window.scrollTo(0, 0);
+    await sleep(100);
+  });
+}
+
 async function forceReveal(page, label) {
   if (label === 'new') {
     await page.evaluate(() => {
@@ -113,9 +139,14 @@ async function main() {
       page.on('response', (res) => { if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`); });
 
       await page.goto(url, { waitUntil: 'networkidle' });
+      await scrollThrough(page);
       await page.addStyleTag({ content: FREEZE_CSS });
       await forceReveal(page, label);
-      await page.waitForTimeout(100);
+      // Back to the top after scrollThrough: the fixed navbar is painted at
+      // the current scroll offset in a fullPage capture, so a stray offset
+      // stamps the nav across the middle of the screenshot.
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(200);
 
       const { scrollWidth, clientWidth } = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,

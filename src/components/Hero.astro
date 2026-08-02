@@ -2,14 +2,33 @@
 import ButtonOutline from './ButtonOutline.astro';
 ---
 
-<section class="hero bg-hero">
-  <div class="hero-content">
-    <h1 class="hero-title" data-reveal="flip-up">
-      TRUSTED INSIGHTS INTO FRONTIER COMPUTE MANUFACTURING
-    </h1>
-    <ButtonOutline href="#contact" />
+{/* Real <img> layer rather than `.bg-hero { background-image }`: it is the
+    genuine LCP element, `fetchpriority` applies to it, and Phase 6 has
+    something concrete to parallax. Phase 4 replaces this with <Picture>. */}
+<section class="hero">
+  <div class="hero-media">
+    <img
+      src="/images/Banner.png"
+      alt=""
+      aria-hidden="true"
+      width="2880"
+      height="1600"
+      fetchpriority="high"
+      decoding="async"
+    />
   </div>
-  <div class="scroll-indicator">
+  <div class="hero-scrim" aria-hidden="true"></div>
+
+  <div class="container grid">
+    <div class="hero-content">
+      <h1 class="hero-title" data-reveal="flip-up">
+        TRUSTED INSIGHTS INTO FRONTIER COMPUTE MANUFACTURING
+      </h1>
+      <ButtonOutline href="#contact" />
+    </div>
+  </div>
+
+  <div class="hero-scroll container">
     <a href="#about" aria-label="Scroll to About Us"><img class="floating-arrow" src="/images/ic_arrow.svg" alt="" aria-hidden="true" /></a>
   </div>
 </section>

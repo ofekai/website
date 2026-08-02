@@ -3,33 +3,44 @@ import SectionTitle from './SectionTitle.astro';
 ---
 
 <section id="consulting" class="section expertise-section bg-expertise">
-  <div class="container">
-    <div class="grid-3">
-      <SectionTitle light="OUR" bold="EXPERTISE AND INTELLIGENCE" />
-      {/* Empty in the legacy markup: the <img> was commented out but the div
-          still reserves 640px. Phase 3 composes this layer properly. */}
-      <div class="img_taipei101"></div>
-      <div class="card-outer" id="heatVision">
-        <div class="diagonal-card-1" data-reveal="left">
-          <div class="card-img"><img src="/images/ic_consultant.png" alt="" aria-hidden="true" /></div>
-          <div class="outer">
-            <h3 class="card-title">Consulting</h3>
-            <p class="card-text">
-              We leverage our technical knowledge and local ecosystem insights to drive manufacturing
-              improvements. Building long-term partnerships based on trust and transparency, creating
-              lasting value.
-            </p>
-          </div>
+  <div class="container grid expertise-grid">
+    <SectionTitle light="OUR" bold="EXPERTISE AND INTELLIGENCE" />
+
+    {/* Phase 1/2 carried the legacy shape here: an empty div reserving 640px
+        next to a CSS `background-image`, with the real <img> commented out.
+        It is now a composed layer on grid columns 1-5. */}
+    <div class="expertise-media">
+      <img
+        src="/images/img_taipei101_2.png"
+        alt=""
+        aria-hidden="true"
+        width="959"
+        height="1568"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+
+    <div class="card-outer" id="heatVision">
+      <div class="diagonal-card diagonal-card-1" data-reveal="left">
+        <div class="card-img"><img src="/images/ic_consultant.png" alt="" aria-hidden="true" /></div>
+        <div class="outer">
+          <h3 class="card-title">Consulting</h3>
+          <p class="card-text">
+            We leverage our technical knowledge and local ecosystem insights to drive manufacturing
+            improvements. Building long-term partnerships based on trust and transparency, creating
+            lasting value.
+          </p>
         </div>
-        <div class="diagonal-card-2" data-reveal="left">
-          <div class="card-img"><img src="/images/heatVision.png" alt="" aria-hidden="true" /></div>
-          <div class="outer">
-            <h3 class="card-title">HeatVision<sup>&reg;</sup></h3>
-            <p class="card-text">
-              Our software brings real-time clarity from manufacturing to data center through big data
-              analytics and machine learning, anticipating failures and eliminating the underlying causes.
-            </p>
-          </div>
+      </div>
+      <div class="diagonal-card diagonal-card-2" data-reveal="left">
+        <div class="card-img"><img src="/images/heatVision.png" alt="" aria-hidden="true" /></div>
+        <div class="outer">
+          <h3 class="card-title">HeatVision<sup>&reg;</sup></h3>
+          <p class="card-text">
+            Our software brings real-time clarity from manufacturing to data center through big data
+            analytics and machine learning, anticipating failures and eliminating the underlying causes.
+          </p>
         </div>
       </div>
     </div>

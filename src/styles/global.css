@@ -77,9 +77,9 @@
     padding-block: 1.25rem;
     color: white;
     transition:
-      background-color var(--dur-base) ease,
-      box-shadow var(--dur-base) ease,
-      padding var(--dur-base) ease;
+      background-color var(--dur-base) var(--ease-out-quart),
+      box-shadow var(--dur-base) var(--ease-out-quart),
+      padding var(--dur-base) var(--ease-out-quart);
   }
 
   .nav-container {
@@ -111,7 +111,7 @@
 
   .nav-links a {
     color: white;
-    transition: color var(--dur-base) ease;
+    transition: color var(--dur-base) var(--ease-out-quart);
   }
 
   .nav-links a:hover {
@@ -243,7 +243,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    transition: var(--dur-base);
+    transition: var(--dur-base) var(--ease-out-quart);
     border-radius: var(--radius-md);
   }
 
@@ -269,7 +269,7 @@
   }
 
   .floating-arrow {
-    animation: breathing 2s ease-in-out infinite;
+    animation: breathing var(--dur-breathe) ease-in-out infinite;
   }
 
   @keyframes breathing {
@@ -727,11 +727,20 @@
 }
 
 /* ==========================================================================
-   Scroll reveal — replaces AOS 2.3.4 and the old .fade-in-section block.
+   Scroll reveal — Phase 5. Motion (src/scripts/motion.ts) owns the actual
+   animation for every value except `flip-up`; this block only supplies the
+   pre-JS/no-JS/reduced-motion hidden state so there's no flash of visible
+   content before the script runs.
 
    Initial states are gated on `html.js` so the page renders fully visible
    when JS is off or the module fails to load, and on `no-preference` so
    reduced-motion users never get a hidden initial state at all.
+
+   No blanket `transition` here: Motion sets opacity/transform via inline
+   style directly, and a CSS transition on the same properties would race it,
+   producing a visible double-animation. `flip-up` (Hero only, Phase 6
+   territory) is the one value still driven by a CSS transition + the
+   `.is-revealed` class, so it keeps its own transition below.
 
    Phase 1's unconditional `[data-reveal] { transform: translate3d(0,0,0) }`
    is gone. It existed only to reproduce the stacking context AOS left behind,
@@ -747,31 +756,27 @@
          their own compositing layer, which switches text antialiasing from
          subpixel to grayscale and visibly changes every heading and paragraph
          inside a revealed block. AOS did not set it either. */
-      transition:
-        opacity var(--reveal-duration, var(--dur-reveal)) ease-out var(--reveal-delay, 0ms),
-        transform var(--reveal-duration, var(--dur-reveal)) ease-out var(--reveal-delay, 0ms);
     }
 
-    html.js [data-reveal='up'] {
-      transform: translate3d(0, 20px, 0);
+    html.js [data-reveal]:not([data-reveal='diagonal']):not([data-reveal='flip-up']) {
+      transform: translateY(24px);
     }
 
-    html.js [data-reveal='down'] {
-      transform: translate3d(0, -100px, 0);
-    }
-
-    html.js [data-reveal='left'] {
-      transform: translate3d(100px, 0, 0);
-    }
-
-    html.js [data-reveal='right'] {
-      transform: translate3d(-100px, 0, 0);
+    html.js [data-reveal='diagonal'] {
+      transform: translate3d(32px, 16px, 0);
     }
 
     html.js [data-reveal='flip-up'] {
       transform: perspective(2500px) rotateX(-100deg);
+      transition:
+        opacity var(--dur-reveal) var(--ease-out-expo),
+        transform var(--dur-reveal) var(--ease-out-expo);
     }
 
+    /* Instant settle. Motion sets final inline styles directly and never
+       adds this class in production; it exists for the flip-up legacy path
+       and so scripts/visual-diff.mjs can force pre-scroll elements visible
+       for screenshotting. */
     html.js [data-reveal].is-revealed {
       opacity: 1;
       transform: translate3d(0, 0, 0);

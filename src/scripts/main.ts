@@ -1,5 +1,5 @@
 import { initNav } from './nav';
-import { initReveal } from './reveal';
+import { initMotion } from './motion';
 
 initNav();
-initReveal();
+initMotion();

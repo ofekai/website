@@ -8,8 +8,8 @@ import IconLinkedin from '../icons/linkedin.svg';
 ---
 
 <footer id="contact" class="footer">
-  <div class="container grid footer-grid">
-    <div class="footer-brand">
+  <div class="container grid footer-grid" data-reveal-group>
+    <div class="footer-brand" data-reveal>
       <div class="footer-logo">
         <Image src={logoOfek} alt="Ofek" width={150} height={75} densities={[1, 2]} />
       </div>
@@ -19,7 +19,7 @@ import IconLinkedin from '../icons/linkedin.svg';
         ))
       }
     </div>
-    <div class="footer-links-grid">
+    <div class="footer-links-grid" data-reveal>
       <h3 class="footer-header">Let&rsquo;s team up!</h3>
       <a href={`mailto:${site.email}`}>
         <span class="footer-email">Email us at {site.email}</span>
@@ -29,6 +29,6 @@ import IconLinkedin from '../icons/linkedin.svg';
         <IconLinkedin class="icon-linkedin" aria-hidden="true" />
       </a>
     </div>
-    <div class="copyright">© 2026 Ofek. All rights reserved.</div>
+    <div class="copyright" data-reveal>© 2026 Ofek. All rights reserved.</div>
   </div>
 </footer>

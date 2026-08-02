@@ -23,10 +23,10 @@ const partners = [
 <section id="partners" class="section partners-section">
   <div class="container grid">
     <SectionTitle light="WHO" bold="WE TEAM UP WITH" class="partners-title" />
-    <div class="partners-strip" data-reveal="down">
+    <div class="partners-strip" data-reveal-group>
       {
         partners.map((p) => (
-          <div class="logo-item" style={`--logo-scale: ${p.scale}`}>
+          <div class="logo-item" data-reveal style={`--logo-scale: ${p.scale}`}>
             <Image src={p.src} alt={p.alt} height={57} densities={[1, 2]} />
           </div>
         ))

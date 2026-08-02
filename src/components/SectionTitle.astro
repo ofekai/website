@@ -11,7 +11,7 @@ const { light, bold, class: className } = Astro.props;
 {/* The gap between the two spans is CSS (`.title-bold { margin-inline-start }`),
     not the text node — Astro 7 strips whitespace with JSX rules, see plan risk
     R3. The `{' '}` stays only so screen readers still hear a word boundary. */}
-<h2 class:list={['main-title', className]}>
+<h2 class:list={['main-title', className]} data-reveal>
   <span class="title-light">{light}</span>{' '}
   <span class="title-bold">{bold}</span>
 </h2>

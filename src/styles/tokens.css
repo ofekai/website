@@ -81,6 +81,7 @@
     --dur-base: 300ms;
     --dur-slow: 600ms;
     --dur-reveal: 1200ms;
+    --dur-breathe: 2s;
     --stagger: 60ms;
   }
 
@@ -93,6 +94,7 @@
       --dur-base: 1ms;
       --dur-slow: 1ms;
       --dur-reveal: 1ms;
+      --dur-breathe: 1ms;
       --stagger: 0ms;
     }
 

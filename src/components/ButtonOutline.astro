@@ -7,7 +7,9 @@ interface Props {
 const { href, label = 'Talk to us' } = Astro.props;
 ---
 
-<a href={href} class="btn-outline">
+{/* `data-magnetic` is an opt-in only: motion.ts ignores it entirely unless the
+    device actually has a fine hover pointer. */}
+<a href={href} class="btn-outline" data-magnetic>
   {label}
   <svg
     xmlns="http://www.w3.org/2000/svg"

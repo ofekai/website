@@ -31,8 +31,18 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     scroll-padding-top: var(--nav-h);
+  }
+
+  /* Opt in to smooth scrolling rather than opting out of it under `reduce`.
+     tokens.css also sets `scroll-behavior: auto` in its reduced-motion block,
+     but that lives in the `tokens` layer, which loses to this one — so the
+     override never applied and anchor jumps kept animating for people who had
+     asked them not to. Gating the smooth value itself cannot be out-ordered. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
@@ -97,8 +107,14 @@
     display: none;
   }
 
-  .logo > img {
+  /* Both marks, not just `.logo > img`. The legacy child selector only ever
+     matched the light logo, so swapping to the dark one on scroll shrank the
+     mark from 100px to its intrinsic width — a visible jump at exactly the
+     moment the navbar is drawing attention to itself. */
+  .logo > img,
+  .logo-dark > img {
     width: 100%;
+    height: auto;
   }
 
   .nav-links {
@@ -110,12 +126,36 @@
   }
 
   .nav-links a {
+    position: relative;
     color: white;
-    transition: color var(--dur-base) var(--ease-out-quart);
+    transition: color var(--dur-fast) var(--ease-out-quart);
   }
 
   .nav-links a:hover {
     color: var(--color-accent);
+  }
+
+  /* Underline sweep. The origin flips between the two states, so the rule
+     grows in from the left on enter and continues out to the right on leave
+     rather than retracting the way it came. `scale` (the independent
+     property) rather than `transform`, so it can never collide with anything
+     Motion writes to `transform`. currentColor picks up the teal hover. */
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.45em;
+    block-size: 1px;
+    background: currentColor;
+    scale: 0 1;
+    transform-origin: right center;
+    transition: scale var(--dur-fast) var(--ease-out-quart);
+  }
+
+  .nav-links a:hover::after,
+  .nav-links a:focus-visible::after {
+    scale: 1 1;
+    transform-origin: left center;
   }
 
   .nav-scrolled {
@@ -177,8 +217,22 @@
     inset: 0;
     z-index: -2;
     /* Dominant colour of the banner (mean RGB via sharp stats), so the hero
-       never flashes white before the AVIF/WebP decodes. */
+       never flashes white before the AVIF/WebP decodes — and, once the
+       parallax is running, the backstop behind the travelling image. */
     background-color: #2b2b2b;
+  }
+
+  /* <Picture> wraps the <img> in a <picture>, and <picture> is display:inline
+     with auto height — so the img's `height: 100%` had no definite containing
+     block to resolve against and silently fell back to the intrinsic aspect
+     ratio. At 1440x900 that left a 100px band of bare backdrop under the
+     banner; on a 412x823 phone the banner covered only the top 229px of the
+     hero. Making <picture> the positioned, definitely-sized box gives the
+     percentage something to resolve against. */
+  .hero-media picture {
+    position: absolute;
+    inset: 0;
+    display: block;
   }
 
   .hero-media img {
@@ -186,6 +240,80 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+  }
+
+  /* --- Hero parallax -------------------------------------------------------
+     Two implementations of one effect, and which one you get depends only on
+     whether your browser has scroll-driven animations.
+
+     Where it does — Chromium and Safari 26+ — the whole thing is the CSS
+     below: no JavaScript at all, driven by a ScrollTimeline the compositor
+     owns, so it cannot drop a frame to main-thread work and it costs nothing
+     on the critical path. Where it doesn't — Firefox, at time of writing —
+     motion.ts feature-detects the gap and lazily loads Motion's `scroll()`,
+     which drives the identical keyframes from rAF. That is the arrangement
+     the plan asks for; the only change is that the 6 KB fallback is fetched
+     by the browsers that need it instead of by all of them.
+
+     The `@supports` wrapper is not optional. `animation-timeline` is an
+     unknown property in Firefox, but `animation: hero-parallax linear both`
+     is not — left unguarded it would degrade into a *time*-based animation
+     with a 0s duration and slam the image straight to its end position.
+
+     Headroom: the image travels down 12% of its own height as the hero
+     leaves, so the gap would open at the top. The media box is grown to 114%
+     and pulled up by 14% to pre-fill it — 12% of 114% is 13.68%, so the top
+     edge lands at -0.32%, still covered at the end of the travel. Anything
+     spilling past the bottom is clipped by `.hero { overflow: clip }`.
+     Averaged across the scroll the framing matches the static composition.
+
+     The headroom is expressed as `top` / `height` on the positioned <picture>
+     and NOT as a margin. Margin percentages — including `margin-block-start` —
+     resolve against the containing block's *inline* size, so on a 1440x900
+     hero a "-14%" margin is -201px rather than -126px, which drags the banner
+     clean out of frame. `top` and `height` resolve against its height. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .hero {
+        view-timeline-name: --hero;
+      }
+
+      .hero-media picture {
+        top: -14%;
+        bottom: auto;
+        height: 114%;
+      }
+
+      /* `exit` is precisely the plan's ['start start', 'end start']: it runs
+         from the hero's top edge meeting the top of the scrollport to its
+         bottom edge meeting the same line. */
+      .hero-media img[data-parallax] {
+        animation: hero-parallax linear both;
+        animation-timeline: --hero;
+        animation-range: exit;
+      }
+    }
+
+    /* Fallback path only. Motion supplies the movement here, so the headroom
+       is conditional on JS having run — otherwise a no-JS Firefox visitor
+       would get the offset framing with nothing to justify it. */
+    @supports not (animation-timeline: view()) {
+      html.js .hero-media picture {
+        top: -14%;
+        bottom: auto;
+        height: 114%;
+      }
+    }
+  }
+
+  @keyframes hero-parallax {
+    from {
+      transform: translateY(0) scale(1);
+    }
+
+    to {
+      transform: translateY(12%) scale(1.05);
+    }
   }
 
   /* Two gradients: a left-to-right wash that buys contrast for the headline
@@ -220,15 +348,86 @@
     block-size: 2px;
     background: var(--color-accent);
     margin-block-end: var(--space-6);
+    /* Beat 0 of the hero choreography, drawn left-to-right alongside the
+       first word rather than before it. */
+    scale: 0 1;
+    transform-origin: left center;
+    animation: rule-draw var(--dur-slow) var(--ease-out-expo) forwards;
   }
 
   .hero-title {
     font-size: var(--step-4);
     font-weight: 400;
-    line-height: 1.08;
+    /* 1.08 leaves the glyph box marginally taller than the line box, which is
+       invisible in normal flow but would be clipped by the mask's
+       `overflow: hidden`. 1.12 buys the headroom back; the headline is set in
+       all caps, so there are no descenders to accommodate beyond this. */
+    line-height: 1.12;
     letter-spacing: -0.01em;
     text-wrap: balance;
     margin-block-end: var(--space-7);
+  }
+
+  /* --- Hero mask reveal ----------------------------------------------------
+     Pure CSS, no Motion. The hero headline is the first text the page paints
+     and it must not wait on a JS chunk to become visible (plan risk R5).
+     Hero.astro splits the words at build time and stamps each with its own
+     --i; everything below is the CSS that reads it.
+
+     LCP safety, in three parts:
+     - word 0 has --i:0, so it starts at t=0 with no delay whatsoever;
+     - the six words span 5 x --stagger = 300ms, inside the 350ms budget;
+     - the words animate `translate` only and never `opacity`, so the text is
+       opaque from its first painted pixel. (An element at `opacity: 0` is
+       excluded from LCP candidacy outright, which is what the Phase 5
+       `flip-up` treatment did to this headline.)
+
+     Under prefers-reduced-motion both --dur-reveal and --stagger collapse via
+     tokens.css, so every word lands at its final position on frame one. The
+     animation is transform-only, so there is no layout jump either way. */
+  .hero-title .word {
+    display: inline-block;
+    overflow: hidden;
+    /* `overflow: hidden` moves an inline-block's baseline to its bottom margin
+       edge. Aligning bottoms explicitly keeps the masked words sitting on the
+       same line as the surrounding text nodes instead of riding a full
+       line-height high. */
+    vertical-align: bottom;
+  }
+
+  .hero-title .word-in {
+    display: inline-block;
+    translate: 0 110%;
+    animation: word-rise var(--dur-reveal) var(--ease-out-expo) forwards;
+    animation-delay: calc(var(--i) * var(--stagger));
+  }
+
+  @keyframes word-rise {
+    to {
+      translate: 0 0;
+    }
+  }
+
+  @keyframes rule-draw {
+    to {
+      scale: 1 1;
+    }
+  }
+
+  /* The two beats after the headline. Unlike the words these do fade from
+     `opacity: 0`, which is safe here precisely because neither can be the LCP
+     candidate: measured, that is the H1, which is several times the painted
+     area of the CTA and the scroll cue combined. */
+  @keyframes hero-fade-up {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
   }
 
   .btn-outline {
@@ -243,7 +442,14 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    transition: var(--dur-base) var(--ease-out-quart);
+    /* Enumerated, not the `transition: <time> <easing>` shorthand this used to
+       be — that expands to `all`, which would put a CSS transition on
+       `transform` and have it fight the magnetic spring Motion drives on the
+       very same property. */
+    transition:
+      background-color var(--dur-fast) var(--ease-out-quart),
+      border-color var(--dur-fast) var(--ease-out-quart),
+      color var(--dur-fast) var(--ease-out-quart);
     border-radius: var(--radius-md);
   }
 
@@ -252,9 +458,23 @@
     color: black;
   }
 
+  /* The arrow leans into the direction it points on hover. `translate` keeps
+     it clear of the button's own magnetic `transform`. */
   .btn-arrow {
     width: 1.2rem;
     height: 1.2rem;
+    transition: translate var(--dur-fast) var(--ease-out-quart);
+  }
+
+  .btn-outline:hover .btn-arrow {
+    translate: 0.25rem 0;
+  }
+
+  /* Beat 6 of the hero choreography — one --stagger after the last word. */
+  .hero-content .btn-outline {
+    opacity: 0;
+    animation: hero-fade-up var(--dur-slow) var(--ease-out-expo) forwards;
+    animation-delay: calc(6 * var(--stagger));
   }
 
   /* On the same rail as the headline and the CTA, not centred in the
@@ -266,22 +486,54 @@
     right: 0;
     bottom: var(--space-8);
     color: white;
+    /* Beat 8 — the last thing to arrive, two --stagger after the CTA. */
+    opacity: 0;
+    animation: hero-fade-up var(--dur-slow) var(--ease-out-expo) forwards;
+    animation-delay: calc(8 * var(--stagger));
+  }
+
+  /* Negative margin cancels the padding, so the hit target grows to a
+     comfortable size without moving the arrow off the rail. */
+  .hero-scroll a {
+    display: inline-flex;
+    padding: var(--space-3);
+    margin: calc(var(--space-3) * -1);
+    color: inherit;
+    transition: color var(--dur-fast) var(--ease-out-quart);
+  }
+
+  .hero-scroll a:hover,
+  .hero-scroll a:focus-visible {
+    color: var(--color-accent);
   }
 
   .floating-arrow {
     animation: breathing var(--dur-breathe) ease-in-out infinite;
   }
 
+  /* `translate` rather than `transform`: the arrow's idle loop is the one
+     animation on the page that never stops, so it must not occupy the
+     property anything else might want to compose onto it. */
   @keyframes breathing {
     0%,
     100% {
-      transform: translateY(0);
+      translate: 0 0;
       opacity: 0.6;
     }
 
     50% {
-      transform: translateY(8px);
+      translate: 0 6px;
       opacity: 1;
+    }
+  }
+
+  /* The only `infinite` animation on the site, and the one case where
+     collapsing --dur-breathe to 1ms is not enough — that would run a full
+     cycle every frame instead of stopping. See the note in tokens.css. */
+  @media (prefers-reduced-motion: reduce) {
+    .floating-arrow {
+      animation: none;
+      opacity: 0.8;
     }
   }
 
@@ -475,6 +727,28 @@
     margin-block-start: calc(var(--rule-thick) * -1);
   }
 
+  /* Hover lift.
+     Two constraints shape this one. It has to use `translate`, because Motion
+     writes the reveal's settled state to these cards' inline `transform` and
+     an inline style beats any stylesheet rule. And it is gated on a real hover
+     pointer, so a tap on a touch device cannot leave a card stuck in the
+     lifted state with no way to un-hover it.
+
+     3px, not the usual 6-8px: the two cards overlap by --rule-thick and share
+     a teal seam, so a larger lift would visibly break the joint. */
+  @media (hover: hover) and (pointer: fine) {
+    .diagonal-card {
+      transition:
+        translate var(--dur-fast) var(--ease-out-quart),
+        border-color var(--dur-fast) var(--ease-out-quart);
+    }
+
+    .diagonal-card:hover {
+      translate: 0 -3px;
+      border-color: rgb(255 255 255 / 34%);
+    }
+  }
+
   .card-title {
     font-size: 1.5rem;
     font-weight: 700;
@@ -499,8 +773,15 @@
     flex-shrink: 0;
   }
 
+  /* `height: auto` is load-bearing. Astro's <Image> emits width/height
+     attributes, and the UA stylesheet turns those into an aspect-ratio only
+     while height is auto. Without it the attribute pins the height and the
+     CSS pins the width, so these square icons rendered 115x86 — a 34%
+     horizontal stretch, and the one thing standing between this build and a
+     best-practices 100. */
   .card-img img {
     width: 100%;
+    height: auto;
     display: block;
   }
 
@@ -727,10 +1008,9 @@
 }
 
 /* ==========================================================================
-   Scroll reveal — Phase 5. Motion (src/scripts/motion.ts) owns the actual
-   animation for every value except `flip-up`; this block only supplies the
-   pre-JS/no-JS/reduced-motion hidden state so there's no flash of visible
-   content before the script runs.
+   Scroll reveal. Motion (src/scripts/motion.ts) owns the actual animation;
+   this block only supplies the pre-JS/no-JS/reduced-motion hidden state so
+   there's no flash of visible content before the script runs.
 
    Initial states are gated on `html.js` so the page renders fully visible
    when JS is off or the module fails to load, and on `no-preference` so
@@ -738,9 +1018,12 @@
 
    No blanket `transition` here: Motion sets opacity/transform via inline
    style directly, and a CSS transition on the same properties would race it,
-   producing a visible double-animation. `flip-up` (Hero only, Phase 6
-   territory) is the one value still driven by a CSS transition + the
-   `.is-revealed` class, so it keeps its own transition below.
+   producing a visible double-animation.
+
+   Phase 5's `flip-up` value is gone. It was the hero headline's AOS-era
+   entrance, and it started the H1 at `opacity: 0` — which disqualified the
+   page's headline from being an LCP candidate at all. Phase 6 replaced it
+   with the transform-only CSS mask reveal in the hero block above.
 
    Phase 1's unconditional `[data-reveal] { transform: translate3d(0,0,0) }`
    is gone. It existed only to reproduce the stacking context AOS left behind,
@@ -758,7 +1041,7 @@
          inside a revealed block. AOS did not set it either. */
     }
 
-    html.js [data-reveal]:not([data-reveal='diagonal']):not([data-reveal='flip-up']) {
+    html.js [data-reveal]:not([data-reveal='diagonal']) {
       transform: translateY(24px);
     }
 
@@ -766,17 +1049,9 @@
       transform: translate3d(32px, 16px, 0);
     }
 
-    html.js [data-reveal='flip-up'] {
-      transform: perspective(2500px) rotateX(-100deg);
-      transition:
-        opacity var(--dur-reveal) var(--ease-out-expo),
-        transform var(--dur-reveal) var(--ease-out-expo);
-    }
-
-    /* Instant settle. Motion sets final inline styles directly and never
-       adds this class in production; it exists for the flip-up legacy path
-       and so scripts/visual-diff.mjs can force pre-scroll elements visible
-       for screenshotting. */
+    /* Instant settle. Motion sets final inline styles directly and never adds
+       this class in production; it exists so scripts/visual-diff.mjs can force
+       pre-scroll elements visible for screenshotting. */
     html.js [data-reveal].is-revealed {
       opacity: 1;
       transform: translate3d(0, 0, 0);

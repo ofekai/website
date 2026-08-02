@@ -1,5 +1,5 @@
 /**
- * Nav behaviour — ported from _legacy/js/script.js.
+ * Nav behaviour — ported from the pre-Astro static site's script.js.
  *
  * Phase 1 kept the observable behaviour identical (scrolled state past ~50px,
  * hamburger toggle, close on link click) but replaced the unthrottled

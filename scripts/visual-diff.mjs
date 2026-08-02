@@ -1,37 +1,30 @@
 #!/usr/bin/env node
 /**
- * Visual-diff harness: screenshots the built site (dist/) against
- * _legacy/index.html at a fixed set of widths, plus the cross-cutting
- * checks every phase gate calls for (horizontal overflow, console
- * errors/404s). Reused across phases rather than rewritten each time.
+ * Screenshots the built site at a fixed set of widths and runs the
+ * cross-cutting checks every phase gate calls for: no horizontal overflow at
+ * any width, no console errors, no failed requests, and — with JavaScript
+ * switched off — a page that is still fully laid out and readable.
  *
  * Usage: npm run build && node scripts/visual-diff.mjs
  * Screenshots land in .visual-diff/ (gitignored).
  *
- * Both sites' [data-reveal]/[data-aos] elements are forced to their
- * settled "revealed" state before capture — a fullPage screenshot never
- * scrolls anything into view for real, so whichever IntersectionObserver
- * each site uses never fires otherwise, leaving below-the-fold sections
- * stuck at opacity:0.
+ * Phase 6 removed the side-by-side comparison against _legacy/index.html
+ * along with _legacy/ itself; the migration it existed to police is finished.
  *
- * _legacy/ only kept index.html/css/js (images live in public/ now), so
- * the legacy server falls back to public/images/ for any /images/* path
- * it doesn't have itself.
+ * [data-reveal] elements are forced to their settled state before capture — a
+ * fullPage screenshot never scrolls anything into view for real, so the
+ * IntersectionObserver driving them never fires and below-the-fold sections
+ * would otherwise capture at opacity:0.
  */
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.join(SCRIPT_DIR, '..');
 const DIST_DIR = path.join(PROJECT_ROOT, 'dist');
-const LEGACY_DIR = path.join(PROJECT_ROOT, '_legacy');
-const PUBLIC_IMAGES_DIR = path.join(PROJECT_ROOT, 'public', 'images');
-const ASSET_IMAGES_DIR = path.join(PROJECT_ROOT, 'src', 'assets', 'images');
-const ICONS_DIR = path.join(PROJECT_ROOT, 'src', 'icons');
 const OUT_DIR = path.join(PROJECT_ROOT, '.visual-diff');
 
 const WIDTHS = [1440, 1200, 1100, 1000, 900, 868, 768, 425];
@@ -42,25 +35,11 @@ const MIME = {
   '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain',
 };
 
-function staticServer(rootDir, { legacyImageFallback = false } = {}) {
+function staticServer(rootDir) {
   return createServer(async (req, res) => {
     let reqPath = decodeURIComponent(req.url.split('?')[0]);
     if (reqPath === '/') reqPath = '/index.html';
-    let filePath = path.join(rootDir, reqPath);
-    if (legacyImageFallback && reqPath.startsWith('/images/') && !existsSync(filePath)) {
-      const name = reqPath.replace(/^\/images\//, '');
-      // Phase 4 moved optimizable rasters to src/assets/images/ and icons to
-      // src/icons/ (stripping the `_green` suffix on the collapsed pairs) —
-      // check both so this legacy-vs-new comparison keeps working.
-      const candidates = [
-        path.join(PUBLIC_IMAGES_DIR, name),
-        path.join(ASSET_IMAGES_DIR, name),
-      ];
-      if (/^ic_/.test(name)) {
-        candidates.push(path.join(ICONS_DIR, name.replace(/^ic_/, '').replace(/_green\.svg$/, '.svg')));
-      }
-      filePath = candidates.find((c) => existsSync(c)) ?? filePath;
-    }
+    const filePath = path.join(rootDir, reqPath);
     try {
       const data = await readFile(filePath);
       res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] ?? 'application/octet-stream' });
@@ -110,85 +89,108 @@ async function scrollThrough(page) {
   });
 }
 
-async function forceReveal(page, label) {
-  if (label === 'new') {
-    await page.evaluate(() => {
-      document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-revealed'));
-    });
-  } else {
-    await page.evaluate(() => {
-      document.querySelectorAll('.fade-in-section').forEach((el) => el.classList.add('is-visible'));
-      document.querySelectorAll('[data-aos]').forEach((el) => el.classList.add('aos-animate'));
-    });
+async function forceReveal(page) {
+  await page.evaluate(() => {
+    document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-revealed'));
+  });
+}
+
+/**
+ * With JavaScript off, every reveal's initial hidden state is gated away in
+ * CSS and the page should render complete. Verified with locator geometry
+ * rather than page.evaluate — script evaluation never resolves in a
+ * javaScriptEnabled:false context and the call hangs forever.
+ */
+async function checkNoJs(browser, url) {
+  const context = await browser.newContext({
+    viewport: { width: 1200, height: 1000 },
+    javaScriptEnabled: false,
+  });
+  const page = await context.newPage();
+  await page.goto(url, { waitUntil: 'load' });
+
+  const problems = [];
+  const mustBeVisible = [
+    ['hero headline', 'h1.hero-title'],
+    ['hero CTA', '.hero-content .btn-outline'],
+    ['about copy', '.about-section .description'],
+    ['expertise cards', '.diagonal-card-1'],
+    ['partners strip', '.partners-strip'],
+    ['footer', '.footer-brand'],
+  ];
+
+  for (const [label, selector] of mustBeVisible) {
+    const box = await page.locator(selector).first().boundingBox();
+    if (!box || box.width < 1 || box.height < 1) problems.push(`${label} (${selector}) not laid out`);
   }
+
+  await page.screenshot({ path: path.join(OUT_DIR, 'nojs-1200.png'), fullPage: true });
+  await context.close();
+  return problems;
 }
 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
   const distServer = staticServer(DIST_DIR);
-  const legacyServer = staticServer(LEGACY_DIR, { legacyImageFallback: true });
   await listen(distServer, 4501);
-  await listen(legacyServer, 4502);
-
-  const sites = [
-    { label: 'new', url: 'http://localhost:4501/' },
-    { label: 'legacy', url: 'http://localhost:4502/' },
-  ];
+  const url = 'http://localhost:4501/';
 
   const browser = await chromium.launch();
   const overflow = [];
   const issues = [];
 
-  for (const { label, url } of sites) {
-    for (const width of WIDTHS) {
-      const page = await browser.newPage({ viewport: { width, height: 1000 } });
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.addStyleTag({ content: FREEZE_CSS });
+  for (const width of WIDTHS) {
+    const page = await browser.newPage({ viewport: { width, height: 1000 } });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.addStyleTag({ content: FREEZE_CSS });
 
-      const consoleErrors = [];
-      const failedRequests = [];
-      page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
-      page.on('response', (res) => { if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`); });
+    const consoleErrors = [];
+    const failedRequests = [];
+    page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+    page.on('response', (res) => { if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`); });
 
-      await page.goto(url, { waitUntil: 'networkidle' });
-      await scrollThrough(page);
-      await page.addStyleTag({ content: FREEZE_CSS });
-      await forceReveal(page, label);
-      // Back to the top after scrollThrough: the fixed navbar is painted at
-      // the current scroll offset in a fullPage capture, so a stray offset
-      // stamps the nav across the middle of the screenshot.
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await page.waitForTimeout(200);
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await scrollThrough(page);
+    await page.addStyleTag({ content: FREEZE_CSS });
+    await forceReveal(page);
+    // Back to the top after scrollThrough: the fixed navbar is painted at
+    // the current scroll offset in a fullPage capture, so a stray offset
+    // stamps the nav across the middle of the screenshot.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(200);
 
-      const { scrollWidth, clientWidth } = await page.evaluate(() => ({
-        scrollWidth: document.documentElement.scrollWidth,
-        clientWidth: document.documentElement.clientWidth,
-      }));
-      overflow.push({ label, width, overflow: scrollWidth - clientWidth });
-      if (consoleErrors.length || failedRequests.length) {
-        issues.push({ label, width, consoleErrors, failedRequests });
-      }
-
-      await page.screenshot({ path: path.join(OUT_DIR, `${label}-${width}.png`), fullPage: true });
-      await page.close();
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    overflow.push({ width, overflow: scrollWidth - clientWidth });
+    if (consoleErrors.length || failedRequests.length) {
+      issues.push({ width, consoleErrors, failedRequests });
     }
+
+    await page.screenshot({ path: path.join(OUT_DIR, `page-${width}.png`), fullPage: true });
+    await page.close();
   }
+
+  const noJsProblems = await checkNoJs(browser, url);
 
   await browser.close();
   distServer.close();
-  legacyServer.close();
 
   console.log(`Screenshots written to ${path.relative(process.cwd(), OUT_DIR)}/\n`);
   console.log('=== Horizontal overflow (want 0 at every width) ===');
   for (const r of overflow) {
-    console.log(`${r.label.padEnd(7)} ${String(r.width).padEnd(5)} overflow=${r.overflow}${r.overflow > 0 ? '  <-- OVERFLOW' : ''}`);
+    console.log(`${String(r.width).padEnd(5)} overflow=${r.overflow}${r.overflow > 0 ? '  <-- OVERFLOW' : ''}`);
   }
 
   console.log('\n=== Console errors / failed requests ===');
   console.log(issues.length ? JSON.stringify(issues, null, 2) : 'none');
 
-  const failed = overflow.some((r) => r.overflow > 0);
+  console.log('\n=== JavaScript disabled ===');
+  console.log(noJsProblems.length ? noJsProblems.join('\n') : 'all sections laid out');
+
+  const failed = overflow.some((r) => r.overflow > 0) || issues.length > 0 || noJsProblems.length > 0;
   process.exit(failed ? 1 : 0);
 }
 

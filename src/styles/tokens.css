@@ -74,7 +74,22 @@
     --nav-h: 92px;
     --nav-h-scrolled: 84px;
 
-    /* --- Motion --- */
+    /* --- Motion ---
+       One timing language, five rungs. Phase 6 tuned every animated property
+       on the site onto exactly one of these; nothing declares a raw duration.
+
+       | rung          | token          | easing           | used for                            |
+       |---------------|----------------|------------------|-------------------------------------|
+       | hover         | --dur-fast     | --ease-out-quart | colour, underline sweep, card lift  |
+       | chrome        | --dur-base     | --ease-out-quart | navbar scrolled state               |
+       | 2nd entrance  | --dur-slow     | --ease-out-expo  | hero eyebrow, CTA, scroll cue       |
+       | entrance      | --dur-reveal   | --ease-out-expo  | section reveals, hero word rise     |
+       | ambient       | --dur-breathe  | ease-in-out      | the scroll arrow's idle loop        |
+
+       --stagger is the beat between elements in any one entrance, and is also
+       the unit the hero choreography is counted in (word N at N x --stagger).
+       The hero parallax is deliberately absent: it is scroll-linked, so it has
+       a progress curve (linear) rather than a duration. */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
     --dur-fast: 150ms;
@@ -86,8 +101,15 @@
   }
 
   /* Neutralizes every duration/stagger token from one place. Components that
-     read --dur-* and --stagger (today's reveal transition, Phase 5's Motion
-     entries) automatically go inert without per-component overrides. */
+     read --dur-* and --stagger (the CSS reveals, the hero choreography, the
+     Motion entries that resolve these at animate time) automatically go inert
+     without per-component overrides.
+
+     Collapsing a duration is only sufficient for animations that *finish*.
+     An `infinite` animation collapsed to 1ms does not stop — it runs a full
+     cycle every frame, which is worse than the animation it replaced. The one
+     looping animation on the site (.floating-arrow) therefore gets an explicit
+     `animation: none` in global.css rather than relying on --dur-breathe. */
   @media (prefers-reduced-motion: reduce) {
     :root {
       --dur-fast: 1ms;
@@ -96,10 +118,6 @@
       --dur-reveal: 1ms;
       --dur-breathe: 1ms;
       --stagger: 0ms;
-    }
-
-    html {
-      scroll-behavior: auto;
     }
   }
 }

@@ -114,7 +114,7 @@ async function checkNoJs(browser, url) {
     ['hero headline', 'h1.hero-title'],
     ['hero CTA', '.hero-content .btn-outline'],
     ['about copy', '.about-section .description'],
-    ['expertise cards', '.diagonal-card-1'],
+    ['expertise stripes', '.consulting-stripe .stripe-content'],
     ['partners strip', '.partners-strip'],
     ['footer', '.footer-brand'],
   ];
@@ -125,6 +125,70 @@ async function checkNoJs(browser, url) {
   }
 
   await page.screenshot({ path: path.join(OUT_DIR, 'nojs-1200.png'), fullPage: true });
+  await context.close();
+  return problems;
+}
+
+/** Exercises the mobile overlay and the dynamic navigation states that a
+ * frozen full-page screenshot cannot prove. */
+async function checkNavigation(browser, url) {
+  const context = await browser.newContext({ viewport: { width: 425, height: 900 } });
+  const page = await context.newPage();
+  const problems = [];
+  await page.goto(url, { waitUntil: 'networkidle' });
+
+  const initial = await page.evaluate(() => {
+    const title = document.querySelector('.hero-title')?.getBoundingClientRect();
+    return {
+      scrolled: document.querySelector('#navbar')?.classList.contains('nav-scrolled'),
+      titleRight: title?.right ?? Infinity,
+      viewportWidth: innerWidth,
+    };
+  });
+  if (initial.scrolled) problems.push('navbar starts in its scrolled state');
+  if (initial.titleRight > initial.viewportWidth) problems.push('mobile hero headline clips horizontally');
+
+  const toggle = page.locator('#menu-toggle');
+  await toggle.click();
+  const open = await page.evaluate(() => ({
+    expanded: document.querySelector('#menu-toggle')?.getAttribute('aria-expanded'),
+    bodyLocked: document.body.classList.contains('nav-open'),
+    menuOpen: document.querySelector('#nav-links')?.classList.contains('active'),
+  }));
+  if (open.expanded !== 'true' || !open.bodyLocked || !open.menuOpen) {
+    problems.push('mobile menu open state is incomplete');
+  }
+
+  // Dispatch from the focused control rather than the page so headless
+  // Chromium follows the same focus-navigation path as a real keyboard.
+  await toggle.press('Tab');
+  const tabState = await page.evaluate(() => ({
+    passed: document.activeElement === document.querySelector('#nav-links a'),
+    active: `${document.activeElement?.tagName}#${document.activeElement?.id}.${document.activeElement?.className}`,
+  }));
+  if (!tabState.passed) problems.push(`Tab does not move from the menu toggle to the first link (${tabState.active})`);
+
+  await page.keyboard.press('Escape');
+  const closed = await page.evaluate(() => ({
+    expanded: document.querySelector('#menu-toggle')?.getAttribute('aria-expanded'),
+    bodyLocked: document.body.classList.contains('nav-open'),
+    focusReturned: document.activeElement?.id === 'menu-toggle',
+  }));
+  if (closed.expanded !== 'false' || closed.bodyLocked || !closed.focusReturned) {
+    problems.push('Escape does not close the menu and return focus');
+  }
+
+  await page.locator('#about').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(250);
+  const scrolled = await page.evaluate(() => ({
+    navScrolled: document.querySelector('#navbar')?.classList.contains('nav-scrolled'),
+    active: document.querySelector('.nav-links a.is-active')?.getAttribute('href'),
+    progress: document.querySelector('[data-scroll-progress]')?.style.transform,
+  }));
+  if (!scrolled.navScrolled) problems.push('navbar does not enter its scrolled state');
+  if (scrolled.active !== '#about') problems.push('About navigation link is not active in its section');
+  if (!scrolled.progress?.startsWith('scaleX(')) problems.push('reading progress is not updated');
+
   await context.close();
   return problems;
 }
@@ -174,6 +238,7 @@ async function main() {
   }
 
   const noJsProblems = await checkNoJs(browser, url);
+  const navigationProblems = await checkNavigation(browser, url);
 
   await browser.close();
   distServer.close();
@@ -190,7 +255,14 @@ async function main() {
   console.log('\n=== JavaScript disabled ===');
   console.log(noJsProblems.length ? noJsProblems.join('\n') : 'all sections laid out');
 
-  const failed = overflow.some((r) => r.overflow > 0) || issues.length > 0 || noJsProblems.length > 0;
+  console.log('\n=== Navigation interactions ===');
+  console.log(navigationProblems.length ? navigationProblems.join('\n') : 'mobile menu, focus, active state and progress pass');
+
+  const failed =
+    overflow.some((r) => r.overflow > 0) ||
+    issues.length > 0 ||
+    noJsProblems.length > 0 ||
+    navigationProblems.length > 0;
   process.exit(failed ? 1 : 0);
 }
 

@@ -13,10 +13,8 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'ignore',
 
-  // Self-hosted at build time via astro:fonts, replacing the Google Fonts
-  // <link> tags. Lato ships 100/300/400/700/900 only — 300/400/700 are the
-  // only weights the design actually uses (see the weight remap in
-  // global.css); no italic style is used anywhere in the markup.
+  // The reference site's exact pairing, fetched at build time and self-hosted
+  // so the static GitHub Pages deployment has no runtime font dependency.
   fonts: [
     {
       provider: fontProviders.google(),
@@ -26,10 +24,17 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['latin'],
     },
+    {
+      provider: fontProviders.google(),
+      name: 'Open Sans',
+      cssVariable: '--font-open-sans',
+      weights: [300, 400, 700],
+      styles: ['normal'],
+      subsets: ['latin'],
+    },
   ],
 
-  // Astro 7 strips whitespace with JSX rules. The heading language here is two
-  // adjacent inline spans separated by a literal space, so keep HTML intact
-  // until Phase 3 has moved that spacing into CSS. See plan risk R3.
+  // Adjacent inline spans in the title components include intentional literal
+  // spaces, so preserve their authored HTML.
   compressHTML: false,
 });

@@ -2,14 +2,14 @@
 interface Props {
   href: string;
   label?: string;
+  variant?: 'primary' | 'outline';
+  tone?: 'light' | 'dark';
 }
 
-const { href, label = 'Talk to us' } = Astro.props;
+const { href, label = 'Talk to us', variant = 'outline', tone = 'light' } = Astro.props;
 ---
 
-{/* `data-magnetic` is an opt-in only: motion.ts ignores it entirely unless the
-    device actually has a fine hover pointer. */}
-<a href={href} class="btn-outline" data-magnetic>
+<a href={href} class:list={['btn-outline', `btn-${variant}`, `btn-${tone}`]}>
   {label}
   <svg
     xmlns="http://www.w3.org/2000/svg"

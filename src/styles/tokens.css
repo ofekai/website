@@ -9,28 +9,32 @@
 @layer tokens {
   :root {
     /* --- Color primitives --- */
-    --teal-400: #6fc2c3;
+    --teal-300: #78cdcd;
+    --teal-400: #62babb;
     --teal-500: #4da7a8;
     --teal-600: #2d7d7e;
 
-    --ink-900: #1a1b1f;
+    --ink-950: #0d0f10;
+    --ink-900: #141719;
+    --ink-800: #202528;
     --ink-500: #4b4e53;
     --ink-300: #9ca3af;
     --ink-150: #b8b8b8;
     --ink-100: #d9d9d9;
 
     /* --- Color, semantic --- */
-    --color-bg: #fff;
+    --paper-100: #f2f2f2;
+    --paper-50: #ffffff;
+
+    --color-bg: var(--paper-100);
     --color-surface-dark: var(--ink-900);
     --color-text: var(--ink-500);
     --color-text-muted: var(--ink-300);
     --color-accent: var(--teal-500);
+    --color-accent-bright: var(--teal-300);
     --color-accent-hover: var(--teal-400);
     --color-accent-active: var(--teal-600);
-    --color-hairline: rgb(255 255 255 / 20%);
-    /* Light-surface counterpart to --color-hairline. Phase 3's About section
-       separates the feature cards with rules on a white background, where the
-       white hairline is invisible. */
+    --color-hairline: rgb(255 255 255 / 16%);
     --color-hairline-ink: rgb(26 27 31 / 14%);
     --color-focus: var(--teal-600);
 
@@ -41,8 +45,8 @@
     --step-0: 0.875rem; /* 14px — nav links, button label */
     --step-1: 1rem; /* 16px — body copy */
     --step-2: 1.25rem; /* 20px — hero subtitle, card text (desktop) */
-    --step-3: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem); /* 28px -> 40px — section titles */
-    --step-4: clamp(2rem, 1.3rem + 2.75vw, 3.5rem); /* 32px -> 56px — hero title */
+    --step-3: clamp(2rem, 1.3rem + 2.1vw, 3.5rem); /* 32px -> 56px — section titles */
+    --step-4: clamp(3rem, 1.4rem + 5vw, 5.75rem); /* 48px -> 92px — hero title */
 
     /* --- Space ---
        4px base scale plus the handful of semantic slots the plan names. */
@@ -60,19 +64,19 @@
     --space-12: 7.5rem; /* 120px */
 
     --gutter: clamp(1.25rem, 5vw, 3rem);
-    --section-y: clamp(4rem, 8vw, 7.5rem);
-    --container: 1200px;
+    --section-y: clamp(5rem, 10vw, 9rem);
+    --container: 1280px;
     --measure: 68ch;
-    /* Column gap of the 12-column editorial grid. Half the page gutter, so the
-       outer margin always reads as wider than any gap inside the grid. */
+    /* This remains an invisible layout grid only; there are no decorative
+       grid lines anywhere in the rendered design. */
     --grid-gap: calc(var(--gutter) / 2);
 
     /* --- Shape --- */
-    --radius-md: 8px;
-    --card-notch: clamp(24px, 4vw, 64px);
-    --rule-thick: 10px;
-    --nav-h: 92px;
-    --nav-h-scrolled: 84px;
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --nav-h: 104px;
+    --nav-h-scrolled: 72px;
 
     /* --- Motion ---
        One timing language, five rungs. Phase 6 tuned every animated property

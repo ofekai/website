@@ -1,56 +1,61 @@
 ---
 import { Image } from 'astro:assets';
 import SectionTitle from './SectionTitle.astro';
+import EditorialMedia from './EditorialMedia.astro';
 import taipei101 from '../assets/images/img_taipei101_2.png';
 import iconConsultant from '../assets/images/ic_consultant.png';
 import iconHeatVision from '../assets/images/heatVision.png';
 ---
 
-<section id="consulting" class="section expertise-section bg-expertise">
-  <div class="container grid expertise-grid">
+<section id="consulting" class="expertise-section" data-section>
+  <div class="expertise-heading-band">
+    <div class="container">
     <SectionTitle light="OUR" bold="EXPERTISE AND INTELLIGENCE" />
+    </div>
+  </div>
 
-    {/* Phase 1/2 carried the legacy shape here: an empty div reserving 640px
-        next to a CSS `background-image`, with the real <img> commented out.
-        It is now a composed layer on grid columns 1-5. */}
-    <div class="expertise-media">
-      <Image
+  <div class="expertise-stripe consulting-stripe">
+    <div class="stripe-media">
+      <EditorialMedia
         src={taipei101}
         alt=""
-        aria-hidden="true"
-        widths={[640, 960]}
-        sizes="640px"
-        loading="lazy"
-        decoding="async"
+        ratio="auto"
+        position="center"
+        reveal="left"
+        widths={[640, 960, 1280]}
+        sizes="(min-width: 769px) 48vw, 100vw"
       />
     </div>
-
-    <div class="card-outer" id="heatVision" data-reveal-group="diagonal" data-stagger="120">
-      <div class="diagonal-card diagonal-card-1" data-reveal="diagonal">
-        <div class="card-img">
-          <Image src={iconConsultant} alt="" aria-hidden="true" width={115} height={115} densities={[1, 2]} />
-        </div>
-        <div class="outer">
+    <div class="stripe-content" data-reveal="rise">
+      <div class="service-mark">
+        <Image src={iconConsultant} alt="" aria-hidden="true" width={115} height={115} densities={[1, 2]} />
+      </div>
+      <div>
           <h3 class="card-title">Consulting</h3>
           <p class="card-text">
             We leverage our technical knowledge and local ecosystem insights to drive manufacturing
             improvements. Building long-term partnerships based on trust and transparency, creating
             lasting value.
           </p>
-        </div>
       </div>
-      <div class="diagonal-card diagonal-card-2" data-reveal="diagonal">
-        <div class="card-img">
-          <Image src={iconHeatVision} alt="" aria-hidden="true" width={115} height={115} densities={[1, 2]} />
-        </div>
-        <div class="outer">
+    </div>
+  </div>
+
+  <div id="heatVision" class="expertise-stripe heatvision-stripe" data-section>
+    <div class="stripe-content" data-reveal="rise">
+      <div class="service-mark">
+        <Image src={iconHeatVision} alt="" aria-hidden="true" width={115} height={115} densities={[1, 2]} />
+      </div>
+      <div>
           <h3 class="card-title">HeatVision<sup>&reg;</sup></h3>
           <p class="card-text">
             Our software brings real-time clarity from manufacturing to data center through big data
             analytics and machine learning, anticipating failures and eliminating the underlying causes.
           </p>
-        </div>
       </div>
+    </div>
+    <div class="heatvision-stage" aria-hidden="true">
+      <div class="heatvision-wordmark">HeatVision<sup>&reg;</sup></div>
     </div>
   </div>
 </section>

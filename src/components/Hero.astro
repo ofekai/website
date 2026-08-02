@@ -4,22 +4,10 @@ import ButtonOutline from './ButtonOutline.astro';
 import heroBanner from '../assets/images/Banner.png';
 import IconArrow from '../icons/arrow.svg';
 
-// Split at build time, not at runtime. The headline is the hero's first text
-// paint, so the mask reveal has to be pure CSS — routing it through the Motion
-// chunk would delay it by however long that chunk takes to load and execute
-// (plan risk R5). Each word carries its own --i, and the CSS reads that to
-// offset the word's animation-delay.
-//
-// Six words -> the last one starts at 5 x --stagger = 300ms, inside the 350ms
-// headline budget, and word 0 starts at t=0 with no delay at all.
 const headline = 'TRUSTED INSIGHTS INTO FRONTIER COMPUTE MANUFACTURING';
-const words = headline.split(' ');
+const lines = ['TRUSTED INSIGHTS INTO', 'FRONTIER COMPUTE MANUFACTURING'];
 ---
 
-{/* Real <img> layer rather than `.bg-hero { background-image }`: `fetchpriority`
-    applies to it, the browser can prioritise it as a genuine LCP candidate, and
-    it is a concrete element for the scroll parallax to target. (Measured, the
-    LCP element is now the H1 — the banner arrives before it.) */}
 <section class="hero">
   <div class="hero-media">
     <Picture
@@ -37,16 +25,13 @@ const words = headline.split(' ');
     />
   </div>
   <div class="hero-scrim" aria-hidden="true"></div>
-
   <div class="container grid">
     <div class="hero-content">
-      {/* The literal spaces between words are real text nodes so the headline
-          still reads and copy-pastes as one sentence; `{' '}` keeps Astro 7's
-          JSX whitespace handling from collapsing them (plan risk R3). */}
-      <h1 class="hero-title">
-        {/* prettier-ignore */}
-        {words.map((word, i) => (
-          <><span class="word"><span class="word-in" style={`--i:${i}`}>{word}</span></span>{' '}</>
+      <h1 class="hero-title" aria-label={headline}>
+        {lines.map((line, i) => (
+          <span class:list={['hero-line', { 'hero-line-strong': i === 1 }]} aria-hidden="true">
+            <span class="hero-line-in" style={`--i:${i}`}>{line}</span>
+          </span>
         ))}
       </h1>
       <ButtonOutline href="#contact" />

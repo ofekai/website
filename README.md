@@ -27,7 +27,7 @@ Node 24 (see `.nvmrc`; anything ≥ 22.12 works).
 src/
 ├── pages/index.astro        the page — just composes the six sections
 ├── layouts/Layout.astro     <head>: SEO, Open Graph, JSON-LD, fonts, script entry
-├── components/              Nav, Hero, About, Expertise, Partners, Footer
+├── components/              sections plus reusable EditorialMedia and button components
 ├── data/site.ts             site metadata, nav links, addresses, email
 ├── styles/
 │   ├── tokens.css           design tokens — colour, type, space, shape, motion
@@ -35,8 +35,8 @@ src/
 │   └── global.css           every component style, in @layer order
 ├── scripts/
 │   ├── main.ts              entry; calls the two below
-│   ├── nav.ts               scrolled state, mobile menu, focus trap
-│   └── motion.ts            scroll reveals, parallax fallback, magnetic buttons
+│   ├── nav.ts               progress, active sections, mobile menu, focus trap
+│   └── motion.ts            reveals and the lazy scroll-timeline fallback
 ├── assets/images/           optimised at build time by Astro
 └── icons/                   inlined as SVG components
 public/                      copied byte-for-byte, never optimised (CNAME, favicon, robots.txt)
@@ -46,16 +46,15 @@ public/                      copied byte-for-byte, never optimised (CNAME, favic
 
 Almost all text is written directly in the component that renders it —
 `src/components/About.astro` for the About paragraph and the three feature cards,
-`Expertise.astro` for the two diagonal cards, `Hero.astro` for the headline. Edit it in place.
+`Expertise.astro` for the two expertise stripes, `Hero.astro` for the headline. Edit it in place.
 
 Two exceptions:
 
 - **`src/data/site.ts`** holds anything used in more than one spot or in `<head>`: the page title
   and meta description, the email address, the LinkedIn URL, the nav links, and both office
   addresses.
-- **The hero headline** in `Hero.astro` is a plain string (`const headline = '…'`) that the
-  template splits into words for the reveal animation. Edit the string; the animation adapts to
-  however many words it ends up with.
+- **The hero headline** in `Hero.astro` keeps the full accessible sentence in `headline` and its
+  two visual display lines in `lines`. Keep both in sync if that copy changes.
 
 ### Design tokens
 
@@ -74,9 +73,8 @@ inline: a looping animation needs an explicit `animation: none`, because collaps
 
 ### Motion
 
-Components opt in with data attributes, so the markup stays readable:
-`data-reveal`, `data-reveal-group`, `data-parallax`, `data-magnetic`. `src/scripts/motion.ts`
-documents each one and explains why each effect is implemented the way it is.
+Components opt in with `data-reveal`, `data-reveal-group`, and `data-parallax`, so the markup stays
+readable. Pointer spotlights and magnetic motion are deliberately excluded from this design.
 
 Two things worth knowing before changing anything there:
 
@@ -86,6 +84,13 @@ Two things worth knowing before changing anything there:
 - **The hero parallax is CSS where the browser supports scroll-driven animations** and lazily
   falls back to Motion only where it doesn't (Firefox, at time of writing). Importing Motion's
   `scroll()` eagerly for everyone measurably cost LCP.
+
+### Editorial images
+
+Use `src/components/EditorialMedia.astro` for current and future content imagery. It supplies
+responsive AVIF/WebP output, consistent ratios and crop positions, monochrome or natural tone,
+and directional reveal options. The design rule is intentionally strict: square corners, crisp
+crops, dark mattes, no shadows, glow, blur, grain, or decorative overlays.
 
 ## Deploying
 

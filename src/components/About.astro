@@ -20,11 +20,11 @@ const features = [
 ];
 ---
 
-<section id="about" class="section about-section">
-  <div class="container grid about-grid">
-    <div class="about-intro">
+<section id="about" class="about-section" data-section>
+  <div class="about-intro-band">
+    <div class="container about-intro">
       <SectionTitle light="US," bold="IN A NUTSHELL" />
-      <p class="description" data-reveal>
+      <p class="description" data-reveal="rise">
         Founded in 2020, Ofek partners with top S&P 100 companies to optimize their technology-focused
         manufacturing operations in Taiwan through tailored consultancy services. Drawing on deep
         knowledge of Taiwan&rsquo;s supply chain and our engineering expertise, we build strong relationships
@@ -32,15 +32,19 @@ const features = [
         for smoother operations.
       </p>
     </div>
-    <div class="feature-grid" data-reveal-group>
-      {
-        features.map(({ Icon, text }) => (
-          <div class="feature-card" data-reveal>
-            <div class="feature-num"><Icon aria-hidden="true" /></div>
-            <div class="feature-label">{text}</div>
-          </div>
-        ))
-      }
+  </div>
+  <div class="about-features-band">
+    <div class="container">
+      <div class="feature-grid" data-reveal-group>
+        {
+          features.map(({ Icon, text }) => (
+            <div class="feature-card" data-reveal="rise">
+              <div class="feature-num"><Icon aria-hidden="true" /></div>
+              <div class="feature-label">{text}</div>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>

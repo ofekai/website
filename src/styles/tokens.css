@@ -45,8 +45,8 @@
     --step-0: 0.875rem; /* 14px — nav links, button label */
     --step-1: 1rem; /* 16px — body copy */
     --step-2: 1.25rem; /* 20px — hero subtitle, card text (desktop) */
-    --step-3: clamp(2rem, 1.3rem + 2.1vw, 3.5rem); /* 32px -> 56px — section titles */
-    --step-4: clamp(3rem, 1.4rem + 5vw, 5.75rem); /* 48px -> 92px — hero title */
+    --step-3: clamp(1.85rem, 1.5rem + 1.4vw, 3rem); /* 30px -> 48px — section titles */
+    --step-4: clamp(2.25rem, 1.55rem + 3.2vw, 4.5rem); /* 36px -> 72px — hero title */
 
     /* --- Space ---
        4px base scale plus the handful of semantic slots the plan names. */
@@ -64,7 +64,10 @@
     --space-12: 7.5rem; /* 120px */
 
     --gutter: clamp(1.25rem, 5vw, 3rem);
-    --section-y: clamp(5rem, 10vw, 9rem);
+    /* Width-only spacing made wide, short laptops feel oversized. These
+       scales consider both axes and stop growing once a layout is spacious. */
+    --section-y: clamp(4rem, calc(2.5vw + 2.5vh), 7rem);
+    --section-y-compact: clamp(3.5rem, calc(2vw + 2vh), 6rem);
     --container: 1280px;
     --measure: 68ch;
     /* This remains an invisible layout grid only; there are no decorative
@@ -75,8 +78,8 @@
     --radius-sm: 0;
     --radius-md: 0;
     --radius-lg: 0;
-    --nav-h: 104px;
-    --nav-h-scrolled: 72px;
+    --nav-h: 92px;
+    --nav-h-scrolled: 68px;
 
     /* --- Motion ---
        One timing language, five rungs. Phase 6 tuned every animated property

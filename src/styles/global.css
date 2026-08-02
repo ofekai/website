@@ -197,7 +197,8 @@
   .hero {
     position: relative;
     display: grid;
-    min-height: 100svh;
+    height: clamp(40rem, 100svh, 75rem);
+    min-height: 0;
     overflow: hidden;
     place-items: center;
     background: var(--ink-950);
@@ -250,7 +251,7 @@
     margin: 0 0 clamp(2rem, 4vw, 3.5rem);
     color: #fff;
     font-family: var(--font-lato), Arial, sans-serif;
-    font-size: clamp(2.25rem, 5.2vw, 5rem);
+    font-size: var(--step-4);
     font-weight: 300;
     letter-spacing: 0.12em;
     line-height: 1.14;
@@ -387,7 +388,7 @@
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--grid-gap);
     align-items: center;
-    row-gap: clamp(3rem, 6vw, 5rem);
+    row-gap: clamp(2.5rem, 4vw, 4rem);
   }
 
   .about-intro > .main-title {
@@ -397,7 +398,7 @@
   .about-brand-mark {
     grid-column: 1 / span 4;
     display: flex;
-    min-height: 150px;
+    min-height: 128px;
     align-items: center;
     border-block: 1px solid var(--color-hairline-ink);
   }
@@ -421,7 +422,7 @@
   }
 
   .about-features-band {
-    padding-block: clamp(4rem, 8vw, 7rem);
+    padding-block: var(--section-y);
     border-block: 1px solid var(--color-hairline-ink);
     background: var(--paper-100);
   }
@@ -433,7 +434,7 @@
 
   .feature-card {
     min-width: 0;
-    padding: 0 clamp(2rem, 4vw, 4rem);
+    padding: 0 clamp(1.5rem, 3vw, 3rem);
     border-right: 1px solid var(--color-hairline-ink);
   }
 
@@ -448,10 +449,10 @@
 
   .feature-num {
     display: grid;
-    width: 72px;
-    height: 72px;
+    width: clamp(56px, 4.5vw, 64px);
+    height: clamp(56px, 4.5vw, 64px);
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     color: var(--color-accent);
     place-items: center;
   }
@@ -470,13 +471,14 @@
 
   /* Expertise: alternating full-width image/content stripes ----------- */
   .expertise-heading-band {
-    padding-block: clamp(4.5rem, 8vw, 7rem);
+    padding-block: var(--section-y-compact);
     background: #fff;
   }
 
   .expertise-stripe {
     display: grid;
-    min-height: clamp(500px, 58vw, 760px);
+    height: clamp(32.5rem, min(68svh, 42vw), 45rem);
+    min-height: 0;
     grid-template-columns: minmax(0, 48%) minmax(0, 52%);
   }
 
@@ -503,7 +505,7 @@
     display: grid;
     align-content: center;
     gap: clamp(2rem, 4vw, 4rem);
-    padding: clamp(4rem, 8vw, 8rem) clamp(2.5rem, 8vw, 8rem);
+    padding: var(--section-y-compact) clamp(2.5rem, 5vw, 6rem);
     background: var(--paper-100);
   }
 
@@ -523,10 +525,27 @@
     margin: 0 0 1.75rem;
     color: var(--ink-900);
     font-family: var(--font-lato), Arial, sans-serif;
-    font-size: clamp(2.2rem, 4.3vw, 4.5rem);
+    font-size: clamp(2.1rem, 3.4vw, 4rem);
     font-weight: 300;
     letter-spacing: 0.01em;
     line-height: 1;
+  }
+
+  .consulting-title {
+    letter-spacing: 0.025em;
+    line-height: 0.96;
+    text-transform: uppercase;
+  }
+
+  .consulting-title span,
+  .consulting-title strong {
+    display: block;
+  }
+
+  .consulting-title strong {
+    margin-top: 0.08em;
+    font-weight: 700;
+    letter-spacing: 0.01em;
   }
 
   .card-title::after {
@@ -547,7 +566,7 @@
     max-width: 590px;
     margin: 0;
     color: var(--ink-500);
-    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    font-size: clamp(1rem, 0.55vw + 0.55rem, 1.075rem);
     font-weight: 300;
     line-height: 1.85;
   }
@@ -577,7 +596,7 @@
   .heatvision-wordmark {
     color: var(--color-accent);
     font-family: var(--font-lato), Arial, sans-serif;
-    font-size: clamp(2.5rem, 6vw, 6.5rem);
+    font-size: clamp(2.25rem, 4vw, 5rem);
     font-weight: 300;
     letter-spacing: -0.04em;
     white-space: nowrap;
@@ -626,6 +645,15 @@
     filter: grayscale(1) contrast(1.1);
   }
 
+  .consulting-stripe .editorial-media img {
+    object-fit: contain;
+  }
+
+  .consulting-stripe .stripe-media,
+  .consulting-stripe .editorial-media {
+    background: #000;
+  }
+
   .editorial-media:hover img {
     transform: scale(1.02);
   }
@@ -637,7 +665,7 @@
   }
 
   .partners-section > .grid {
-    row-gap: clamp(3.5rem, 7vw, 6rem);
+    row-gap: clamp(3rem, 4vw, 5rem);
   }
 
   .partners-title {
@@ -692,8 +720,8 @@
 
   .logo-item {
     display: grid;
-    width: clamp(250px, 22vw, 330px);
-    min-height: 200px;
+    width: clamp(220px, 18vw, 300px);
+    min-height: clamp(150px, 12vw, 180px);
     border-right: 1px solid var(--color-hairline-ink);
     place-items: center;
   }
@@ -722,14 +750,14 @@
 
   /* Footer ------------------------------------------------------------- */
   .footer {
-    padding-block: clamp(5rem, 10vw, 9rem) 2rem;
+    padding-block: var(--section-y) 2rem;
     border-top: 1px solid var(--color-hairline);
     background: var(--ink-900);
     color: #fff;
   }
 
   .footer-grid {
-    row-gap: clamp(4rem, 8vw, 7rem);
+    row-gap: clamp(3.5rem, 5vw, 6rem);
   }
 
   .footer-brand {
@@ -771,7 +799,7 @@
   .footer-header {
     margin: 0 0 1.5rem;
     font-family: var(--font-lato), Arial, sans-serif;
-    font-size: clamp(2.5rem, 5vw, 5rem);
+    font-size: clamp(2.25rem, 3.5vw, 4rem);
     font-weight: 300;
     letter-spacing: 0.01em;
     line-height: 1;
@@ -912,8 +940,10 @@
 
   @media (max-width: 868px) {
     :root {
-      --nav-h: 78px;
-      --nav-h-scrolled: 66px;
+      --nav-h: 72px;
+      --nav-h-scrolled: 64px;
+      --section-y: clamp(3.5rem, 8vw, 5rem);
+      --section-y-compact: clamp(3rem, 7vw, 4.5rem);
     }
 
     .menu-toggle {
@@ -978,7 +1008,7 @@
     }
 
     .hero-title {
-      font-size: clamp(2rem, 8vw, 4rem);
+      font-size: clamp(2rem, 7vw, 3.5rem);
       letter-spacing: 0.08em;
     }
 
@@ -988,7 +1018,7 @@
 
     .about-intro {
       grid-template-columns: 1fr;
-      gap: 3rem;
+      gap: 2.5rem;
     }
 
     .about-intro > .main-title,
@@ -1008,7 +1038,7 @@
     .feature-card,
     .feature-card:first-child,
     .feature-card:last-child {
-      padding: 2.5rem 0;
+      padding: 2rem 0;
       border-right: 0;
       border-bottom: 1px solid var(--color-hairline-ink);
     }
@@ -1024,21 +1054,24 @@
 
     .expertise-stripe,
     .heatvision-stripe {
+      height: auto;
       min-height: 0;
       grid-template-columns: 1fr;
     }
 
     .stripe-media {
-      min-height: min(72vw, 620px);
+      height: clamp(16rem, 62vw, 30rem);
+      min-height: 0;
     }
 
     .stripe-content {
-      min-height: 480px;
-      padding: clamp(4rem, 10vw, 6rem) var(--gutter);
+      min-height: 0;
+      padding: var(--section-y) var(--gutter);
     }
 
     .heatvision-stage {
-      min-height: min(68vw, 500px);
+      height: clamp(16rem, 58vw, 27.5rem);
+      min-height: 0;
       grid-row: 1;
       border-bottom: 1px solid var(--color-hairline);
       border-left: 0;
@@ -1056,7 +1089,7 @@
 
   @media (max-width: 520px) {
     .hero-title {
-      font-size: clamp(1.75rem, 9vw, 2.6rem);
+      font-size: clamp(1.75rem, 8vw, 2.25rem);
       line-height: 1.22;
     }
 
@@ -1065,16 +1098,12 @@
     }
 
     .main-title {
-      font-size: clamp(1.85rem, 10vw, 2.6rem);
-    }
-
-    .stripe-content {
-      min-height: 430px;
+      font-size: clamp(1.8rem, 8vw, 2.15rem);
     }
 
     .logo-item {
       width: 220px;
-      min-height: 160px;
+      min-height: 145px;
     }
 
     .partners-group {

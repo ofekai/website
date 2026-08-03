@@ -476,15 +476,15 @@
 
   .hero-scroll a {
     display: grid;
-    width: 44px;
+    width: 96px;
     height: 44px;
     color: #fff;
     place-items: center;
   }
 
   .floating-arrow {
-    width: 24px;
-    height: 24px;
+    width: 84px;
+    height: 36px;
     animation: arrow-float var(--dur-breathe) ease-in-out infinite;
   }
 

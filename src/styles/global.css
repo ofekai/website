@@ -1118,8 +1118,8 @@
     justify-content: center;
     gap: 0.7rem;
     padding-inline: 1.15rem;
-    border: 1px solid #fff;
-    border-radius: 7px;
+    border: 1px solid currentColor;
+    border-radius: 0;
     color: #fff;
     font-size: 0.94rem;
     font-weight: 700;
@@ -1151,8 +1151,8 @@
     display: inline-grid;
     width: 54px;
     height: 54px;
-    border: 1px solid #fff;
-    border-radius: 7px;
+    border: 1px solid currentColor;
+    border-radius: 0;
     color: #fff;
     text-decoration: none;
     place-items: center;

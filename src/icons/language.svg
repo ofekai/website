@@ -1,7 +1,6 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="30" cy="29" r="16" stroke="currentColor" stroke-width="2"/>
-  <path d="M14 29H46M30 13C35 17.5 37 23 37 29C37 35 35 39.5 32.5 42M30 13C25 17.5 23 23 23 29C23 35 25 39.5 27.5 42" stroke="currentColor" stroke-width="1.75"/>
-  <path d="M18 20H42M18 38H28" stroke="currentColor" stroke-width="1.75"/>
-  <path d="M34 39H51V50H42L37 54V50H34V39Z" fill="currentColor"/>
-  <path d="M38 43H47M38 46H44" stroke="white" stroke-width="1.5"/>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="22" cy="21.5" r="13.5" stroke="currentColor" stroke-width="1.25"/>
+  <path d="M8.5 21.5H35.5M22 8C26 11.8 28 16.3 28 21.5C28 26.5 26.2 30.8 23.4 35M22 8C18 11.8 16 16.3 16 21.5C16 26.5 17.8 30.8 20.6 35M11.8 14.5H32.2M11.8 28.5H26" stroke="currentColor" stroke-width="1.25"/>
+  <path d="M28 29.5H41V38H34.5L30.5 41V38H28V29.5Z" fill="white" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+  <path d="M31.5 33H37.5M31.5 35.5H35.5" stroke="currentColor" stroke-width="1.1"/>
 </svg>

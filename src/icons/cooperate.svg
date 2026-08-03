@@ -1,10 +1,7 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="7" y="7" width="50" height="50" fill="currentColor" opacity="0.08"/>
-  <path d="M27 21L22 16H14V29L19 34" stroke="currentColor" stroke-width="2" stroke-linejoin="miter"/>
-  <path d="M37 21L42 16H50V29L45 34" stroke="currentColor" stroke-width="2" stroke-linejoin="miter"/>
-  <path d="M21 31L30 22C32 20 34 20 36 22L47 33L39 41C37.5 42.5 35.5 42.5 34 41L22 29" stroke="currentColor" stroke-width="2" stroke-linejoin="miter"/>
-  <path d="M17 35L28 46C29.5 47.5 31.5 47.5 33 46L36 43" stroke="currentColor" stroke-width="2" stroke-linejoin="miter"/>
-  <path d="M27 36L32 41M32 32L39 39" stroke="currentColor" stroke-width="2"/>
-  <rect x="12" y="14" width="7" height="17" fill="currentColor"/>
-  <rect x="45" y="14" width="7" height="17" fill="currentColor"/>
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M18 14.5L14.5 11H8V20.5L12 24" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+  <path d="M30 14.5L33.5 11H40V20.5L36 24" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+  <path d="M13.5 22L20.5 15C22.2 13.3 24.5 13.3 26.2 15L36.5 25.3L30.5 31.3C29.3 32.5 27.4 32.5 26.2 31.3L17 22.2" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>
+  <path d="M11 25.5L20 34.5C21.2 35.7 23.1 35.7 24.3 34.5L26.5 32.3M20.5 27L24.5 31M24.5 24L30 29.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+  <path d="M8 9H13V22H8V9ZM35 9H40V22H35V9Z" stroke="currentColor" stroke-width="1.25"/>
 </svg>

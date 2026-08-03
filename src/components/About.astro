@@ -31,13 +31,14 @@ const featureIcons = [IconData, IconLanguage, IconCooperate];
     <div class="container">
       <div class="feature-grid" data-reveal-group>
         {
-          messages.features.map((text, index) => {
+          messages.features.map((feature, index) => {
             const Icon = featureIcons[index];
             return (
-            <div class="feature-card" data-reveal="rise">
+            <article class="feature-card" data-reveal="rise">
               <div class="feature-num">{Icon && <Icon aria-hidden="true" />}</div>
-              <div class="feature-label">{text}</div>
-            </div>
+              <h3 class="feature-title">{feature.title}</h3>
+              <p class="feature-label">{feature.text}</p>
+            </article>
             );
           })
         }

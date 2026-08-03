@@ -43,7 +43,11 @@ export interface Messages {
     titleLight: string;
     titleBold: string;
     description: string;
-    features: readonly [string, string, string];
+    features: readonly [
+      { title: string; text: string },
+      { title: string; text: string },
+      { title: string; text: string },
+    ];
   };
   expertise: {
     titleLight: string;

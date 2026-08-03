@@ -5,6 +5,10 @@ import EditorialMedia from './EditorialMedia.astro';
 import type { Messages } from '../i18n';
 import consultingTree from '../assets/images/consulting-tree-v2.png';
 import iconHeatVision from '../assets/images/heatVision.png';
+import heatVisionSpi from '../assets/images/heatvision/spi-board-heatmap-3d.png';
+import heatVisionAoi from '../assets/images/heatvision/aoi-sankey.png';
+import heatVisionPointMap from '../assets/images/heatvision/pt-heatmap.png';
+import heatVisionReflow from '../assets/images/heatvision/reflow-temp-top-ts.png';
 
 interface Props {
   messages: Messages['expertise'];
@@ -52,14 +56,51 @@ const { messages } = Astro.props;
         <Image src={iconHeatVision} alt="" aria-hidden="true" width={115} height={115} densities={[1, 2]} />
       </div>
       <div>
-          <h3 class="card-title brand-ltr" dir="ltr">HeatVision<sup>&reg;</sup></h3>
+          <h3 class="card-title heatvision-title brand-ltr" dir="ltr">HeatVision<sup>&reg;</sup></h3>
           <p class="card-text">
             {messages.heatVisionBody}
           </p>
       </div>
     </div>
     <div class="heatvision-stage" aria-hidden="true">
-      <div class="heatvision-wordmark" dir="ltr">HeatVision<sup>&reg;</sup></div>
+      <div class="heatvision-gallery">
+        <figure class="heatvision-shot heatvision-shot-primary">
+          <Image
+            src={heatVisionSpi}
+            alt=""
+            widths={[640, 960, 1280, 1920, 2560]}
+            sizes="(min-width: 869px) 46vw, (min-width: 521px) 78vw, 90vw"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="heatvision-shot heatvision-shot-support heatvision-shot-aoi">
+          <Image
+            src={heatVisionAoi}
+            alt=""
+            widths={[320, 480, 640, 960]}
+            sizes="(min-width: 869px) 21vw, (min-width: 521px) 36vw, 46vw"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="heatvision-shot heatvision-shot-support heatvision-shot-point">
+          <Image
+            src={heatVisionPointMap}
+            alt=""
+            widths={[320, 480, 640, 960]}
+            sizes="(min-width: 869px) 17vw, (min-width: 521px) 28vw, 40vw"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="heatvision-shot heatvision-shot-support heatvision-shot-reflow">
+          <Image
+            src={heatVisionReflow}
+            alt=""
+            widths={[320, 480, 640, 960]}
+            sizes="(min-width: 869px) 17vw, (min-width: 521px) 28vw, 38vw"
+            loading="lazy"
+          />
+        </figure>
+      </div>
     </div>
   </div>
 </section>

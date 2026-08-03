@@ -646,12 +646,36 @@
   }
 
   .consulting-stripe .editorial-media img {
+    --contained-image-width: min(100cqw, 133.333cqh);
+    --source-edge-inset: calc((100cqw - var(--contained-image-width)) / 2);
+    --source-edge-fade: min(14cqw, 18.667cqh);
+
     object-fit: contain;
+    /* The source artwork has illuminated ground at both horizontal edges.
+       Fade those source edges into the panel instead of exposing a hard cut. */
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0 var(--source-edge-inset),
+      #000 calc(var(--source-edge-inset) + var(--source-edge-fade)),
+      #000 calc(100cqw - var(--source-edge-inset) - var(--source-edge-fade)),
+      transparent calc(100cqw - var(--source-edge-inset)) 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0 var(--source-edge-inset),
+      #000 calc(var(--source-edge-inset) + var(--source-edge-fade)),
+      #000 calc(100cqw - var(--source-edge-inset) - var(--source-edge-fade)),
+      transparent calc(100cqw - var(--source-edge-inset)) 100%
+    );
   }
 
   .consulting-stripe .stripe-media,
   .consulting-stripe .editorial-media {
     background: #000;
+  }
+
+  .consulting-stripe .stripe-media {
+    container-type: size;
   }
 
   .editorial-media:hover img {

@@ -4,7 +4,7 @@ import type { ImageMetadata } from 'astro';
 import SectionTitle from './SectionTitle.astro';
 import logoAnnapurna from '../assets/images/logo_Annapurna.png';
 import logoHipcam from '../assets/images/logo_Hipcam.png';
-import logoGoldtek from '../assets/images/logo_Goldtek.png';
+import logoGoldtek from '../assets/images/logo_Goldtek.svg';
 import logoAccton from '../assets/images/logo_Accton.png';
 import logoInventec from '../assets/images/logo_Inventec.svg';
 import logoAWS from '../assets/images/logo_AWS.svg';
@@ -51,7 +51,12 @@ const groups = [false, true];
         groups.map((duplicate) => (
           <div class="partners-group" role={duplicate ? undefined : 'list'} aria-hidden={duplicate ? 'true' : undefined}>
             {partners.map((p) => (
-              <div class="logo-item" role={duplicate ? undefined : 'listitem'} style={`--logo-scale: ${p.scale}`}>
+              <div
+                class="logo-item"
+                role={duplicate ? undefined : 'listitem'}
+                tabindex={duplicate ? undefined : '0'}
+                style={`--logo-scale: ${p.scale}`}
+              >
                 {p.remote ? (
                   <img
                     src={p.remote}

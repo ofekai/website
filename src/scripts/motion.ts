@@ -78,11 +78,15 @@ function initScrollFallback(): VoidFunction | undefined {
     void import('motion').then(({ scroll }) => {
       if (cancelled) return;
       stopImage = scroll(
-        animate(image, { transform: ['translateY(0) scale(1.06)', 'translateY(14%) scale(1.34)'] }, { ease: 'linear' }),
+        animate(
+          image,
+          { transform: ['translateY(0) scale(1.06)', 'translateY(50%) scale(1.06)'] },
+          { ease: 'linear' },
+        ),
         { target: hero, offset: ['start start', 'end start'] },
       );
       stopContent = scroll(
-        animate(content, { opacity: [1, 0], transform: ['translateY(0)', 'translateY(-14vh)'] }, { ease: 'linear' }),
+        animate(content, { opacity: [1, 0] }, { ease: 'linear' }),
         { target: hero, offset: ['start start', '0.68 start'] },
       );
     });

@@ -1,33 +1,57 @@
 ---
 import { Image } from 'astro:assets';
-import ButtonOutline from './ButtonOutline.astro';
 import { site, addresses } from '../data/site';
 import logoOfek from '../assets/images/Logo_Ofek.png';
 import IconLocation from '../icons/location.svg';
 import IconLinkedin from '../icons/linkedin.svg';
+import IconMail from '../icons/mail.svg';
+
+const officeLocations = addresses.map((location) => {
+  const [office, address] = location.split('｜');
+  return { office, address };
+});
 ---
 
 <footer id="contact" class="footer" data-section>
-  <div class="container grid footer-grid" data-reveal-group>
-    <div class="footer-brand" data-reveal="rise">
-      <div class="footer-logo">
-        <Image src={logoOfek} alt="Ofek" width={150} height={75} densities={[1, 2]} />
+  <div class="container footer-container" data-reveal-group>
+    <div class="footer-main">
+      <div class="footer-brand" data-reveal="rise">
+        <div class="footer-logo">
+          <Image src={logoOfek} alt="Ofek" width={150} height={75} densities={[1, 2]} />
+        </div>
+        <div class="footer-addresses">
+          {
+            officeLocations.map(({ office, address }) => (
+              <div class="footer-location">
+                <span class="footer-location-icon"><IconLocation aria-hidden="true" /></span>
+                <p>
+                  <span class="footer-office">{office}</span>
+                  <span>{address}</span>
+                </p>
+              </div>
+            ))
+          }
+        </div>
       </div>
-      {
-        addresses.map((address) => (
-          <p class="footer-loction"><IconLocation aria-hidden="true" />{address}</p>
-        ))
-      }
-    </div>
-    <div class="footer-links-grid" data-reveal="mask">
-      <h3 class="footer-header">Let&rsquo;s team up!</h3>
-      <a href={`mailto:${site.email}`}>
-        <span class="footer-email">Email us at {site.email}</span>
-      </a>
-      <ButtonOutline href={`mailto:${site.email}`} />
-      <a class="footer-link-outer" target="_blank" rel="noopener noreferrer" href={site.linkedin} aria-label="Ofek on LinkedIn">
-        <IconLinkedin class="icon-linkedin" aria-hidden="true" />
-      </a>
+      <div class="footer-contact" data-reveal="mask">
+        <p class="footer-kicker">Contact Ofek</p>
+        <h2 class="footer-header">
+          <span>Start a</span>
+          <strong>conversation</strong>
+        </h2>
+        <a class="footer-email-link" href={`mailto:${site.email}`}>
+          <span class="footer-email">Email us at {site.email}</span>
+        </a>
+        <div class="footer-actions">
+          <a class="footer-mail-button" href={`mailto:${site.email}`}>
+            <span>Contact us</span>
+            <IconMail aria-hidden="true" />
+          </a>
+          <a class="footer-link-outer" target="_blank" rel="noopener noreferrer" href={site.linkedin} aria-label="Ofek on LinkedIn">
+            <IconLinkedin class="icon-linkedin" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
     </div>
     <div class="copyright" data-reveal="line">© 2026 Ofek. All rights reserved.</div>
   </div>

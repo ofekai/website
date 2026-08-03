@@ -194,7 +194,7 @@ async function checkNavigation(browser, url) {
 }
 
 /** Proves the desktop landing state keeps its logo and that the hero's two
- * visual planes travel in opposite directions during the first viewport. */
+ * visual planes travel at clearly different speeds during the first viewport. */
 async function checkHeroLayering(browser, url) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
@@ -218,7 +218,8 @@ async function checkHeroLayering(browser, url) {
     };
     return { imageY: y('.hero-media img'), contentY: y('.hero-content') };
   });
-  if (layers.imageY < 10 || layers.contentY > -10) {
+  const separation = layers.imageY - layers.contentY;
+  if (layers.imageY < 180 || separation < 180) {
     problems.push(`hero layers do not separate during scroll (image=${layers.imageY}, content=${layers.contentY})`);
   }
 

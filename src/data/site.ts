@@ -17,6 +17,6 @@ export const navLinks = [
 ] as const;
 
 export const addresses = [
-  'USA｜ 112 Capitol trail , Newark , Delaware 19711 USA',
-  'TW ｜ No. 2, Sec. 1, Dunhua S. Rd., Songshan Dist., Taipei City 105408, Taiwan (R.O.C.) ',
+  'United States｜112 Capitol Trail, Newark, Delaware 19711, USA',
+  'Taiwan｜No. 2, Sec. 1, Dunhua S. Rd., Songshan Dist., Taipei City 105408, Taiwan (R.O.C.)',
 ] as const;

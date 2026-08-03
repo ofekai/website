@@ -774,95 +774,213 @@
 
   /* Footer ------------------------------------------------------------- */
   .footer {
-    padding-block: var(--section-y) 2rem;
+    padding-block: clamp(3rem, calc(1.5vw + 2vh), 4rem) 1.5rem;
     border-top: 1px solid var(--color-hairline);
     background: var(--ink-900);
     color: #fff;
   }
 
-  .footer-grid {
-    row-gap: clamp(3.5rem, 5vw, 6rem);
+  .footer-container {
+    width: min(calc(100% - (2 * var(--gutter))), 1120px);
+  }
+
+  .footer-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(22rem, 0.95fr);
+    gap: clamp(3.5rem, 7vw, 6.5rem);
   }
 
   .footer-brand {
-    grid-column: 1 / span 5;
+    min-width: 0;
   }
 
   .footer-logo {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .footer-logo img {
-    width: 150px;
+    width: 132px;
     height: auto;
   }
 
-  .footer-loction {
-    display: flex;
-    max-width: 460px;
-    align-items: flex-start;
-    gap: 0.9rem;
-    margin: 0.8rem 0 0;
+  .footer-addresses {
+    display: grid;
+    max-width: 480px;
+    gap: 0.8rem;
+  }
+
+  .footer-location {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .footer-location-icon {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    color: var(--color-accent-bright);
+    place-items: center;
+  }
+
+  .footer-location-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .footer-location p {
+    margin: 0;
     color: rgb(255 255 255 / 65%);
-    font-size: 0.82rem;
-    line-height: 1.65;
+    font-size: 0.8rem;
+    line-height: 1.7;
   }
 
-  .footer-loction svg {
-    width: 15px;
-    min-width: 15px;
-    margin-top: 0.3rem;
-    color: var(--color-accent);
+  .footer-office {
+    display: block;
+    margin-bottom: 0.15rem;
+    color: rgb(255 255 255 / 88%);
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
   }
 
-  .footer-links-grid {
-    grid-column: 7 / -1;
+  .footer-contact {
     align-self: start;
+    padding-left: clamp(2.5rem, 4.5vw, 4rem);
+    border-left: 1px solid var(--color-hairline);
+  }
+
+  .footer-kicker {
+    margin: 0 0 0.75rem;
+    color: var(--color-accent-bright);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
   }
 
   .footer-header {
-    margin: 0 0 1.5rem;
+    margin: 0 0 1rem;
     font-family: var(--font-lato), Arial, sans-serif;
-    font-size: clamp(2.25rem, 3.5vw, 4rem);
+    font-size: var(--step-3);
     font-weight: 300;
-    letter-spacing: 0.01em;
-    line-height: 1;
+    letter-spacing: 0.02em;
+    line-height: 1.08;
+    text-transform: uppercase;
   }
 
-  .footer-links-grid > a:not(.btn-outline, .footer-link-outer) {
+  .footer-header span,
+  .footer-header strong {
+    display: block;
+  }
+
+  .footer-header strong {
+    font-weight: 700;
+  }
+
+  .footer-header::after {
+    display: block;
+    width: 96px;
+    height: 3px;
+    margin-top: 0.9rem;
+    background: var(--color-accent);
+    content: '';
+  }
+
+  .footer-email-link {
     display: block;
     width: fit-content;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     color: rgb(255 255 255 / 70%);
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out-quart);
   }
 
-  .footer-links-grid .btn-outline {
-    margin-right: 1.25rem;
+  .footer-email-link:hover,
+  .footer-email-link:focus-visible {
+    color: #fff;
+  }
+
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .footer-mail-button {
+    display: inline-flex;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    padding-inline: 1.15rem;
+    border: 1px solid #fff;
+    border-radius: 7px;
+    color: #fff;
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      background-color var(--dur-base) var(--ease-out-quart),
+      border-color var(--dur-base) var(--ease-out-quart),
+      color var(--dur-base) var(--ease-out-quart),
+      transform var(--dur-fast) var(--ease-out-quart);
+  }
+
+  .footer-mail-button svg {
+    width: 27px;
+    height: 27px;
+    flex: none;
+  }
+
+  .footer-mail-button:hover,
+  .footer-mail-button:focus-visible {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    transform: translateY(-1px);
   }
 
   .footer-link-outer {
     display: inline-grid;
-    width: 48px;
-    height: 48px;
-    border: 1px solid rgb(255 255 255 / 45%);
-    vertical-align: top;
+    width: 54px;
+    height: 54px;
+    border: 1px solid #fff;
+    border-radius: 7px;
+    color: #fff;
+    text-decoration: none;
     place-items: center;
+    transition:
+      background-color var(--dur-base) var(--ease-out-quart),
+      border-color var(--dur-base) var(--ease-out-quart),
+      color var(--dur-base) var(--ease-out-quart);
+  }
+
+  .footer-link-outer:hover,
+  .footer-link-outer:focus-visible {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
   }
 
   .icon-linkedin {
-    width: 18px;
-    height: 18px;
+    width: 36px;
+    height: 36px;
   }
 
   .copyright {
-    grid-column: 1 / -1;
-    padding-top: 2rem;
+    margin-top: clamp(2.5rem, 4vw, 3.5rem);
+    padding-top: 1.1rem;
     border-top: 1px solid var(--color-hairline);
     color: rgb(255 255 255 / 45%);
-    font-size: var(--step--1);
-    letter-spacing: 0.04em;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
   }
 }
 
@@ -913,12 +1031,17 @@
 
   @keyframes hero-depth {
     from { transform: translateY(0) scale(1.06); }
-    to { transform: translateY(14%) scale(1.34); }
+    /*
+     * A 50% counter-travel makes the distant image move at roughly half the
+     * page speed. Its top edge remains above the viewport throughout the
+     * hero's exit, so this can create depth without disguising it as a zoom.
+     */
+    to { transform: translateY(50%) scale(1.06); }
   }
 
   @keyframes hero-content-exit {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-14vh); }
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   @supports (animation-timeline: view()) {
@@ -1105,9 +1228,16 @@
       grid-row: 2;
     }
 
-    .footer-brand,
-    .footer-links-grid {
-      grid-column: 1 / -1;
+    .footer-main {
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+    }
+
+    .footer-contact {
+      padding-top: 2.25rem;
+      padding-left: 0;
+      border-top: 1px solid var(--color-hairline);
+      border-left: 0;
     }
   }
 
@@ -1134,8 +1264,8 @@
       grid-template-columns: 1fr;
     }
 
-    .footer-links-grid .btn-outline {
-      margin-bottom: 1rem;
+    .footer {
+      padding-top: 3rem;
     }
   }
 

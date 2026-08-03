@@ -209,7 +209,8 @@
     justify-content: center;
     gap: 0.4rem;
     padding-inline: 0.5rem;
-    border: 1px solid currentColor;
+    border: 0;
+    background: transparent;
     cursor: pointer;
     list-style: none;
   }

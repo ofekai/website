@@ -67,7 +67,7 @@ function afterLoad(fn: VoidFunction): VoidFunction {
 function initScrollFallback(): VoidFunction | undefined {
   if (CSS.supports('animation-timeline', 'view()')) return undefined;
   const hero = document.querySelector<HTMLElement>('.hero');
-  const image = hero?.querySelector<HTMLElement>('img[data-parallax]');
+  const image = hero?.querySelector<HTMLElement>('[data-parallax]');
   const content = hero?.querySelector<HTMLElement>('.hero-content');
   if (!hero || !image || !content) return undefined;
 

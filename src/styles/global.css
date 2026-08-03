@@ -209,8 +209,10 @@
   }
 
   .hero-media,
+  .hero-visual,
   .hero-media picture,
   .hero-media img,
+  .hero-contours,
   .hero-scrim {
     position: absolute;
     inset: 0;
@@ -219,21 +221,74 @@
   }
 
   .hero-media {
-    z-index: -2;
+    z-index: -3;
     overflow: hidden;
+  }
+
+  .hero-visual {
+    transform: scale(1.06);
+    animation: hero-arrive 1.8s var(--ease-out-expo) both;
   }
 
   .hero-media img {
     object-fit: cover;
     object-position: center;
-    filter: grayscale(1) contrast(1.12) brightness(0.78);
-    transform: scale(1.06);
-    animation: hero-arrive 1.8s var(--ease-out-expo) both;
+    filter: grayscale(1) contrast(1.02) brightness(1.16);
+  }
+
+  .hero-contours {
+    z-index: 1;
+    fill: none;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    stroke-linecap: square;
+  }
+
+  .hero-contours stop {
+    stop-color: var(--color-accent);
+  }
+
+  .hero-contour {
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .hero-contour-main {
+    stroke: url('#hero-edge-accent');
+  }
+
+  .hero-contour-secondary {
+    stroke: url('#hero-edge-secondary');
+  }
+
+  .hero-contour-tertiary {
+    stroke: url('#hero-edge-tertiary');
+    stroke-width: 1.5;
+  }
+
+  .hero-contour-mobile {
+    display: none;
+  }
+
+  .hero-contour-mobile-left {
+    stroke: url('#hero-edge-mobile-left');
+  }
+
+  .hero-contour-mobile-right {
+    stroke: url('#hero-edge-mobile-right');
   }
 
   .hero-scrim {
-    z-index: -1;
-    background: rgb(5 7 8 / 53%);
+    z-index: -2;
+    background:
+      radial-gradient(ellipse 58% 42% at 50% 51%, rgb(5 7 8 / 42%), transparent 74%),
+      linear-gradient(
+        to bottom,
+        rgb(5 7 8 / 30%) 0%,
+        rgb(5 7 8 / 8%) 25%,
+        rgb(5 7 8 / 14%) 68%,
+        rgb(5 7 8 / 24%) 100%
+      );
   }
 
   .hero > .container {
@@ -1046,7 +1101,7 @@
 
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      .hero-media img {
+      .hero-visual {
         animation: hero-arrive 1.8s var(--ease-out-expo) both, hero-depth linear both;
         animation-timeline: auto, --hero-scroll;
         animation-range: normal, exit 0% exit 100%;
@@ -1242,6 +1297,14 @@
   }
 
   @media (max-width: 520px) {
+    .hero-contour-desktop {
+      display: none;
+    }
+
+    .hero-contour-mobile {
+      display: block;
+    }
+
     .hero-title {
       font-size: clamp(1.75rem, 8vw, 2.25rem);
       line-height: 1.22;

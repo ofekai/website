@@ -10,19 +10,64 @@ const lines = ['TRUSTED INSIGHTS INTO', 'FRONTIER COMPUTE MANUFACTURING'];
 
 <section class="hero">
   <div class="hero-media">
-    <Picture
-      src={heroBanner}
-      formats={['avif', 'webp']}
-      fallbackFormat="png"
-      widths={[640, 960, 1280, 1600, 1920, 2560]}
-      sizes="100vw"
-      alt=""
-      aria-hidden="true"
-      loading="eager"
-      fetchpriority="high"
-      decoding="sync"
-      data-parallax
-    />
+    <div class="hero-visual" data-parallax>
+      <Picture
+        src={heroBanner}
+        formats={['avif', 'webp']}
+        fallbackFormat="png"
+        widths={[640, 960, 1280, 1600, 1920, 2560]}
+        sizes="100vw"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        fetchpriority="high"
+        decoding="sync"
+      />
+      <svg
+        class="hero-contours"
+        viewBox="0 0 2880 1600"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="hero-edge-accent" x1="610" y1="1305" x2="1110" y2="840" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-opacity="0" />
+            <stop offset="0.14" stop-opacity="0.58" />
+            <stop offset="0.78" stop-opacity="0.82" />
+            <stop offset="1" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="hero-edge-secondary" x1="1770" y1="840" x2="2280" y2="1305" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-opacity="0" />
+            <stop offset="0.2" stop-opacity="0.48" />
+            <stop offset="0.76" stop-opacity="0.62" />
+            <stop offset="1" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="hero-edge-tertiary" x1="960" y1="650" x2="1325" y2="185" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-opacity="0" />
+            <stop offset="0.22" stop-opacity="0.34" />
+            <stop offset="0.74" stop-opacity="0.52" />
+            <stop offset="1" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="hero-edge-mobile-left" x1="1125" y1="1210" x2="1280" y2="990" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-opacity="0" />
+            <stop offset="0.14" stop-opacity="0.58" />
+            <stop offset="0.78" stop-opacity="0.82" />
+            <stop offset="1" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="hero-edge-mobile-right" x1="1600" y1="990" x2="1755" y2="1210" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-opacity="0" />
+            <stop offset="0.22" stop-opacity="0.4" />
+            <stop offset="0.76" stop-opacity="0.62" />
+            <stop offset="1" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path class="hero-contour hero-contour-desktop hero-contour-main" d="M610 1305 L1110 840" />
+        <path class="hero-contour hero-contour-desktop hero-contour-secondary" d="M1770 840 L2280 1305" />
+        <path class="hero-contour hero-contour-desktop hero-contour-tertiary" d="M960 650 L1325 185" />
+        <path class="hero-contour hero-contour-mobile hero-contour-mobile-left" d="M1125 1210 L1280 990" />
+        <path class="hero-contour hero-contour-mobile hero-contour-mobile-right" d="M1600 990 L1755 1210" />
+      </svg>
+    </div>
   </div>
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="container grid">

@@ -14,10 +14,11 @@ Node 24 (see `.nvmrc`; anything ≥ 22.12 works).
 |---|---|
 | `npm install` | once, after cloning |
 | `npm run dev` | dev server on http://localhost:4321, hot reloads |
-| `npm run build` | type-check, then build to `dist/` |
+| `npm run build` | type-check, build to `dist/`, then validate all localized output |
 | `npm run preview` | serve the built `dist/` as it will be served in production |
 | `npm run check` | type-check only |
-| `npm run visual-diff` | screenshot `dist/` at 8 widths, and fail on horizontal overflow, console errors or 404s |
+| `npm run check:i18n` | validate built locale pages, canonicals, alternates, and sitemap |
+| `npm run visual-diff` | screenshot both locales at 8 widths and run interaction, overflow, console, and no-JS checks |
 
 `npm run build` runs `astro check` first, so a type error fails the build rather than shipping.
 
@@ -25,10 +26,11 @@ Node 24 (see `.nvmrc`; anything ≥ 22.12 works).
 
 ```
 src/
-├── pages/index.astro        the page — just composes the six sections
+├── pages/                   English root, localized route entries, and generated sitemap
 ├── layouts/Layout.astro     <head>: SEO, Open Graph, JSON-LD, fonts, script entry
 ├── components/              sections plus reusable EditorialMedia and button components
-├── data/site.ts             site metadata, nav links, addresses, email
+├── i18n/                    locale definitions, strict message type, and translation files
+├── data/site.ts             locale-independent organization metadata and contact details
 ├── styles/
 │   ├── tokens.css           design tokens — colour, type, space, shape, motion
 │   ├── reset.css
@@ -42,19 +44,19 @@ src/
 public/                      copied byte-for-byte, never optimised (CNAME, favicon, robots.txt)
 ```
 
-### Editing copy
+### Editing copy and languages
 
-Almost all text is written directly in the component that renders it —
-`src/components/About.astro` for the About paragraph and the three feature cards,
-`Expertise.astro` for the two expertise stripes, `Hero.astro` for the headline. Edit it in place.
+All visitor-facing copy lives in `src/i18n/locales/`. Every locale must satisfy the shared
+`Messages` interface in `src/i18n/types.ts`, so a missing translation fails `npm run check`.
+Locale paths, HTML language tags, direction, and switcher labels live in `src/i18n/config.ts`.
 
-Two exceptions:
+English is canonical at `/`; Traditional Chinese is published at `/zh-tw/`. The hero keeps one
+accessible `headline` plus locale-specific visual `lines` and a `strongLine` index. Keep those
+fields semantically synchronized when editing a headline.
 
-- **`src/data/site.ts`** holds anything used in more than one spot or in `<head>`: the page title
-  and meta description, the email address, the LinkedIn URL, the nav links, and both office
-  addresses.
-- **The hero headline** in `Hero.astro` keeps the full accessible sentence in `headline` and its
-  two visual display lines in `lines`. Keep both in sync if that copy changes.
+Brand names, email, LinkedIn URL, and canonical organization addresses remain in
+`src/data/site.ts`. Non-English copy is an initial marketing translation and should receive
+native-speaker review before production publication.
 
 ### Design tokens
 

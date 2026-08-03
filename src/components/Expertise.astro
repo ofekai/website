@@ -2,14 +2,21 @@
 import { Image } from 'astro:assets';
 import SectionTitle from './SectionTitle.astro';
 import EditorialMedia from './EditorialMedia.astro';
+import type { Messages } from '../i18n';
 import consultingTree from '../assets/images/consulting-tree-v2.png';
 import iconHeatVision from '../assets/images/heatVision.png';
+
+interface Props {
+  messages: Messages['expertise'];
+}
+
+const { messages } = Astro.props;
 ---
 
 <section id="consulting" class="expertise-section" data-section>
   <div class="expertise-heading-band">
     <div class="container">
-    <SectionTitle light="OUR" bold="EXPERTISE AND INTELLIGENCE" />
+    <SectionTitle light={messages.titleLight} bold={messages.titleBold} />
     </div>
   </div>
 
@@ -29,13 +36,11 @@ import iconHeatVision from '../assets/images/heatVision.png';
     <div class="stripe-content" data-reveal="rise">
       <div>
           <h3 class="card-title consulting-title">
-            <span>Consulting</span>
-            <strong>Services</strong>
+            <span>{messages.consultingTitleLight}</span>
+            <strong>{messages.consultingTitleBold}</strong>
           </h3>
           <p class="card-text">
-            We leverage our technical knowledge and local ecosystem insights to drive manufacturing
-            improvements. Building long-term partnerships based on trust and transparency, creating
-            lasting value.
+            {messages.consultingBody}
           </p>
       </div>
     </div>
@@ -47,15 +52,14 @@ import iconHeatVision from '../assets/images/heatVision.png';
         <Image src={iconHeatVision} alt="" aria-hidden="true" width={115} height={115} densities={[1, 2]} />
       </div>
       <div>
-          <h3 class="card-title">HeatVision<sup>&reg;</sup></h3>
+          <h3 class="card-title brand-ltr" dir="ltr">HeatVision<sup>&reg;</sup></h3>
           <p class="card-text">
-            Our software brings real-time clarity from manufacturing to data center through big data
-            analytics and machine learning, anticipating failures and eliminating the underlying causes.
+            {messages.heatVisionBody}
           </p>
       </div>
     </div>
     <div class="heatvision-stage" aria-hidden="true">
-      <div class="heatvision-wordmark">HeatVision<sup>&reg;</sup></div>
+      <div class="heatvision-wordmark" dir="ltr">HeatVision<sup>&reg;</sup></div>
     </div>
   </div>
 </section>

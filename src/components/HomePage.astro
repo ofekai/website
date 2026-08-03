@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from './Nav.astro';
+import Hero from './Hero.astro';
+import About from './About.astro';
+import Expertise from './Expertise.astro';
+import Partners from './Partners.astro';
+import Footer from './Footer.astro';
+import { getMessages } from '../i18n';
+import type { Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const messages = getMessages(locale);
+---
+
+<Layout locale={locale} messages={messages}>
+  <Nav locale={locale} messages={messages} />
+  <main>
+    <Hero messages={messages.hero} />
+    <About messages={messages.about} />
+    <Expertise messages={messages.expertise} />
+    <Partners messages={messages.partners} />
+  </main>
+  <Footer messages={messages.footer} />
+</Layout>

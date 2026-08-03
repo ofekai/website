@@ -8,10 +8,11 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && node scripts/check-i18n.mjs",
     "build:fast": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "check:i18n": "node scripts/check-i18n.mjs",
     "astro": "astro",
     "visual-diff": "node scripts/visual-diff.mjs"
   },

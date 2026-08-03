@@ -11,15 +11,27 @@ export function initNav(): void {
   const menuToggle = document.getElementById('menu-toggle');
   const navLinks = document.getElementById('nav-links');
   const progress = document.querySelector<HTMLElement>('[data-scroll-progress]');
+  const languageSwitcher = navLinks?.querySelector<HTMLDetailsElement>('[data-language-switcher]');
   if (!navbar || !menuToggle || !navLinks) return;
 
   const isOpen = () => navLinks.classList.contains('active');
+  const closeLanguageSwitcher = () => {
+    if (languageSwitcher) languageSwitcher.open = false;
+  };
+  const focusableMenuItems = () =>
+    Array.from(navLinks.querySelectorAll<HTMLElement>('a[href], summary')).filter(
+      (element) => !element.closest('details:not([open])') || element.matches('summary'),
+    );
 
   const setOpen = (open: boolean) => {
     navLinks.classList.toggle('active', open);
     menuToggle.setAttribute('aria-expanded', String(open));
-    menuToggle.setAttribute('aria-label', open ? 'Close Menu' : 'Open Menu');
+    menuToggle.setAttribute(
+      'aria-label',
+      open ? menuToggle.dataset.labelClose ?? 'Close Menu' : menuToggle.dataset.labelOpen ?? 'Open Menu',
+    );
     document.body.classList.toggle('nav-open', open);
+    if (!open) closeLanguageSwitcher();
   };
 
   const closeMenu = () => setOpen(false);
@@ -27,7 +39,7 @@ export function initNav(): void {
   menuToggle.addEventListener('click', () => setOpen(!isOpen()));
   menuToggle.addEventListener('keydown', (event) => {
     if (!isOpen() || event.key !== 'Tab' || event.shiftKey) return;
-    const firstLink = navLinks.querySelector<HTMLElement>('a');
+    const firstLink = focusableMenuItems()[0];
     if (!firstLink) return;
     event.preventDefault();
     firstLink.focus();
@@ -37,7 +49,39 @@ export function initNav(): void {
     link.addEventListener('click', closeMenu);
   });
 
+  navLinks.querySelectorAll<HTMLAnchorElement>('[data-locale-link]').forEach((link) => {
+    link.addEventListener('click', () => {
+      const sectionAnchor = navbar.getBoundingClientRect().bottom + 1;
+      const currentSection = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-section][id]'),
+      )
+        .filter((section) => {
+          const bounds = section.getBoundingClientRect();
+          return bounds.top <= sectionAnchor && bounds.bottom > sectionAnchor;
+        })
+        .at(-1);
+
+      if (currentSection) {
+        const target = new URL(link.href);
+        target.hash = currentSection.id;
+        link.href = target.href;
+      }
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (languageSwitcher?.open && !languageSwitcher.contains(event.target as Node)) {
+      closeLanguageSwitcher();
+    }
+  });
+
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && languageSwitcher?.open) {
+      closeLanguageSwitcher();
+      languageSwitcher.querySelector<HTMLElement>('summary')?.focus();
+      return;
+    }
+
     if (!isOpen()) return;
 
     if (event.key === 'Escape') {
@@ -48,7 +92,7 @@ export function initNav(): void {
 
     if (event.key !== 'Tab') return;
 
-    const links = Array.from(navLinks.querySelectorAll<HTMLElement>('a'));
+    const links = focusableMenuItems();
     const focusable = [menuToggle, ...links];
     if (!focusable.length) return;
     const first = focusable[0];

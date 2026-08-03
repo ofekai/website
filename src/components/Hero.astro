@@ -1,11 +1,15 @@
 ---
 import { Picture } from 'astro:assets';
 import ButtonOutline from './ButtonOutline.astro';
+import type { Messages } from '../i18n';
 import heroBanner from '../assets/images/Banner.png';
 import IconArrow from '../icons/arrow.svg';
 
-const headline = 'TRUSTED INSIGHTS INTO FRONTIER COMPUTE MANUFACTURING';
-const lines = ['TRUSTED INSIGHTS INTO', 'FRONTIER COMPUTE MANUFACTURING'];
+interface Props {
+  messages: Messages['hero'];
+}
+
+const { messages } = Astro.props;
 ---
 
 <section class="hero">
@@ -72,18 +76,18 @@ const lines = ['TRUSTED INSIGHTS INTO', 'FRONTIER COMPUTE MANUFACTURING'];
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="container grid">
     <div class="hero-content">
-      <h1 class="hero-title" aria-label={headline}>
-        {lines.map((line, i) => (
-          <span class:list={['hero-line', { 'hero-line-strong': i === 1 }]} aria-hidden="true">
+      <h1 class="hero-title" aria-label={messages.headline}>
+        {messages.lines.map((line, i) => (
+          <span class:list={['hero-line', { 'hero-line-strong': i === messages.strongLine }]} aria-hidden="true">
             <span class="hero-line-in" style={`--i:${i}`}>{line}</span>
           </span>
         ))}
       </h1>
-      <ButtonOutline href="#contact" />
+      <ButtonOutline href="#contact" label={messages.cta} />
     </div>
   </div>
 
   <div class="hero-scroll container">
-    <a href="#about" aria-label="Scroll to About Us"><IconArrow class="floating-arrow" aria-hidden="true" /></a>
+    <a href="#about" aria-label={messages.scrollLabel}><IconArrow class="floating-arrow" aria-hidden="true" /></a>
   </div>
 </section>

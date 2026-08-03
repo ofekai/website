@@ -1,15 +1,17 @@
 ---
 import { Image } from 'astro:assets';
-import { site, addresses } from '../data/site';
+import { site } from '../data/site';
+import type { Messages } from '../i18n';
 import logoOfek from '../assets/images/Logo_Ofek_o.png';
 import IconLocation from '../icons/location.svg';
 import IconLinkedin from '../icons/linkedin.svg';
 import IconMail from '../icons/mail.svg';
 
-const officeLocations = addresses.map((location) => {
-  const [office, address] = location.split('｜');
-  return { office, address };
-});
+interface Props {
+  messages: Messages['footer'];
+}
+
+const { messages } = Astro.props;
 ---
 
 <footer id="contact" class="footer" data-section>
@@ -26,12 +28,12 @@ const officeLocations = addresses.map((location) => {
         </div>
         <div class="footer-addresses">
           {
-            officeLocations.map(({ office, address }) => (
+            messages.offices.map(({ office, address, addressDirection }) => (
               <div class="footer-location">
                 <span class="footer-location-icon"><IconLocation aria-hidden="true" /></span>
                 <p>
                   <span class="footer-office">{office}</span>
-                  <span>{address}</span>
+                  <span dir={addressDirection}>{address}</span>
                 </p>
               </div>
             ))
@@ -39,25 +41,25 @@ const officeLocations = addresses.map((location) => {
         </div>
       </div>
       <div class="footer-contact" data-reveal="mask">
-        <p class="footer-kicker">Contact Ofek</p>
+        <p class="footer-kicker">{messages.kicker}</p>
         <h2 class="footer-header">
-          <span>Start a</span>
-          <strong>conversation</strong>
+          <span>{messages.headingLight}</span>
+          <strong>{messages.headingBold}</strong>
         </h2>
         <a class="footer-email-link" href={`mailto:${site.email}`}>
-          <span class="footer-email">Email us at {site.email}</span>
+          <span class="footer-email">{messages.emailPrefix} <bdi>{site.email}</bdi></span>
         </a>
         <div class="footer-actions">
           <a class="footer-mail-button" href={`mailto:${site.email}`}>
-            <span>Contact us</span>
+            <span>{messages.contactButton}</span>
             <IconMail aria-hidden="true" />
           </a>
-          <a class="footer-link-outer" target="_blank" rel="noopener noreferrer" href={site.linkedin} aria-label="Ofek on LinkedIn">
+          <a class="footer-link-outer" target="_blank" rel="noopener noreferrer" href={site.linkedin} aria-label={messages.linkedInLabel}>
             <IconLinkedin class="icon-linkedin" aria-hidden="true" />
           </a>
         </div>
       </div>
     </div>
-    <div class="copyright" data-reveal="line">© 2026 Ofek. All rights reserved.</div>
+    <div class="copyright" data-reveal="line">{messages.copyright}</div>
   </div>
 </footer>

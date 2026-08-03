@@ -4,37 +4,26 @@ import SectionTitle from './SectionTitle.astro';
 import IconData from '../icons/data.svg';
 import IconLanguage from '../icons/language.svg';
 import IconCooperate from '../icons/cooperate.svg';
+import type { Messages } from '../i18n';
 import logoOfekDark from '../assets/images/Logo_Ofek_o.png';
 
-const features = [
-  {
-    Icon: IconData,
-    text: 'To build on our expertise, we harness big data and machine learning—the engine behind HeatVision®—to continuously refine the gears that drive precise production control.',
-  },
-  {
-    Icon: IconLanguage,
-    text: 'Our multilingual team, fluent in Mandarin, English, and several other languages, enables smooth collaboration between global customers and manufacturing counterparts.',
-  },
-  {
-    Icon: IconCooperate,
-    text: "We prioritize, always, what's best for our partner, creating lasting value.",
-  },
-];
+interface Props {
+  messages: Messages['about'];
+}
+
+const { messages } = Astro.props;
+const featureIcons = [IconData, IconLanguage, IconCooperate];
 ---
 
 <section id="about" class="about-section" data-section>
   <div class="about-intro-band">
     <div class="container about-intro">
-      <SectionTitle light="US," bold="IN A NUTSHELL" />
+      <SectionTitle light={messages.titleLight} bold={messages.titleBold} />
       <div class="about-brand-mark" data-reveal="rise">
         <Image src={logoOfekDark} alt="Ofek" width={150} height={75} />
       </div>
       <p class="description" data-reveal="rise">
-        Founded in 2020, Ofek partners with top S&P 100 companies to optimize their technology-focused
-        manufacturing operations in Taiwan through tailored consultancy services. Drawing on deep
-        knowledge of Taiwan&rsquo;s supply chain and our engineering expertise, we build strong relationships
-        with local manufacturers, helping partners navigate technical, cultural, and regional challenges
-        for smoother operations.
+        {messages.description}
       </p>
     </div>
   </div>
@@ -42,12 +31,15 @@ const features = [
     <div class="container">
       <div class="feature-grid" data-reveal-group>
         {
-          features.map(({ Icon, text }) => (
+          messages.features.map((text, index) => {
+            const Icon = featureIcons[index];
+            return (
             <div class="feature-card" data-reveal="rise">
-              <div class="feature-num"><Icon aria-hidden="true" /></div>
+              <div class="feature-num">{Icon && <Icon aria-hidden="true" />}</div>
               <div class="feature-label">{text}</div>
             </div>
-          ))
+            );
+          })
         }
       </div>
     </div>

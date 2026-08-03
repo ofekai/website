@@ -28,6 +28,10 @@ const DIST_DIR = path.join(PROJECT_ROOT, 'dist');
 const OUT_DIR = path.join(PROJECT_ROOT, '.visual-diff');
 
 const WIDTHS = [1440, 1200, 1100, 1000, 900, 868, 768, 425];
+const LOCALES = [
+  { id: 'en', path: '/', lang: 'en', dir: 'ltr' },
+  { id: 'zh-tw', path: '/zh-tw/', lang: 'zh-TW', dir: 'ltr' },
+];
 
 const MIME = {
   '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript',
@@ -38,7 +42,7 @@ const MIME = {
 function staticServer(rootDir) {
   return createServer(async (req, res) => {
     let reqPath = decodeURIComponent(req.url.split('?')[0]);
-    if (reqPath === '/') reqPath = '/index.html';
+    if (reqPath.endsWith('/')) reqPath += 'index.html';
     const filePath = path.join(rootDir, reqPath);
     try {
       const data = await readFile(filePath);
@@ -216,7 +220,7 @@ async function checkHeroLayering(browser, url) {
       const transform = getComputedStyle(document.querySelector(selector)).transform;
       return transform === 'none' ? 0 : new DOMMatrix(transform).m42;
     };
-    return { imageY: y('.hero-media img'), contentY: y('.hero-content') };
+    return { imageY: y('.hero-visual'), contentY: y('.hero-content') };
   });
   const separation = layers.imageY - layers.contentY;
   if (layers.imageY < 180 || separation < 180) {
@@ -312,54 +316,123 @@ async function checkPartnerMarquee(browser, url) {
   return problems;
 }
 
+/** Verifies that the native language selector exposes every locale, marks the
+ * current page, remains keyboard reachable, and carries the active section to
+ * the destination URL. */
+async function checkLanguageSwitcher(browser, baseUrl, locale) {
+  const context = await browser.newContext({ viewport: { width: 425, height: 900 } });
+  const page = await context.newPage();
+  const problems = [];
+  // Start with a deliberately stale hash, then scroll elsewhere. The locale
+  // link must use the section actually under the fixed nav, not location.hash.
+  await page.goto(new URL(`${locale.path}#partners`, baseUrl).href, { waitUntil: 'networkidle' });
+
+  await page.locator('#about').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(250);
+  await page.locator('#menu-toggle').click();
+  const summary = page.locator('[data-language-switcher] summary');
+  await summary.click();
+
+  const state = await page.evaluate(() => ({
+    options: document.querySelectorAll('[data-locale-link]').length,
+    current: document.querySelector('[data-locale-link][aria-current="page"]')?.getAttribute('href'),
+    detailsOpen: document.querySelector('[data-language-switcher]')?.hasAttribute('open'),
+  }));
+  if (state.options !== LOCALES.length || state.current !== locale.path || !state.detailsOpen) {
+    problems.push(`language selector state is incomplete (${JSON.stringify(state)})`);
+  }
+
+  const destination = locale.id === 'zh-tw' ? '/' : '/zh-tw/';
+  await Promise.all([
+    page.waitForURL((url) => url.pathname === destination && url.hash === '#about'),
+    page.locator(`[data-locale-link][href="${destination}"]`).click(),
+  ]);
+
+  const destinationState = await page.evaluate(() => ({
+    locale: document.documentElement.dataset.locale,
+    hash: location.hash,
+  }));
+  if (destinationState.hash !== '#about') problems.push('language switch does not preserve the active section');
+
+  await context.close();
+  return problems;
+}
+
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
   const distServer = staticServer(DIST_DIR);
   await listen(distServer, 4501);
-  const url = 'http://localhost:4501/';
+  const baseUrl = 'http://localhost:4501/';
 
   const browser = await chromium.launch();
   const overflow = [];
   const issues = [];
 
-  for (const width of WIDTHS) {
-    const page = await browser.newPage({ viewport: { width, height: 1000 } });
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.addStyleTag({ content: FREEZE_CSS });
+  for (const locale of LOCALES) {
+    const localeUrl = new URL(locale.path, baseUrl).href;
+    for (const width of WIDTHS) {
+      const page = await browser.newPage({ viewport: { width, height: 1000 } });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.addStyleTag({ content: FREEZE_CSS });
 
-    const consoleErrors = [];
-    const failedRequests = [];
-    page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
-    page.on('response', (res) => { if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`); });
+      const consoleErrors = [];
+      const failedRequests = [];
+      page.on('console', (msg) => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+      page.on('response', (res) => { if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`); });
 
-    await page.goto(url, { waitUntil: 'networkidle' });
-    await scrollThrough(page);
-    await page.addStyleTag({ content: FREEZE_CSS });
-    await forceReveal(page);
-    // Back to the top after scrollThrough: the fixed navbar is painted at
-    // the current scroll offset in a fullPage capture, so a stray offset
-    // stamps the nav across the middle of the screenshot.
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(200);
+      await page.goto(localeUrl, { waitUntil: 'networkidle' });
+      await scrollThrough(page);
+      await page.addStyleTag({ content: FREEZE_CSS });
+      await forceReveal(page);
+      // Back to the top after scrollThrough: the fixed navbar is painted at
+      // the current scroll offset in a fullPage capture, so a stray offset
+      // stamps the nav across the middle of the screenshot.
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(200);
 
-    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
-      scrollWidth: document.documentElement.scrollWidth,
-      clientWidth: document.documentElement.clientWidth,
-    }));
-    overflow.push({ width, overflow: scrollWidth - clientWidth });
-    if (consoleErrors.length || failedRequests.length) {
-      issues.push({ width, consoleErrors, failedRequests });
+      const state = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+        lang: document.documentElement.lang,
+        dir: document.documentElement.dir,
+        titleRight: document.querySelector('.hero-title')?.getBoundingClientRect().right ?? Infinity,
+        titleLeft: document.querySelector('.hero-title')?.getBoundingClientRect().left ?? -Infinity,
+      }));
+      overflow.push({ locale: locale.id, width, overflow: state.scrollWidth - state.clientWidth });
+      if (state.lang !== locale.lang || state.dir !== locale.dir) {
+        issues.push({ locale: locale.id, width, rootAttributes: state });
+      }
+      if (state.titleLeft < 0 || state.titleRight > state.clientWidth) {
+        issues.push({ locale: locale.id, width, clippedHeadline: state });
+      }
+      if (consoleErrors.length || failedRequests.length) {
+        issues.push({ locale: locale.id, width, consoleErrors, failedRequests });
+      }
+
+      await page.screenshot({ path: path.join(OUT_DIR, `${locale.id}-${width}.png`), fullPage: true });
+      await page.close();
     }
-
-    await page.screenshot({ path: path.join(OUT_DIR, `page-${width}.png`), fullPage: true });
-    await page.close();
   }
 
-  const noJsProblems = await checkNoJs(browser, url);
-  const navigationProblems = await checkNavigation(browser, url);
-  const heroProblems = await checkHeroLayering(browser, url);
-  const partnerProblems = await checkPartnerMarquee(browser, url);
+  const collectLocaleProblems = async (check) => {
+    const all = [];
+    for (const locale of LOCALES) {
+      const problems = await check(browser, new URL(locale.path, baseUrl).href);
+      all.push(...problems.map((problem) => `${locale.id}: ${problem}`));
+    }
+    return all;
+  };
+
+  const noJsProblems = await collectLocaleProblems(checkNoJs);
+  const navigationProblems = await collectLocaleProblems(checkNavigation);
+  const heroProblems = await collectLocaleProblems(checkHeroLayering);
+  const partnerProblems = await collectLocaleProblems(checkPartnerMarquee);
+  const languageProblems = [];
+  for (const locale of LOCALES) {
+    const problems = await checkLanguageSwitcher(browser, baseUrl, locale);
+    languageProblems.push(...problems.map((problem) => `${locale.id}: ${problem}`));
+  }
 
   await browser.close();
   distServer.close();
@@ -367,7 +440,7 @@ async function main() {
   console.log(`Screenshots written to ${path.relative(process.cwd(), OUT_DIR)}/\n`);
   console.log('=== Horizontal overflow (want 0 at every width) ===');
   for (const r of overflow) {
-    console.log(`${String(r.width).padEnd(5)} overflow=${r.overflow}${r.overflow > 0 ? '  <-- OVERFLOW' : ''}`);
+    console.log(`${r.locale.padEnd(5)} ${String(r.width).padEnd(5)} overflow=${r.overflow}${r.overflow > 0 ? '  <-- OVERFLOW' : ''}`);
   }
 
   console.log('\n=== Console errors / failed requests ===');
@@ -385,13 +458,17 @@ async function main() {
   console.log('\n=== Partner rail ===');
   console.log(partnerProblems.length ? partnerProblems.join('\n') : 'seven-logo continuous marquee and reduced-motion fallback pass');
 
+  console.log('\n=== Language selector ===');
+  console.log(languageProblems.length ? languageProblems.join('\n') : 'all locale links, current state, and active-section preservation pass');
+
   const failed =
     overflow.some((r) => r.overflow > 0) ||
     issues.length > 0 ||
     noJsProblems.length > 0 ||
     navigationProblems.length > 0 ||
     heroProblems.length > 0 ||
-    partnerProblems.length > 0;
+    partnerProblems.length > 0 ||
+    languageProblems.length > 0;
   process.exit(failed ? 1 : 0);
 }
 

@@ -13,6 +13,14 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'ignore',
 
+  i18n: {
+    locales: ['en', 'zh-tw'],
+    defaultLocale: 'en',
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
+
   // The reference site's exact pairing, fetched at build time and self-hosted
   // so the static GitHub Pages deployment has no runtime font dependency.
   fonts: [

@@ -202,11 +202,11 @@ async function checkHeroLayering(browser, url) {
   await page.goto(url, { waitUntil: 'networkidle' });
 
   const landingLogo = await page.evaluate(() => ({
-    light: Number(getComputedStyle(document.querySelector('.logo')).opacity),
-    dark: Number(getComputedStyle(document.querySelector('.logo-dark')).opacity),
+    opacity: Number(getComputedStyle(document.querySelector('.logo')).opacity),
+    source: document.querySelector('.logo img')?.currentSrc ?? '',
   }));
-  if (landingLogo.light < 0.9 || landingLogo.dark > 0.1) {
-    problems.push('white desktop logo is not visible in the landing state');
+  if (landingLogo.opacity < 0.9 || !landingLogo.source.includes('Logo_Ofek_o')) {
+    problems.push('original Ofek logo is not visible in the landing state');
   }
 
   await page.evaluate(() => window.scrollTo(0, window.innerHeight * 0.5));

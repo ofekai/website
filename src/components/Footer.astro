@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { site, addresses } from '../data/site';
-import logoOfek from '../assets/images/Logo_Ofek.png';
+import logoOfek from '../assets/images/Logo_Ofek_o.png';
 import IconLocation from '../icons/location.svg';
 import IconLinkedin from '../icons/linkedin.svg';
 import IconMail from '../icons/mail.svg';
@@ -17,7 +17,12 @@ const officeLocations = addresses.map((location) => {
     <div class="footer-main">
       <div class="footer-brand" data-reveal="rise">
         <div class="footer-logo">
-          <Image src={logoOfek} alt="Ofek" width={150} height={75} densities={[1, 2]} />
+          <Image src={logoOfek} alt="Ofek" width={150} height={75} format="png" />
+          <span
+            class="logo-tip"
+            style={`--logo-mask: url("${logoOfek.src}")`}
+            aria-hidden="true"
+          ></span>
         </div>
         <div class="footer-addresses">
           {

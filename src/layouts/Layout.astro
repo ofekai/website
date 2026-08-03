@@ -3,7 +3,7 @@ import { Font, getImage } from 'astro:assets';
 import '../styles/global.css';
 import { site, addresses } from '../data/site';
 import heroBanner from '../assets/images/Banner.png';
-import logoOfek from '../assets/images/Logo_Ofek.png';
+import logoOfek from '../assets/images/Logo_Ofek_o.png';
 
 interface Props {
   title?: string;
@@ -20,7 +20,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImage = await getImage({ src: heroBanner, width: 1200, format: 'jpeg' });
 const ogImageURL = new URL(ogImage.src, Astro.site);
 
-const logoImage = await getImage({ src: logoOfek, width: 300, format: 'png' });
+const logoImage = await getImage({ src: logoOfek, width: 150, format: 'png' });
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',

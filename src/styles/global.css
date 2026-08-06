@@ -752,7 +752,6 @@
 
   .expertise-story {
     position: relative;
-    padding-block-end: var(--expertise-panel-h);
     background: var(--ink-900);
     overflow: clip;
     isolation: isolate;
@@ -1530,15 +1529,38 @@
     to { opacity: 1; clip-path: inset(0 0 0 0); }
   }
 
+  @keyframes transition-about-exit {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0.5; transform: translateY(calc(-1 * var(--transition-depth-sm))) scale(0.99); }
+  }
+
+  @keyframes transition-heading-plate-enter {
+    from {
+      opacity: 0.72;
+      clip-path: inset(72% 0 0 0);
+      transform: translateY(var(--transition-depth-md));
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes transition-expertise-exit {
+    from { filter: brightness(1) saturate(1); }
+    to { filter: brightness(0.56) saturate(0.8); }
+  }
+
+  @keyframes transition-partners-enter {
+    from { clip-path: inset(0 0 18% 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+
   @keyframes transition-seam-draw {
     0% { opacity: 0; transform: scaleX(0); }
     45% { opacity: 1; transform: scaleX(1); }
     100% { opacity: 0; transform: scaleX(1); }
-  }
-
-  @keyframes transition-features-recede {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0.62; transform: translateY(calc(-1 * var(--transition-depth-sm))); }
   }
 
   @keyframes transition-consulting-media-recede {
@@ -1598,6 +1620,10 @@
 
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
+      main {
+        timeline-scope: --expertise-heading, --partners-panel;
+      }
+
       .hero-visual {
         animation: hero-arrive 1.8s var(--ease-out-expo) both, hero-depth linear both;
         animation-timeline: auto, --hero-scroll;
@@ -1628,19 +1654,17 @@
       }
 
       .about-features-band {
-        view-timeline-name: --about-features;
-        view-timeline-axis: block;
-      }
-
-      .about-features-band .feature-grid {
-        animation: transition-features-recede linear both;
-        animation-timeline: --about-features;
-        animation-range: exit 0% exit 58%;
+        animation: transition-about-exit linear both;
+        animation-timeline: --expertise-heading;
+        animation-range: entry 0% entry 92%;
       }
 
       .expertise-heading-band {
         view-timeline-name: --expertise-heading;
         view-timeline-axis: block;
+        animation: transition-heading-plate-enter linear both;
+        animation-timeline: --expertise-heading;
+        animation-range: entry 0% entry 92%;
       }
 
       .expertise-heading-band > .transition-seam {
@@ -1688,10 +1712,17 @@
         animation-range: entry 12% entry 58%;
       }
 
+      .heatvision-stripe {
+        animation: transition-expertise-exit linear both;
+        animation-timeline: --partners-panel;
+        animation-range: entry 0% entry 78%;
+        transform-origin: top center;
+      }
+
       .partners-section {
         view-timeline-name: --partners-panel;
         view-timeline-axis: block;
-        animation: transition-scene-enter linear both;
+        animation: transition-partners-enter linear both;
         animation-timeline: --partners-panel;
         animation-range: entry 0% entry 34%;
       }
@@ -1739,10 +1770,6 @@
     clip-path: none;
     animation: none;
     transform: none;
-  }
-
-  html:not(.js) .expertise-story {
-    padding-block-end: 0;
   }
 
   html:not(.js) :is(.consulting-stripe, .heatvision-stripe) {
@@ -1958,10 +1985,6 @@
       grid-template-columns: 1fr;
     }
 
-    .expertise-story {
-      padding-block-end: 0;
-    }
-
     .consulting-stripe,
     .heatvision-stripe {
       position: relative;
@@ -2106,10 +2129,6 @@
       opacity: 1 !important;
       clip-path: none !important;
       transform: none !important;
-    }
-
-    .expertise-story {
-      padding-block-end: 0;
     }
 
     :is(.consulting-stripe, .heatvision-stripe) {

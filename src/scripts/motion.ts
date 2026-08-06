@@ -113,13 +113,13 @@ function initScrollFallback(): VoidFunction | undefined {
         );
       }
 
-      const sceneSelectors = [
-        '[data-transition="hero-about"]',
-        '[data-transition="heatvision-partners"]',
-        '[data-transition="partners-footer"]',
+      const sceneSpecs = [
+        ['[data-transition="hero-about"]', 8],
+        ['[data-transition="heatvision-partners"]', 18],
+        ['[data-transition="partners-footer"]', 8],
       ] as const;
 
-      sceneSelectors.forEach((selector) => {
+      sceneSpecs.forEach(([selector, inset]) => {
         const panel = document.querySelector<HTMLElement>(selector);
         if (!panel) return;
         const seam = panel.querySelector<HTMLElement>('.transition-seam');
@@ -128,7 +128,7 @@ function initScrollFallback(): VoidFunction | undefined {
           scroll(
             animate(
               panel,
-              { opacity: [0.94, 1], clipPath: ['inset(0 0 8% 0)', 'inset(0 0 0 0)'] },
+              { opacity: [0.94, 1], clipPath: [`inset(0 0 ${inset}% 0)`, 'inset(0 0 0 0)'] },
               { ease: 'linear' },
             ),
             { target: panel, offset: ['start end', 'start 64%'] },
@@ -151,10 +151,23 @@ function initScrollFallback(): VoidFunction | undefined {
 
       const heading = document.querySelector<HTMLElement>('[data-transition-heading]');
       const headingSeam = heading?.querySelector<HTMLElement>('.transition-seam');
-      const features = document.querySelector<HTMLElement>('[data-transition-features] .feature-grid');
+      const features = document.querySelector<HTMLElement>('[data-transition-features]');
       if (heading && headingSeam) {
+        animated.add(heading);
         animated.add(headingSeam);
         stops.push(
+          scroll(
+            animate(
+              heading,
+              {
+                opacity: [0.72, 1],
+                clipPath: ['inset(72% 0 0 0)', 'inset(0 0 0 0)'],
+                transform: ['translateY(48px)', 'translateY(0px)'],
+              },
+              { ease: 'linear' },
+            ),
+            { target: heading, offset: ['start end', 'start 8%'] },
+          ),
           scroll(
             animate(
               headingSeam,
@@ -171,7 +184,7 @@ function initScrollFallback(): VoidFunction | undefined {
           scroll(
             animate(
               features,
-              { opacity: [1, 0.62], transform: ['translateY(0px)', 'translateY(-24px)'] },
+              { opacity: [1, 0.5], transform: ['translateY(0px) scale(1)', 'translateY(-24px) scale(.99)'] },
               { ease: 'linear' },
             ),
             { target: heading, offset: ['start end', 'start 64%'] },
@@ -186,6 +199,7 @@ function initScrollFallback(): VoidFunction | undefined {
       const consulting = document.querySelector<HTMLElement>('[data-transition-panel="consulting"]');
       const consultingMedia = consulting?.querySelector<HTMLElement>('[data-transition-layer="media"]');
       const consultingCopy = consulting?.querySelector<HTMLElement>('[data-transition-layer="copy"]');
+      const partners = document.querySelector<HTMLElement>('[data-transition="heatvision-partners"]');
 
       if (heatVision) {
         const mobile = window.matchMedia('(max-width: 868px)').matches;
@@ -274,6 +288,22 @@ function initScrollFallback(): VoidFunction | undefined {
             ),
           );
         }
+
+        if (partners) {
+          animated.add(heatVision);
+          stops.push(
+            scroll(
+              animate(
+                heatVision,
+                {
+                  filter: ['brightness(1) saturate(1)', 'brightness(.56) saturate(.8)'],
+                },
+                { ease: 'linear' },
+              ),
+              { target: partners, offset: ['start end', 'start 22%'] },
+            ),
+          );
+        }
       }
     });
   });
@@ -286,6 +316,7 @@ function initScrollFallback(): VoidFunction | undefined {
       el.style.opacity = '';
       el.style.transform = '';
       el.style.clipPath = '';
+      el.style.filter = '';
     });
   };
 }

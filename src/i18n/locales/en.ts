@@ -55,6 +55,12 @@ export const en = {
       'We leverage our technical knowledge and local ecosystem insights to drive manufacturing improvements. Building long-term partnerships based on trust and transparency, creating lasting value.',
     heatVisionBody:
       'Our software brings real-time clarity from manufacturing to data center through big data analytics and machine learning, anticipating failures and eliminating the underlying causes.',
+    heatVisionGraphLabels: {
+      surfaceMountTechnology: 'Surface-Mount Technology',
+      pickAndPlace: 'Pick & Place',
+      automaticOpticalInspection: 'Automatic Optical Inspection',
+      reflow: 'Reflow',
+    },
   },
   partners: {
     titleLight: 'TRUSTED',

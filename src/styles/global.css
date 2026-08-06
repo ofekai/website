@@ -782,7 +782,7 @@
 
   .heatvision-stripe {
     height: auto;
-    min-height: clamp(32.5rem, min(68svh, 42vw), 45rem);
+    min-height: clamp(29.25rem, min(68svh, 32.5vw), 40.5rem);
     grid-template-columns: minmax(0, 42%) minmax(0, 58%);
     background: var(--ink-900);
   }
@@ -806,13 +806,26 @@
   }
 
   .heatvision-gallery {
+    --heatvision-gallery-inset: clamp(0.75rem, 1.3cqw, 1.25rem);
+    --heatvision-top-trim: clamp(3.25rem, 3.5vw, 4.5rem);
+
     position: absolute;
-    inset: 0;
+    top: calc(var(--heatvision-gallery-inset) - var(--heatvision-top-trim));
+    right: var(--heatvision-gallery-inset);
+    bottom: auto;
+    left: var(--heatvision-gallery-inset);
+    display: grid;
+    height: calc(
+      100% + var(--heatvision-top-trim) - var(--heatvision-gallery-inset) -
+        var(--heatvision-gallery-inset)
+    );
+    gap: clamp(0.325rem, 0.575cqw, 0.5rem);
+    grid-template-rows: minmax(0, 1fr) 1px auto;
     isolation: isolate;
   }
 
   .heatvision-shot {
-    position: absolute;
+    position: relative;
     margin: 0;
     overflow: hidden;
     background: #18181b;
@@ -820,31 +833,54 @@
 
   .heatvision-shot-primary {
     z-index: 4;
-    top: 18%;
-    left: 50%;
-    width: 78%;
-    transform: translateX(-50%);
+    display: grid;
+    min-height: 0;
+    place-items: center;
   }
 
-  .heatvision-shot-aoi {
+  .heatvision-graph-label {
+    position: absolute;
+    z-index: 8;
+    top: clamp(0.45rem, 0.7cqw, 0.7rem);
+    left: clamp(0.45rem, 0.7cqw, 0.7rem);
+    color: rgb(255 255 255 / 88%);
+    font-family: var(--font-lato), Arial, sans-serif;
+    font-size: clamp(0.72rem, 0.78cqw, 0.9rem);
+    font-weight: 400;
+    letter-spacing: 0.035em;
+    line-height: 1.2;
+    pointer-events: none;
+    text-shadow: 0 1px 4px rgb(0 0 0 / 75%);
+    white-space: nowrap;
+  }
+
+  .heatvision-graph-label-primary {
+    top: calc(var(--heatvision-top-trim) + clamp(0.45rem, 0.7cqw, 0.7rem));
+    font-size: clamp(0.78rem, 0.88cqw, 1rem);
+  }
+
+  .heatvision-gallery-separator {
     z-index: 5;
-    top: 2%;
-    left: 1%;
-    width: 36%;
+    width: 100%;
+    height: 1px;
+    background: var(--color-hairline);
   }
 
-  .heatvision-shot-point {
-    z-index: 7;
-    top: calc(18% + 30.86cqw);
-    right: 1%;
-    width: 28%;
+  .heatvision-support-rail {
+    z-index: 5;
+    display: grid;
+    gap: clamp(0.325rem, 0.575cqw, 0.5rem);
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr) 1px minmax(0, 1fr);
   }
 
-  .heatvision-shot-reflow {
-    z-index: 6;
-    top: 2%;
-    right: 14%;
-    width: 28%;
+  .heatvision-rail-separator {
+    width: 1px;
+    min-width: 1px;
+    background: var(--color-hairline);
+  }
+
+  .heatvision-shot-support {
+    aspect-ratio: 2.05 / 1;
   }
 
   .heatvision-shot img {
@@ -854,6 +890,41 @@
     transition:
       filter 300ms ease,
       transform 300ms ease;
+  }
+
+  .heatvision-primary-composition {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 1cqw, 0.875rem);
+    transform: translateX(clamp(-2.75rem, -4cqw, -1rem));
+  }
+
+  .heatvision-primary-composition .heatvision-primary-chart {
+    width: auto;
+    max-width: calc(100% - clamp(3.5rem, 6cqw, 5rem));
+    height: 100%;
+    flex: 0 1 auto;
+    object-fit: contain;
+  }
+
+  .heatvision-primary-composition .heatvision-primary-scale {
+    width: auto;
+    height: 49%;
+    flex: 0 0 auto;
+    mix-blend-mode: lighten;
+    object-fit: contain;
+  }
+
+  .heatvision-shot-support img {
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .heatvision-shot-unified-bg img {
+    mix-blend-mode: lighten;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -1568,6 +1639,10 @@
       border-inline-start: 0;
     }
 
+    .heatvision-gallery {
+      --heatvision-top-trim: 0rem;
+    }
+
     .heatvision-stripe .stripe-content {
       grid-row: 2;
     }
@@ -1587,33 +1662,27 @@
 
   @media (max-width: 520px) {
     .heatvision-stage {
-      min-height: clamp(28rem, 126vw, 36rem);
+      min-height: clamp(42rem, 180vw, 50rem);
     }
 
-    .heatvision-shot-primary {
-      top: 17%;
-      left: 50%;
-      width: 90%;
-      transform: translateX(-50%);
+    .heatvision-gallery {
+      grid-template-rows: minmax(0, 0.7fr) 1px minmax(0, 1.3fr);
     }
 
-    .heatvision-shot-aoi {
-      top: 2%;
-      left: 0;
-      width: 46%;
+    .heatvision-support-rail {
+      min-height: 0;
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 1fr) 1px minmax(0, 1fr) 1px minmax(0, 1fr);
     }
 
-    .heatvision-shot-point {
-      top: calc(17% + 34.99cqw);
-      right: 0;
-      left: auto;
-      width: 40%;
+    .heatvision-shot-support {
+      aspect-ratio: auto;
     }
 
-    .heatvision-shot-reflow {
-      top: 5%;
-      right: 11%;
-      width: 38%;
+    .heatvision-rail-separator {
+      width: 100%;
+      height: 1px;
+      min-height: 1px;
     }
 
     .hero-contour-desktop {

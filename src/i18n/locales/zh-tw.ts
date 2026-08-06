@@ -55,6 +55,12 @@ export const zhTw = {
       '我們結合技術知識與在地產業生態洞察，推動製造改善，並以信任與透明為基礎建立長期合作關係，持續創造價值。',
     heatVisionBody:
       '我們的軟體透過大數據分析與機器學習，提供從製造現場到資料中心的即時洞察，預測故障並消除根本原因。',
+    heatVisionGraphLabels: {
+      surfaceMountTechnology: '表面黏著技術',
+      pickAndPlace: '元件貼裝',
+      automaticOpticalInspection: '自動光學檢測',
+      reflow: '回焊',
+    },
   },
   partners: {
     titleLight: '值得信賴的',

@@ -56,6 +56,12 @@ export interface Messages {
     consultingTitleBold: string;
     consultingBody: string;
     heatVisionBody: string;
+    heatVisionGraphLabels: {
+      surfaceMountTechnology: string;
+      pickAndPlace: string;
+      automaticOpticalInspection: string;
+      reflow: string;
+    };
   };
   partners: {
     titleLight: string;

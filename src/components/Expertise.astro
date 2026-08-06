@@ -5,10 +5,11 @@ import EditorialMedia from './EditorialMedia.astro';
 import type { Messages } from '../i18n';
 import consultingTree from '../assets/images/consulting-tree-v2.png';
 import iconHeatVision from '../assets/images/heatVision.png';
-import heatVisionSpi from '../assets/images/heatvision/spi-board-heatmap-3d.png';
+import heatVisionSpi from '../assets/images/heatvision/spi-board-heatmap-core.png';
+import heatVisionVolumeScale from '../assets/images/heatvision/spi-volume-scale-original.png';
+import heatVisionBoardMap from '../assets/images/heatvision/board-defect-map.png';
 import heatVisionAoi from '../assets/images/heatvision/aoi-sankey.png';
-import heatVisionPointMap from '../assets/images/heatvision/pt-heatmap.png';
-import heatVisionReflow from '../assets/images/heatvision/reflow-temp-top-ts.png';
+import heatVisionTemperature from '../assets/images/heatvision/reflow-temperature-overview.png';
 
 interface Props {
   messages: Messages['expertise'];
@@ -65,41 +66,69 @@ const { messages } = Astro.props;
     <div class="heatvision-stage" aria-hidden="true">
       <div class="heatvision-gallery">
         <figure class="heatvision-shot heatvision-shot-primary">
-          <Image
-            src={heatVisionSpi}
-            alt=""
-            widths={[640, 960, 1280, 1920, 2560]}
-            sizes="(min-width: 869px) 46vw, (min-width: 521px) 78vw, 90vw"
-            loading="lazy"
-          />
+          <span class="heatvision-graph-label heatvision-graph-label-primary">
+            {messages.heatVisionGraphLabels.surfaceMountTechnology}
+          </span>
+          <div class="heatvision-primary-composition">
+            <Image
+              class="heatvision-primary-chart"
+              src={heatVisionSpi}
+              alt=""
+              widths={[640, 960, 1280, 1920, 2560]}
+              sizes="(min-width: 869px) 46vw, (min-width: 521px) 82vw, 82vw"
+              loading="lazy"
+            />
+            <Image
+              class="heatvision-primary-scale"
+              src={heatVisionVolumeScale}
+              alt=""
+              widths={[64, 136]}
+              sizes="(min-width: 869px) 3vw, 8vw"
+              loading="lazy"
+            />
+          </div>
         </figure>
-        <figure class="heatvision-shot heatvision-shot-support heatvision-shot-aoi">
-          <Image
-            src={heatVisionAoi}
-            alt=""
-            widths={[320, 480, 640, 960]}
-            sizes="(min-width: 869px) 21vw, (min-width: 521px) 36vw, 46vw"
-            loading="lazy"
-          />
-        </figure>
-        <figure class="heatvision-shot heatvision-shot-support heatvision-shot-point">
-          <Image
-            src={heatVisionPointMap}
-            alt=""
-            widths={[320, 480, 640, 960]}
-            sizes="(min-width: 869px) 17vw, (min-width: 521px) 28vw, 40vw"
-            loading="lazy"
-          />
-        </figure>
-        <figure class="heatvision-shot heatvision-shot-support heatvision-shot-reflow">
-          <Image
-            src={heatVisionReflow}
-            alt=""
-            widths={[320, 480, 640, 960]}
-            sizes="(min-width: 869px) 17vw, (min-width: 521px) 28vw, 38vw"
-            loading="lazy"
-          />
-        </figure>
+        <span class="heatvision-gallery-separator"></span>
+        <div class="heatvision-support-rail">
+          <figure class="heatvision-shot heatvision-shot-support heatvision-shot-unified-bg">
+            <span class="heatvision-graph-label">
+              {messages.heatVisionGraphLabels.pickAndPlace}
+            </span>
+            <Image
+              src={heatVisionBoardMap}
+              alt=""
+              widths={[320, 480, 640]}
+              sizes="(min-width: 869px) 18vw, (min-width: 521px) 31vw, 88vw"
+              loading="lazy"
+            />
+          </figure>
+          <span class="heatvision-rail-separator"></span>
+          <figure class="heatvision-shot heatvision-shot-support">
+            <span class="heatvision-graph-label">
+              {messages.heatVisionGraphLabels.automaticOpticalInspection}
+            </span>
+            <Image
+              src={heatVisionAoi}
+              alt=""
+              widths={[320, 480, 640, 960]}
+              sizes="(min-width: 869px) 18vw, (min-width: 521px) 31vw, 88vw"
+              loading="lazy"
+            />
+          </figure>
+          <span class="heatvision-rail-separator"></span>
+          <figure class="heatvision-shot heatvision-shot-support heatvision-shot-unified-bg">
+            <span class="heatvision-graph-label">
+              {messages.heatVisionGraphLabels.reflow}
+            </span>
+            <Image
+              src={heatVisionTemperature}
+              alt=""
+              widths={[320, 480, 640, 960]}
+              sizes="(min-width: 869px) 18vw, (min-width: 521px) 31vw, 88vw"
+              loading="lazy"
+            />
+          </figure>
+        </div>
       </div>
     </div>
   </div>

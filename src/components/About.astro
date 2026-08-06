@@ -4,6 +4,7 @@ import SectionTitle from './SectionTitle.astro';
 import IconData from '../icons/data.svg';
 import IconLanguage from '../icons/language.svg';
 import IconCooperate from '../icons/cooperate.svg';
+import IconArrow from '../icons/arrow.svg';
 import type { Messages } from '../i18n';
 import logoOfekDark from '../assets/images/Logo_Ofek_o.png';
 
@@ -50,5 +51,10 @@ const featureIcons = [IconData, IconLanguage, IconCooperate];
         }
       </div>
     </div>
+  </div>
+  <div class="about-scroll container">
+    <a href="#consulting" aria-label={messages.scrollLabel}>
+      <IconArrow class="floating-arrow" aria-hidden="true" />
+    </a>
   </div>
 </section>

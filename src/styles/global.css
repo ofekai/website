@@ -679,6 +679,25 @@
     background: var(--paper-50);
   }
 
+  .about-scroll {
+    position: absolute;
+    right: 0;
+    bottom: clamp(1rem, 2.5vh, 2rem);
+    left: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .about-scroll a {
+    display: grid;
+    width: 96px;
+    height: 44px;
+    place-items: center;
+    pointer-events: auto;
+  }
+
   .feature-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1973,6 +1992,14 @@
 
     .about-brand-mark {
       min-height: 120px;
+    }
+
+    .about-section {
+      padding-bottom: 4.75rem;
+    }
+
+    .about-scroll {
+      bottom: 1rem;
     }
 
     .feature-grid {

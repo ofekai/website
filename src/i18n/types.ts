@@ -43,6 +43,7 @@ export interface Messages {
     titleLight: string;
     titleBold: string;
     description: string;
+    scrollLabel: string;
     features: readonly [
       { title: string; text: string },
       { title: string; text: string },

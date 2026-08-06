@@ -29,6 +29,7 @@ export const zhTw = {
   about: {
     titleLight: 'OFEK，',
     titleBold: '簡介',
+    scrollLabel: '前往我們的專業與智慧',
     description:
       'Ofek 成立於 2020 年，透過量身打造的顧問服務，協助頂尖 S&P 100 企業優化其在台灣以科技為核心的製造營運。憑藉對台灣供應鏈的深入了解與工程專業，我們與在地製造商建立穩固關係，協助合作夥伴克服技術、文化與區域挑戰，讓營運更加順暢。',
     features: [

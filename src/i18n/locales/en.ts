@@ -29,6 +29,7 @@ export const en = {
   about: {
     titleLight: 'US,',
     titleBold: 'IN A NUTSHELL',
+    scrollLabel: 'Continue to Our Expertise and Intelligence',
     description:
       'Founded in 2020, Ofek partners with top S&P 100 companies to optimize their technology-focused manufacturing operations in Taiwan through tailored consultancy services. Drawing on deep knowledge of Taiwan’s supply chain and our engineering expertise, we build strong relationships with local manufacturers, helping partners navigate technical, cultural, and regional challenges for smoother operations.',
     features: [

@@ -802,7 +802,7 @@
     overflow: hidden;
     border-inline-start: 1px solid var(--color-hairline);
     container-type: inline-size;
-    background: #18181b;
+    background: #000;
   }
 
   .heatvision-gallery {
@@ -828,7 +828,7 @@
     position: relative;
     margin: 0;
     overflow: hidden;
-    background: #18181b;
+    background: #000;
   }
 
   .heatvision-shot-primary {
@@ -887,6 +887,7 @@
     display: block;
     width: 100%;
     height: auto;
+    filter: contrast(1.23);
     transition:
       filter 300ms ease,
       transform 300ms ease;
@@ -929,7 +930,7 @@
 
   @media (hover: hover) and (pointer: fine) {
     .heatvision-shot:hover img {
-      filter: brightness(1.04);
+      filter: contrast(1.23) brightness(1.04);
       transform: scale(1.018);
     }
   }

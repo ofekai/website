@@ -151,7 +151,24 @@ function initScrollFallback(): VoidFunction | undefined {
 
       const heading = document.querySelector<HTMLElement>('[data-transition-heading]');
       const headingSeam = heading?.querySelector<HTMLElement>('.transition-seam');
+      const aboutIntro = document.querySelector<HTMLElement>('.about-intro-band');
       const features = document.querySelector<HTMLElement>('[data-transition-features]');
+      if (aboutIntro) {
+        animated.add(aboutIntro);
+        stops.push(
+          scroll(
+            animate(
+              aboutIntro,
+              {
+                opacity: [1, 0],
+                transform: ['translateY(0px) scale(1)', 'translateY(-48px) scale(.985)'],
+              },
+              { ease: 'linear' },
+            ),
+            { target: aboutIntro, offset: ['start 8%', 'end start'] },
+          ),
+        );
+      }
       if (heading && headingSeam) {
         animated.add(heading);
         animated.add(headingSeam);

@@ -1534,6 +1534,14 @@
     to { opacity: 0.5; transform: translateY(calc(-1 * var(--transition-depth-sm))) scale(0.99); }
   }
 
+  @keyframes transition-about-intro-exit {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to {
+      opacity: 0;
+      transform: translateY(calc(-1 * var(--transition-depth-md))) scale(0.985);
+    }
+  }
+
   @keyframes transition-heading-plate-enter {
     from {
       opacity: 0.72;
@@ -1651,6 +1659,16 @@
         animation: transition-seam-draw linear both;
         animation-timeline: --about-panel;
         animation-range: entry 10% entry 48%;
+      }
+
+      .about-intro-band {
+        view-timeline-name: --about-intro-exit;
+        view-timeline-axis: block;
+        view-timeline-inset: var(--nav-h-scrolled) 0px;
+        animation: transition-about-intro-exit linear both;
+        animation-timeline: --about-intro-exit;
+        animation-range: exit 0% exit 34%;
+        transform-origin: top center;
       }
 
       .about-features-band {

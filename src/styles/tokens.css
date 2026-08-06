@@ -109,12 +109,14 @@
     /* --- Section transitions ---
        Geometry is shared so every boundary feels like part of one system.
        Scroll-linked sequences use progress rather than a raw duration. */
-    --transition-overlap-lg: clamp(5rem, 11svh, 7.5rem);
-    --transition-overlap-md: clamp(3.5rem, 8svh, 6rem);
-    --transition-overlap-sm: clamp(2.5rem, 6svh, 4.5rem);
     --transition-depth-sm: clamp(1rem, 2.2vw, 1.75rem);
     --transition-depth-md: clamp(2rem, 4vw, 3.5rem);
     --transition-line: clamp(5rem, 8vw, 7rem);
+    --expertise-heading-h: clamp(9.5rem, 18dvh, 12.5rem);
+    --expertise-panel-h: max(
+      32rem,
+      calc(100dvh - var(--nav-h-scrolled) - var(--expertise-heading-h))
+    );
   }
 
   /* Neutralizes every duration/stagger token from one place. Components that

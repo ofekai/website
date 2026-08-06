@@ -76,7 +76,7 @@
   .navbar.nav-scrolled {
     height: var(--nav-h-scrolled);
     border-color: rgb(20 23 25 / 10%);
-    background: rgb(255 255 255 / 97%);
+    background: #fff;
     box-shadow: 0 3px 14px rgb(0 0 0 / 6%);
     color: var(--ink-900);
   }
@@ -315,7 +315,9 @@
   .hero {
     position: relative;
     display: grid;
-    height: clamp(40rem, 100svh, 75rem);
+    height: 100vh;
+    height: 100svh;
+    height: 100dvh;
     min-height: 0;
     overflow: hidden;
     place-items: center;
@@ -570,14 +572,12 @@
     font-weight: 700;
   }
 
-  /* Section transitions: one hard-edged editorial motion language. The
-     negative flow margin creates real overlap; the scroll-linked transform
-     below determines when the incoming plate is allowed to cover the outgoing
-     one. No decorative layer ever receives pointer input. */
+  /* Section transitions: each editorial plate owns its complete flow box.
+     Motion is clipped inside that box, so adjacent scenes can exchange without
+     leaking into one another's stable viewport. */
   .transition-panel {
-    --transition-lift: var(--transition-overlap-md);
-
     position: relative;
+    overflow: clip;
     isolation: isolate;
   }
 
@@ -620,10 +620,9 @@
 
   /* About: hard-edged editorial bands --------------------------------- */
   .about-section {
-    --transition-lift: var(--transition-overlap-lg);
-
     z-index: 3;
-    margin-block-start: calc(-1 * var(--transition-overlap-lg));
+    min-height: calc(100dvh - var(--nav-h-scrolled));
+    background: var(--paper-50);
   }
 
   .about-intro-band {
@@ -736,23 +735,44 @@
   }
 
   /* Expertise: alternating full-width image/content stripes ----------- */
+  #heatVision {
+    scroll-margin-top: var(--expertise-heading-h);
+  }
+
   .expertise-heading-band {
-    position: relative;
-    z-index: 3;
-    padding-block: var(--section-y-compact);
+    position: sticky;
+    z-index: 10;
+    top: var(--nav-h-scrolled);
+    display: grid;
+    height: var(--expertise-heading-h);
+    padding-block: 0;
+    align-items: center;
     background: #fff;
   }
 
   .expertise-story {
     position: relative;
+    padding-block-end: var(--expertise-panel-h);
+    background: var(--ink-900);
+    overflow: clip;
     isolation: isolate;
   }
 
   .expertise-stripe {
     display: grid;
-    height: clamp(32.5rem, min(68svh, 42vw), 45rem);
+    height: var(--expertise-panel-h);
     min-height: 0;
     grid-template-columns: minmax(0, 48%) minmax(0, 52%);
+  }
+
+  .consulting-stripe,
+  .heatvision-stripe {
+    position: sticky;
+    top: calc(var(--nav-h-scrolled) + var(--expertise-heading-h));
+  }
+
+  .consulting-stripe {
+    z-index: 1;
   }
 
   .stripe-media,
@@ -845,10 +865,9 @@
   }
 
   .heatvision-stripe {
-    position: relative;
     z-index: 2;
-    height: auto;
-    min-height: clamp(29.25rem, min(68svh, 32.5vw), 40.5rem);
+    height: var(--expertise-panel-h);
+    min-height: 0;
     grid-template-columns: minmax(0, 42%) minmax(0, 58%);
     background: var(--ink-900);
     isolation: isolate;
@@ -889,7 +908,7 @@
 
   .heatvision-gallery {
     --heatvision-gallery-inset: clamp(0.75rem, 1.3cqw, 1.25rem);
-    --heatvision-top-trim: clamp(3.25rem, 3.5vw, 4.5rem);
+    --heatvision-top-trim: 0rem;
 
     position: absolute;
     top: calc(var(--heatvision-gallery-inset) - var(--heatvision-top-trim));
@@ -1108,10 +1127,7 @@
 
   /* Partners ----------------------------------------------------------- */
   .partners-section {
-    --transition-lift: var(--transition-overlap-md);
-
     z-index: 4;
-    margin-block-start: calc(-1 * var(--transition-overlap-md));
     padding-block: var(--section-y);
     background: #fff;
   }
@@ -1204,10 +1220,11 @@
 
   /* Footer ------------------------------------------------------------- */
   .footer {
-    --transition-lift: var(--transition-overlap-sm);
-
     z-index: 5;
-    margin-block-start: calc(-1 * var(--transition-overlap-sm));
+    min-height: max(
+      27rem,
+      calc(100dvh - var(--nav-h-scrolled) - 34.5rem)
+    );
     padding-block: clamp(3rem, calc(1.5vw + 2vh), 4rem) 1.5rem;
     border-top: 1px solid var(--color-hairline);
     background: var(--ink-900);
@@ -1508,9 +1525,9 @@
     to { opacity: 0; }
   }
 
-  @keyframes transition-panel-lift {
-    from { transform: translateY(var(--transition-lift)); }
-    to { transform: translateY(0); }
+  @keyframes transition-scene-enter {
+    from { opacity: 0.94; clip-path: inset(0 0 8% 0); }
+    to { opacity: 1; clip-path: inset(0 0 0 0); }
   }
 
   @keyframes transition-seam-draw {
@@ -1599,7 +1616,7 @@
       .about-section {
         view-timeline-name: --about-panel;
         view-timeline-axis: block;
-        animation: transition-panel-lift linear both;
+        animation: transition-scene-enter linear both;
         animation-timeline: --about-panel;
         animation-range: entry 0% entry 36%;
       }
@@ -1674,7 +1691,7 @@
       .partners-section {
         view-timeline-name: --partners-panel;
         view-timeline-axis: block;
-        animation: transition-panel-lift linear both;
+        animation: transition-scene-enter linear both;
         animation-timeline: --partners-panel;
         animation-range: entry 0% entry 34%;
       }
@@ -1688,7 +1705,7 @@
       .footer {
         view-timeline-name: --footer-panel;
         view-timeline-axis: block;
-        animation: transition-panel-lift linear both;
+        animation: transition-scene-enter linear both;
         animation-timeline: --footer-panel;
         animation-range: entry 0% entry 42%;
       }
@@ -1701,20 +1718,11 @@
     }
   }
 
-  @media (min-width: 869px) and (min-height: 701px) and (prefers-reduced-motion: no-preference) {
-    html.js .consulting-stripe {
-      position: sticky;
-      z-index: 1;
-      top: var(--nav-h-scrolled);
-    }
-  }
-
   html.js .partners-section:not(.is-transition-settled) .partners-track {
     animation-play-state: paused;
   }
 
   html:not(.js) :is(.about-section, .partners-section, .footer) {
-    margin-block-start: 0;
     animation: none;
     transform: none;
   }
@@ -1733,7 +1741,11 @@
     transform: none;
   }
 
-  html:not(.js) .consulting-stripe {
+  html:not(.js) .expertise-story {
+    padding-block-end: 0;
+  }
+
+  html:not(.js) :is(.consulting-stripe, .heatvision-stripe) {
     position: relative;
     top: auto;
   }
@@ -1783,10 +1795,9 @@
       --nav-h: 72px;
       --nav-h-scrolled: 64px;
       --section-y: clamp(3.5rem, 8vw, 5rem);
+      --expertise-heading-h: clamp(9.5rem, 24dvh, 11rem);
+      --expertise-panel-h: clamp(48rem, 130vw, 62rem);
       --section-y-compact: clamp(3rem, 7vw, 4.5rem);
-      --transition-overlap-lg: clamp(3rem, 9svh, 4.5rem);
-      --transition-overlap-md: clamp(2.5rem, 7svh, 3.75rem);
-      --transition-overlap-sm: clamp(2rem, 5svh, 3rem);
       --transition-depth-sm: clamp(0.75rem, 4vw, 1.25rem);
       --transition-depth-md: clamp(1.25rem, 6vw, 2rem);
     }
@@ -1942,12 +1953,17 @@
 
     .expertise-stripe,
     .heatvision-stripe {
-      height: auto;
+      height: var(--expertise-panel-h);
       min-height: 0;
       grid-template-columns: 1fr;
     }
 
-    .consulting-stripe {
+    .expertise-story {
+      padding-block-end: 0;
+    }
+
+    .consulting-stripe,
+    .heatvision-stripe {
       position: relative;
       top: auto;
     }
@@ -1992,6 +2008,10 @@
   }
 
   @media (max-width: 520px) {
+    :root {
+      --expertise-panel-h: clamp(62rem, 235vw, 70rem);
+    }
+
     .heatvision-stage {
       min-height: clamp(42rem, 180vw, 50rem);
     }
@@ -2072,7 +2092,6 @@
     }
 
     :is(.about-section, .partners-section, .footer) {
-      margin-block-start: 0;
       transform: none !important;
     }
 
@@ -2089,7 +2108,11 @@
       transform: none !important;
     }
 
-    .consulting-stripe {
+    .expertise-story {
+      padding-block-end: 0;
+    }
+
+    :is(.consulting-stripe, .heatvision-stripe) {
       position: relative !important;
       top: auto !important;
     }

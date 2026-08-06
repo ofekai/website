@@ -7,15 +7,6 @@ function tokenSeconds(name: string, fallbackMs: number): number {
   return (Number.isFinite(value) ? value : fallbackMs) / 1000;
 }
 
-function tokenPixels(name: string, fallbackPx: number): number {
-  const probe = document.createElement('span');
-  probe.style.cssText = `position:absolute;visibility:hidden;width:var(${name});pointer-events:none`;
-  document.body.append(probe);
-  const value = parseFloat(getComputedStyle(probe).width);
-  probe.remove();
-  return Number.isFinite(value) ? value : fallbackPx;
-}
-
 function finalState(el: HTMLElement): Record<string, string | number> {
   const state: Record<string, string | number> = { opacity: 1, transform: 'none' };
   if (el.dataset.reveal === 'mask' || el.dataset.reveal === 'line') {
@@ -122,21 +113,24 @@ function initScrollFallback(): VoidFunction | undefined {
         );
       }
 
-      const panelSpecs = [
-        ['[data-transition="hero-about"]', '--transition-overlap-lg', 104],
-        ['[data-transition="heatvision-partners"]', '--transition-overlap-md', 80],
-        ['[data-transition="partners-footer"]', '--transition-overlap-sm', 56],
+      const sceneSelectors = [
+        '[data-transition="hero-about"]',
+        '[data-transition="heatvision-partners"]',
+        '[data-transition="partners-footer"]',
       ] as const;
 
-      panelSpecs.forEach(([selector, token, fallback]) => {
+      sceneSelectors.forEach((selector) => {
         const panel = document.querySelector<HTMLElement>(selector);
         if (!panel) return;
         const seam = panel.querySelector<HTMLElement>('.transition-seam');
-        const lift = tokenPixels(token, fallback);
         animated.add(panel);
         stops.push(
           scroll(
-            animate(panel, { transform: [`translateY(${lift}px)`, 'translateY(0px)'] }, { ease: 'linear' }),
+            animate(
+              panel,
+              { opacity: [0.94, 1], clipPath: ['inset(0 0 8% 0)', 'inset(0 0 0 0)'] },
+              { ease: 'linear' },
+            ),
             { target: panel, offset: ['start end', 'start 64%'] },
           ),
         );

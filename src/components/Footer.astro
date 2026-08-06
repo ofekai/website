@@ -14,7 +14,13 @@ interface Props {
 const { messages } = Astro.props;
 ---
 
-<footer id="contact" class="footer" data-section>
+<footer
+  id="contact"
+  class="footer transition-panel transition-panel-dark"
+  data-section
+  data-transition="partners-footer"
+>
+  <span class="transition-seam transition-seam-end" aria-hidden="true"></span>
   <div class="container footer-container" data-reveal-group>
     <div class="footer-main">
       <div class="footer-brand" data-reveal="rise">

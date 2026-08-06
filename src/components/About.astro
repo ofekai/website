@@ -15,7 +15,13 @@ const { messages } = Astro.props;
 const featureIcons = [IconData, IconLanguage, IconCooperate];
 ---
 
-<section id="about" class="about-section" data-section>
+<section
+  id="about"
+  class="about-section transition-panel transition-panel-light"
+  data-section
+  data-transition="hero-about"
+>
+  <span class="transition-seam transition-seam-start" aria-hidden="true"></span>
   <div class="about-intro-band">
     <div class="container about-intro">
       <SectionTitle light={messages.titleLight} bold={messages.titleBold} />
@@ -27,7 +33,7 @@ const featureIcons = [IconData, IconLanguage, IconCooperate];
       </p>
     </div>
   </div>
-  <div class="about-features-band">
+  <div class="about-features-band" data-transition-features>
     <div class="container">
       <div class="feature-grid" data-reveal-group>
         {

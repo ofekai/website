@@ -570,8 +570,64 @@
     font-weight: 700;
   }
 
+  /* Section transitions: one hard-edged editorial motion language. The
+     negative flow margin creates real overlap; the scroll-linked transform
+     below determines when the incoming plate is allowed to cover the outgoing
+     one. No decorative layer ever receives pointer input. */
+  .transition-panel {
+    --transition-lift: var(--transition-overlap-md);
+
+    position: relative;
+    isolation: isolate;
+  }
+
+  .transition-panel-light {
+    background: #fff;
+  }
+
+  .transition-panel-dark {
+    background: var(--ink-900);
+  }
+
+  .transition-seam {
+    position: absolute;
+    z-index: 5;
+    top: 0;
+    width: var(--transition-line);
+    height: 2px;
+    background: var(--color-accent);
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: left;
+  }
+
+  .transition-seam-start {
+    inset-inline-start: var(--gutter);
+  }
+
+  .transition-seam-end {
+    inset-inline-end: var(--gutter);
+    transform-origin: right;
+  }
+
+  html[dir='rtl'] .transition-seam {
+    transform-origin: right;
+  }
+
+  html[dir='rtl'] .transition-seam-end {
+    transform-origin: left;
+  }
+
   /* About: hard-edged editorial bands --------------------------------- */
+  .about-section {
+    --transition-lift: var(--transition-overlap-lg);
+
+    z-index: 3;
+    margin-block-start: calc(-1 * var(--transition-overlap-lg));
+  }
+
   .about-intro-band {
+    position: relative;
     padding-block: var(--section-y);
     background: #fff;
   }
@@ -618,6 +674,7 @@
   }
 
   .about-features-band {
+    position: relative;
     padding-block: var(--section-y-compact);
     border-block: 1px solid var(--color-hairline-ink);
     background: var(--paper-50);
@@ -680,8 +737,15 @@
 
   /* Expertise: alternating full-width image/content stripes ----------- */
   .expertise-heading-band {
+    position: relative;
+    z-index: 3;
     padding-block: var(--section-y-compact);
     background: #fff;
+  }
+
+  .expertise-story {
+    position: relative;
+    isolation: isolate;
   }
 
   .expertise-stripe {
@@ -781,10 +845,28 @@
   }
 
   .heatvision-stripe {
+    position: relative;
+    z-index: 2;
     height: auto;
     min-height: clamp(29.25rem, min(68svh, 32.5vw), 40.5rem);
     grid-template-columns: minmax(0, 42%) minmax(0, 58%);
     background: var(--ink-900);
+    isolation: isolate;
+  }
+
+  .heatvision-transition-edge {
+    position: absolute;
+    z-index: 12;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--color-accent);
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: left;
+  }
+
+  html[dir='rtl'] .heatvision-transition-edge {
+    transform-origin: right;
   }
 
   .heatvision-stripe .stripe-content {
@@ -1026,6 +1108,10 @@
 
   /* Partners ----------------------------------------------------------- */
   .partners-section {
+    --transition-lift: var(--transition-overlap-md);
+
+    z-index: 4;
+    margin-block-start: calc(-1 * var(--transition-overlap-md));
     padding-block: var(--section-y);
     background: #fff;
   }
@@ -1118,10 +1204,15 @@
 
   /* Footer ------------------------------------------------------------- */
   .footer {
+    --transition-lift: var(--transition-overlap-sm);
+
+    z-index: 5;
+    margin-block-start: calc(-1 * var(--transition-overlap-sm));
     padding-block: clamp(3rem, calc(1.5vw + 2vh), 4rem) 1.5rem;
     border-top: 1px solid var(--color-hairline);
     background: var(--ink-900);
     color: #fff;
+    isolation: isolate;
   }
 
   .footer-container {
@@ -1417,6 +1508,77 @@
     to { opacity: 0; }
   }
 
+  @keyframes transition-panel-lift {
+    from { transform: translateY(var(--transition-lift)); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes transition-seam-draw {
+    0% { opacity: 0; transform: scaleX(0); }
+    45% { opacity: 1; transform: scaleX(1); }
+    100% { opacity: 0; transform: scaleX(1); }
+  }
+
+  @keyframes transition-features-recede {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0.62; transform: translateY(calc(-1 * var(--transition-depth-sm))); }
+  }
+
+  @keyframes transition-consulting-media-recede {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0.66; transform: translateY(calc(-0.45 * var(--transition-depth-sm))) scale(0.985); }
+  }
+
+  @keyframes transition-consulting-copy-recede {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0.42; transform: translateY(calc(-1 * var(--transition-depth-sm))); }
+  }
+
+  @keyframes transition-heatvision-copy-enter {
+    from {
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+      transform: translateX(calc(-1 * var(--transition-depth-md)));
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes transition-heatvision-stage-enter {
+    from {
+      opacity: 0.2;
+      clip-path: inset(0 0 0 100%);
+      transform: translateX(var(--transition-depth-md));
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes transition-heatvision-edge-draw {
+    0% { opacity: 0; transform: scaleX(0); }
+    45% { opacity: 1; transform: scaleX(1); }
+    100% { opacity: 0; transform: scaleX(1); }
+  }
+
+  @keyframes transition-heatvision-mobile-enter {
+    from {
+      opacity: 0;
+      clip-path: inset(100% 0 0 0);
+      transform: translateY(var(--transition-depth-sm));
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translateY(0);
+    }
+  }
+
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .hero-visual {
@@ -1432,6 +1594,164 @@
         animation-fill-mode: both;
         animation-timeline: --hero-scroll;
         animation-range: exit 0% exit 68%;
+      }
+
+      .about-section {
+        view-timeline-name: --about-panel;
+        view-timeline-axis: block;
+        animation: transition-panel-lift linear both;
+        animation-timeline: --about-panel;
+        animation-range: entry 0% entry 36%;
+      }
+
+      .about-section > .transition-seam {
+        animation: transition-seam-draw linear both;
+        animation-timeline: --about-panel;
+        animation-range: entry 10% entry 48%;
+      }
+
+      .about-features-band {
+        view-timeline-name: --about-features;
+        view-timeline-axis: block;
+      }
+
+      .about-features-band .feature-grid {
+        animation: transition-features-recede linear both;
+        animation-timeline: --about-features;
+        animation-range: exit 0% exit 58%;
+      }
+
+      .expertise-heading-band {
+        view-timeline-name: --expertise-heading;
+        view-timeline-axis: block;
+      }
+
+      .expertise-heading-band > .transition-seam {
+        animation: transition-seam-draw linear both;
+        animation-timeline: --expertise-heading;
+        animation-range: entry 0% entry 42%;
+      }
+
+      .expertise-story {
+        timeline-scope: --heatvision-entry;
+      }
+
+      .heatvision-stripe {
+        view-timeline-name: --heatvision-entry;
+        view-timeline-axis: block;
+      }
+
+      .consulting-stripe [data-transition-layer='media'] {
+        animation: transition-consulting-media-recede linear both;
+        animation-timeline: --heatvision-entry;
+        animation-range: entry 0% entry 76%;
+      }
+
+      .consulting-stripe [data-transition-layer='copy'] {
+        animation: transition-consulting-copy-recede linear both;
+        animation-timeline: --heatvision-entry;
+        animation-range: entry 0% entry 68%;
+      }
+
+      .heatvision-stripe [data-transition-layer='copy'] {
+        animation: transition-heatvision-copy-enter linear both;
+        animation-timeline: --heatvision-entry;
+        animation-range: entry 8% entry 66%;
+      }
+
+      .heatvision-stripe [data-transition-layer='stage'] {
+        animation: transition-heatvision-stage-enter linear both;
+        animation-timeline: --heatvision-entry;
+        animation-range: entry 0% entry 72%;
+      }
+
+      .heatvision-transition-edge {
+        animation: transition-heatvision-edge-draw linear both;
+        animation-timeline: --heatvision-entry;
+        animation-range: entry 12% entry 58%;
+      }
+
+      .partners-section {
+        view-timeline-name: --partners-panel;
+        view-timeline-axis: block;
+        animation: transition-panel-lift linear both;
+        animation-timeline: --partners-panel;
+        animation-range: entry 0% entry 34%;
+      }
+
+      .partners-section > .transition-seam {
+        animation: transition-seam-draw linear both;
+        animation-timeline: --partners-panel;
+        animation-range: entry 10% entry 50%;
+      }
+
+      .footer {
+        view-timeline-name: --footer-panel;
+        view-timeline-axis: block;
+        animation: transition-panel-lift linear both;
+        animation-timeline: --footer-panel;
+        animation-range: entry 0% entry 42%;
+      }
+
+      .footer > .transition-seam {
+        animation: transition-seam-draw linear both;
+        animation-timeline: --footer-panel;
+        animation-range: entry 10% entry 54%;
+      }
+    }
+  }
+
+  @media (min-width: 869px) and (min-height: 701px) and (prefers-reduced-motion: no-preference) {
+    html.js .consulting-stripe {
+      position: sticky;
+      z-index: 1;
+      top: var(--nav-h-scrolled);
+    }
+  }
+
+  html.js .partners-section:not(.is-transition-settled) .partners-track {
+    animation-play-state: paused;
+  }
+
+  html:not(.js) :is(.about-section, .partners-section, .footer) {
+    margin-block-start: 0;
+    animation: none;
+    transform: none;
+  }
+
+  html:not(.js) :is(.transition-seam, .heatvision-transition-edge) {
+    opacity: 0;
+    clip-path: none;
+    animation: none;
+    transform: none;
+  }
+
+  html:not(.js) [data-transition-layer] {
+    opacity: 1;
+    clip-path: none;
+    animation: none;
+    transform: none;
+  }
+
+  html:not(.js) .consulting-stripe {
+    position: relative;
+    top: auto;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (max-width: 868px) and (prefers-reduced-motion: no-preference) {
+      .consulting-stripe [data-transition-layer] {
+        animation: none;
+      }
+
+      .heatvision-stripe [data-transition-layer='stage'] {
+        animation-name: transition-heatvision-mobile-enter;
+        animation-range: entry 0% entry 54%;
+      }
+
+      .heatvision-stripe [data-transition-layer='copy'] {
+        animation-name: transition-heatvision-mobile-enter;
+        animation-range: entry 28% entry 78%;
       }
     }
   }
@@ -1464,6 +1784,11 @@
       --nav-h-scrolled: 64px;
       --section-y: clamp(3.5rem, 8vw, 5rem);
       --section-y-compact: clamp(3rem, 7vw, 4.5rem);
+      --transition-overlap-lg: clamp(3rem, 9svh, 4.5rem);
+      --transition-overlap-md: clamp(2.5rem, 7svh, 3.75rem);
+      --transition-overlap-sm: clamp(2rem, 5svh, 3rem);
+      --transition-depth-sm: clamp(0.75rem, 4vw, 1.25rem);
+      --transition-depth-md: clamp(1.25rem, 6vw, 2rem);
     }
 
     .menu-toggle {
@@ -1622,6 +1947,11 @@
       grid-template-columns: 1fr;
     }
 
+    .consulting-stripe {
+      position: relative;
+      top: auto;
+    }
+
     .stripe-media {
       height: clamp(16rem, 62vw, 30rem);
       min-height: 0;
@@ -1739,6 +2069,29 @@
       opacity: 1;
       clip-path: none !important;
       transform: none;
+    }
+
+    :is(.about-section, .partners-section, .footer) {
+      margin-block-start: 0;
+      transform: none !important;
+    }
+
+    :is(.transition-seam, .heatvision-transition-edge) {
+      opacity: 0 !important;
+      clip-path: none !important;
+      transform: none !important;
+    }
+
+    [data-transition-layer],
+    .about-features-band .feature-grid {
+      opacity: 1 !important;
+      clip-path: none !important;
+      transform: none !important;
+    }
+
+    .consulting-stripe {
+      position: relative !important;
+      top: auto !important;
     }
 
     .hero-media img,

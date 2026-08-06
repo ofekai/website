@@ -19,14 +19,16 @@ const { messages } = Astro.props;
 ---
 
 <section id="consulting" class="expertise-section" data-section>
-  <div class="expertise-heading-band">
+  <div class="expertise-heading-band" data-transition-heading>
+    <span class="transition-seam transition-seam-start" aria-hidden="true"></span>
     <div class="container">
     <SectionTitle light={messages.titleLight} bold={messages.titleBold} />
     </div>
   </div>
 
-  <div class="expertise-stripe consulting-stripe">
-    <div class="stripe-media">
+  <div class="expertise-story" data-transition-story>
+  <div class="expertise-stripe consulting-stripe" data-transition-panel="consulting">
+    <div class="stripe-media" data-transition-layer="media">
       <EditorialMedia
         src={consultingTree}
         alt=""
@@ -38,7 +40,7 @@ const { messages } = Astro.props;
         sizes="(min-width: 769px) 48vw, 100vw"
       />
     </div>
-    <div class="stripe-content" data-reveal="rise">
+    <div class="stripe-content" data-reveal="rise" data-transition-layer="copy">
       <div>
           <h3 class="card-title consulting-title">
             <span>{messages.consultingTitleLight}</span>
@@ -51,8 +53,14 @@ const { messages } = Astro.props;
     </div>
   </div>
 
-  <div id="heatVision" class="expertise-stripe heatvision-stripe" data-section>
-    <div class="stripe-content" data-reveal="rise">
+  <div
+    id="heatVision"
+    class="expertise-stripe heatvision-stripe"
+    data-section
+    data-transition-panel="heatvision"
+  >
+    <span class="heatvision-transition-edge" aria-hidden="true"></span>
+    <div class="stripe-content" data-transition-layer="copy">
       <div class="service-mark">
         <Image src={iconHeatVision} alt="" aria-hidden="true" width={115} height={115} densities={[1, 2]} />
       </div>
@@ -63,7 +71,7 @@ const { messages } = Astro.props;
           </p>
       </div>
     </div>
-    <div class="heatvision-stage" aria-hidden="true">
+    <div class="heatvision-stage" data-transition-layer="stage" aria-hidden="true">
       <div class="heatvision-gallery">
         <figure class="heatvision-shot heatvision-shot-primary">
           <span class="heatvision-graph-label heatvision-graph-label-primary">
@@ -131,5 +139,6 @@ const { messages } = Astro.props;
         </div>
       </div>
     </div>
+  </div>
   </div>
 </section>

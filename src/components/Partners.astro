@@ -43,7 +43,13 @@ const partners: Partner[] = [
 const groups = [false, true];
 ---
 
-<section id="partners" class="section partners-section" data-section>
+<section
+  id="partners"
+  class="section partners-section transition-panel transition-panel-light"
+  data-section
+  data-transition="heatvision-partners"
+>
+  <span class="transition-seam transition-seam-start" aria-hidden="true"></span>
   <div class="container grid">
     <SectionTitle light={messages.titleLight} bold={messages.titleBold} class="partners-title" />
     <div
@@ -53,7 +59,7 @@ const groups = [false, true];
       aria-label={messages.ariaLabel}
       tabindex="0"
     >
-      <div class="partners-track">
+      <div class="partners-track" data-transition-marquee>
       {
         groups.map((duplicate) => (
           <div class="partners-group" role={duplicate ? undefined : 'list'} aria-hidden={duplicate ? 'true' : undefined}>

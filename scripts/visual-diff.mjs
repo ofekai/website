@@ -197,6 +197,97 @@ async function checkNavigation(browser, url) {
   return problems;
 }
 
+/** Proves the Expertise stripes are sized by their content at phone widths.
+ *
+ * The stripes carry a fixed `height: var(--expertise-panel-h)` so each is one
+ * pinned viewport tall for the scene stack. That stack is gated off below
+ * 869px, and a grid box with a definite height never shrinks to its content,
+ * so a regression here does not throw or overflow the page -- it silently
+ * strands empty space or shears the copy off inside `.expertise-story`'s
+ * `overflow: clip`. Nothing else in this harness can see that: the width sweep
+ * renders at height 1000 and every scene check runs at desktop sizes, which is
+ * why ~66px of the HeatVision paragraph shipped cut in half.
+ *
+ * Motion is frozen because the reveal keyframes hold a translateY at rest,
+ * which would otherwise show up as a phantom ~16px overflow.
+ */
+async function checkMobilePanels(browser, url) {
+  const problems = [];
+  for (const [width, height] of [[390, 844], [375, 667], [430, 932]]) {
+    const context = await browser.newContext({
+      viewport: { width, height },
+      isMobile: true,
+      hasTouch: true,
+      reducedMotion: 'reduce',
+    });
+    const page = await context.newPage();
+    await page.goto(url, { waitUntil: 'networkidle' });
+    // Resolve the lazy charts so the stage reports its real height.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += 400) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => setTimeout(resolve, 30));
+      }
+      window.scrollTo(0, 0);
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    });
+
+    const state = await page.evaluate(() => {
+      const box = (selector) => {
+        const el = document.querySelector(selector);
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+        return {
+          top: rect.top + scrollY,
+          bottom: rect.bottom + scrollY,
+          height: rect.height,
+          scrollH: el.scrollHeight,
+          clientH: el.clientHeight,
+        };
+      };
+      return {
+        story: box('.expertise-story'),
+        hvStripe: box('.heatvision-stripe'),
+        hvCopy: box('.heatvision-stripe .stripe-content'),
+        hvText: box('.heatvision-stripe .card-text'),
+        mark: box('.heatvision-stripe .service-mark'),
+        stage: box('.heatvision-stage'),
+        consCopy: box('.consulting-stripe .stripe-content'),
+        consMedia: box('.consulting-stripe .stripe-media'),
+      };
+    });
+
+    const at = `${width}x${height}`;
+    if (state.story.scrollH > state.story.clientH) {
+      problems.push(`${at}: .expertise-story clips ${state.story.scrollH - state.story.clientH}px of its stripes`);
+    }
+    if (state.hvCopy.scrollH > state.hvCopy.clientH) {
+      problems.push(`${at}: HeatVision copy overflows its panel by ${state.hvCopy.scrollH - state.hvCopy.clientH}px`);
+    }
+    if (state.hvText.bottom > state.hvStripe.bottom) {
+      problems.push(`${at}: HeatVision body copy is cut off below the stripe`);
+    }
+    if (state.mark.top < state.hvCopy.top) {
+      problems.push(`${at}: HeatVision logo is sheared off the top of its panel`);
+    }
+    // Copy reads before its image in both stripes.
+    if (state.consCopy.top >= state.consMedia.top) {
+      problems.push(`${at}: Consulting image is placed above its copy`);
+    }
+    if (state.hvCopy.top >= state.stage.top) {
+      problems.push(`${at}: HeatVision charts are placed above their copy`);
+    }
+    // The panel is content-sized, so the only slack is the copy's own padding.
+    const slack = state.consCopy.height - state.consCopy.scrollH;
+    if (slack > 8) {
+      problems.push(`${at}: Consulting copy panel strands ${Math.round(slack)}px of empty space`);
+    }
+
+    await context.close();
+  }
+  return problems;
+}
+
 /** Proves the desktop landing state keeps its logo and that the hero's two
  * visual planes travel at clearly different speeds during the first viewport. */
 async function checkHeroLayering(browser, url) {
@@ -500,6 +591,7 @@ async function main() {
 
   const noJsProblems = await collectLocaleProblems(checkNoJs);
   const navigationProblems = await collectLocaleProblems(checkNavigation);
+  const mobilePanelProblems = await collectLocaleProblems(checkMobilePanels);
   const heroProblems = await collectLocaleProblems(checkHeroLayering);
   const handoffProblems = await collectLocaleProblems(checkSceneHandoff);
   const partnerProblems = await collectLocaleProblems(checkPartnerMarquee);
@@ -527,6 +619,9 @@ async function main() {
   console.log('\n=== Navigation interactions ===');
   console.log(navigationProblems.length ? navigationProblems.join('\n') : 'mobile menu, focus, active state and progress pass');
 
+  console.log('\n=== Mobile Expertise panels ===');
+  console.log(mobilePanelProblems.length ? mobilePanelProblems.join('\n') : 'stripes sized to content, copy before image, nothing clipped at 375/390/430');
+
   console.log('\n=== Hero layering ===');
   console.log(heroProblems.length ? heroProblems.join('\n') : 'landing logo and differential image/text scroll pass');
 
@@ -544,6 +639,7 @@ async function main() {
     issues.length > 0 ||
     noJsProblems.length > 0 ||
     navigationProblems.length > 0 ||
+    mobilePanelProblems.length > 0 ||
     heroProblems.length > 0 ||
     handoffProblems.length > 0 ||
     partnerProblems.length > 0 ||

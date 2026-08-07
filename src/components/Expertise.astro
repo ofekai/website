@@ -19,14 +19,14 @@ const { messages } = Astro.props;
 ---
 
 <section id="consulting" class="expertise-section" data-section>
-  <div class="expertise-heading-band" data-transition-heading>
+  <div class="expertise-heading-band">
     <span class="transition-seam transition-seam-start" aria-hidden="true"></span>
     <div class="container">
     <SectionTitle light={messages.titleLight} bold={messages.titleBold} />
     </div>
   </div>
 
-  <div class="expertise-story" data-transition-story>
+  <div class="expertise-story">
   <div class="expertise-stripe consulting-stripe" data-transition-panel="consulting">
     <div class="stripe-media" data-transition-layer="media">
       <EditorialMedia
@@ -52,6 +52,8 @@ const { messages } = Astro.props;
       </div>
     </div>
   </div>
+
+  <span class="scene-seam" data-seam="consulting-heatvision" aria-hidden="true"></span>
 
   <div
     id="heatVision"

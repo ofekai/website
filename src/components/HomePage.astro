@@ -19,10 +19,18 @@ const messages = getMessages(locale);
 
 <Layout locale={locale} messages={messages}>
   <Nav locale={locale} messages={messages} />
+  {/*
+    The .scene-seam spans are the view-timeline subjects for every
+    section-to-section transition. They sit between scenes so they are never
+    descendants of a pinned box -- see the .scene-seam comment in global.css.
+  */}
   <main>
     <Hero messages={messages.hero} />
+    <span class="scene-seam" data-seam="hero-about" aria-hidden="true"></span>
     <About messages={messages.about} />
+    <span class="scene-seam" data-seam="about-expertise" aria-hidden="true"></span>
     <Expertise messages={messages.expertise} />
+    <span class="scene-seam" data-seam="heatvision-partners" aria-hidden="true"></span>
     <Partners messages={messages.partners} />
   </main>
   <Footer messages={messages.footer} />

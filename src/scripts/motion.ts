@@ -81,246 +81,178 @@ function afterLoad(fn: VoidFunction): VoidFunction {
   return () => window.removeEventListener('load', fn);
 }
 
+/*
+ * Mirrors the CSS scroll-driven choreography for browsers without
+ * `animation-timeline: view()`. The structural half of every transition --
+ * scenes pinning under the nav while the next one travels over them -- is
+ * plain `position: sticky` and needs no fallback at all, so only the property
+ * tweens live here.
+ *
+ * Every CSS range is `cover <from>% cover <to>%` on a zero-height .scene-seam,
+ * which makes the translation mechanical: see coverRange() below.
+ */
 function initScrollFallback(): VoidFunction | undefined {
   if (CSS.supports('animation-timeline', 'view()')) return undefined;
-  const hero = document.querySelector<HTMLElement>('.hero');
-  const image = hero?.querySelector<HTMLElement>('[data-parallax]');
-  const content = hero?.querySelector<HTMLElement>('.hero-content');
+
+  const seam = (name: string) => document.querySelector<HTMLElement>(`[data-seam="${name}"]`);
+  const find = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector);
+
+  /*
+   * A zero-height subject's `cover 0%` is the marker sitting on the viewport
+   * bottom and `cover 100%` is the marker on the viewport top, so the CSS
+   * percentage maps to a Motion viewport offset by simple complement.
+   */
+  const coverRange = (from: number, to: number): [`start ${number}%`, `start ${number}%`] => [
+    `start ${100 - from}%`,
+    `start ${100 - to}%`,
+  ];
 
   const stops: VoidFunction[] = [];
   const animated = new Set<HTMLElement>();
   let cancelled = false;
+
   const cancelLoad = afterLoad(() => {
     void import('motion').then(({ scroll }) => {
       if (cancelled) return;
 
-      if (hero && image && content) {
-        animated.add(image);
-        animated.add(content);
+      const drive = (
+        el: HTMLElement | null | undefined,
+        marker: HTMLElement | null,
+        keyframes: Parameters<typeof animate>[1],
+        from: number,
+        to: number,
+      ) => {
+        if (!el || !marker) return;
+        animated.add(el);
         stops.push(
-          scroll(
-            animate(
-              image,
-              { transform: ['translateY(0) scale(1.06)', 'translateY(50%) scale(1.06)'] },
-              { ease: 'linear' },
-            ),
-            { target: hero, offset: ['start start', 'end start'] },
-          ),
-          scroll(
-            animate(content, { opacity: [1, 0] }, { ease: 'linear' }),
-            { target: hero, offset: ['start start', '0.68 start'] },
-          ),
+          scroll(animate(el, keyframes, { ease: 'linear' }), {
+            target: marker,
+            offset: coverRange(from, to),
+          }),
         );
-      }
+      };
 
-      const sceneSpecs = [
-        ['[data-transition="hero-about"]', 8],
-        ['[data-transition="heatvision-partners"]', 18],
-        ['[data-transition="partners-footer"]', 8],
-      ] as const;
-
-      sceneSpecs.forEach(([selector, inset]) => {
-        const panel = document.querySelector<HTMLElement>(selector);
-        if (!panel) return;
-        const seam = panel.querySelector<HTMLElement>('.transition-seam');
-        animated.add(panel);
-        stops.push(
-          scroll(
-            animate(
-              panel,
-              { opacity: [0.94, 1], clipPath: [`inset(0 0 ${inset}% 0)`, 'inset(0 0 0 0)'] },
-              { ease: 'linear' },
-            ),
-            { target: panel, offset: ['start end', 'start 64%'] },
-          ),
-        );
-        if (seam) {
-          animated.add(seam);
-          stops.push(
-            scroll(
-              animate(
-                seam,
-                { opacity: [0, 1, 0], transform: ['scaleX(0)', 'scaleX(1)', 'scaleX(1)'] },
-                { ease: 'linear' },
-              ),
-              { target: panel, offset: ['start 92%', 'start 52%'] },
-            ),
-          );
-        }
+      const seamDraw = () => ({
+        opacity: [0, 1, 0],
+        transform: ['scaleX(0)', 'scaleX(1)', 'scaleX(1)'],
       });
 
-      const heading = document.querySelector<HTMLElement>('[data-transition-heading]');
-      const headingSeam = heading?.querySelector<HTMLElement>('.transition-seam');
-      const aboutIntro = document.querySelector<HTMLElement>('.about-intro-band');
-      const features = document.querySelector<HTMLElement>('[data-transition-features]');
-      if (aboutIntro) {
-        animated.add(aboutIntro);
-        stops.push(
-          scroll(
-            animate(
-              aboutIntro,
-              {
-                opacity: [1, 0],
-                transform: ['translateY(0px) scale(1)', 'translateY(-48px) scale(.985)'],
-              },
-              { ease: 'linear' },
-            ),
-            { target: aboutIntro, offset: ['start 8%', 'end start'] },
-          ),
+      const fadeOut = () => ({
+        opacity: [1, 0],
+        transform: ['translateY(0px)', 'translateY(-24px)'],
+      });
+
+      /* ---- Hero -> About ---- */
+      const heroAbout = seam('hero-about');
+      drive(
+        find('.hero [data-parallax]'),
+        heroAbout,
+        { transform: ['translateY(0) scale(1.06)', 'translateY(50%) scale(1.06)'] },
+        0,
+        100,
+      );
+      drive(find('.hero-content'), heroAbout, { opacity: [1, 0] }, 0, 68);
+      drive(find('.about-section > .transition-seam'), heroAbout, seamDraw(), 30, 78);
+
+      /* ---- About -> Expertise ---- */
+      const aboutExpertise = seam('about-expertise');
+      drive(find('.about-intro-band'), aboutExpertise, fadeOut(), 10, 88);
+      drive(find('.about-features-band'), aboutExpertise, fadeOut(), 10, 88);
+      drive(find('.about-scroll'), aboutExpertise, fadeOut(), 0, 18);
+      drive(find('.expertise-heading-band > .transition-seam'), aboutExpertise, seamDraw(), 4, 92);
+
+      /* ---- Consulting -> HeatVision ---- */
+      const consultingHeatVision = seam('consulting-heatvision');
+      const mobile = window.matchMedia('(max-width: 868px)').matches;
+      const heatVision = find('[data-transition-panel="heatvision"]');
+      const consulting = find('[data-transition-panel="consulting"]');
+
+      drive(
+        heatVision?.querySelector<HTMLElement>('[data-transition-layer="copy"]'),
+        consultingHeatVision,
+        mobile
+          ? {
+              opacity: [0, 1],
+              clipPath: ['inset(100% 0 0 0)', 'inset(0 0 0 0)'],
+              transform: ['translateY(20px)', 'translateY(0px)'],
+            }
+          : {
+              opacity: [0, 1],
+              clipPath: ['inset(0 100% 0 0)', 'inset(0 0 0 0)'],
+              transform: ['translateX(-48px)', 'translateX(0px)'],
+            },
+        mobile ? 30 : 6,
+        mobile ? 74 : 49,
+      );
+
+      drive(
+        heatVision?.querySelector<HTMLElement>('[data-transition-layer="stage"]'),
+        consultingHeatVision,
+        mobile
+          ? {
+              opacity: [0, 1],
+              clipPath: ['inset(100% 0 0 0)', 'inset(0 0 0 0)'],
+              transform: ['translateY(20px)', 'translateY(0px)'],
+            }
+          : {
+              opacity: [0.2, 1],
+              clipPath: ['inset(0 0 0 100%)', 'inset(0 0 0 0)'],
+              transform: ['translateX(48px)', 'translateX(0px)'],
+            },
+        mobile ? 8 : 0,
+        mobile ? 52 : 53,
+      );
+
+      drive(
+        heatVision?.querySelector<HTMLElement>('.heatvision-transition-edge'),
+        consultingHeatVision,
+        seamDraw(),
+        9,
+        43,
+      );
+
+      if (!mobile) {
+        drive(
+          consulting?.querySelector<HTMLElement>('[data-transition-layer="media"]'),
+          consultingHeatVision,
+          {
+            opacity: [1, 0.66],
+            transform: ['translateY(0px) scale(1)', 'translateY(-12px) scale(.985)'],
+          },
+          0,
+          56,
+        );
+        drive(
+          consulting?.querySelector<HTMLElement>('[data-transition-layer="copy"]'),
+          consultingHeatVision,
+          { opacity: [1, 0.42], transform: ['translateY(0px)', 'translateY(-24px)'] },
+          0,
+          50,
         );
       }
-      if (heading && headingSeam) {
-        animated.add(heading);
-        animated.add(headingSeam);
+
+      /* ---- HeatVision -> Partners ---- */
+      drive(
+        find('.partners-section > .transition-seam'),
+        seam('heatvision-partners'),
+        seamDraw(),
+        4,
+        40,
+      );
+
+      /* ---- Partners -> Footer ----
+         The footer is a sibling of `main`, so there is no seam between them;
+         it drives its own rule off its own box, mirroring --footer-panel. */
+      const footer = find('.footer');
+      const footerSeam = footer?.querySelector<HTMLElement>('.transition-seam');
+      if (footer && footerSeam) {
+        animated.add(footerSeam);
         stops.push(
-          scroll(
-            animate(
-              heading,
-              {
-                opacity: [0.72, 1],
-                clipPath: ['inset(72% 0 0 0)', 'inset(0 0 0 0)'],
-                transform: ['translateY(48px)', 'translateY(0px)'],
-              },
-              { ease: 'linear' },
-            ),
-            { target: heading, offset: ['start end', 'start 8%'] },
-          ),
-          scroll(
-            animate(
-              headingSeam,
-              { opacity: [0, 1, 0], transform: ['scaleX(0)', 'scaleX(1)', 'scaleX(1)'] },
-              { ease: 'linear' },
-            ),
-            { target: heading, offset: ['start end', 'start 62%'] },
-          ),
+          scroll(animate(footerSeam, seamDraw(), { ease: 'linear' }), {
+            target: footer,
+            offset: ['start 92%', 'start 52%'],
+          }),
         );
-      }
-      if (heading && features) {
-        animated.add(features);
-        stops.push(
-          scroll(
-            animate(
-              features,
-              { opacity: [1, 0.5], transform: ['translateY(0px) scale(1)', 'translateY(-24px) scale(.99)'] },
-              { ease: 'linear' },
-            ),
-            { target: heading, offset: ['start end', 'start 64%'] },
-          ),
-        );
-      }
-
-      const heatVision = document.querySelector<HTMLElement>('[data-transition-panel="heatvision"]');
-      const heatCopy = heatVision?.querySelector<HTMLElement>('[data-transition-layer="copy"]');
-      const heatStage = heatVision?.querySelector<HTMLElement>('[data-transition-layer="stage"]');
-      const heatEdge = heatVision?.querySelector<HTMLElement>('.heatvision-transition-edge');
-      const consulting = document.querySelector<HTMLElement>('[data-transition-panel="consulting"]');
-      const consultingMedia = consulting?.querySelector<HTMLElement>('[data-transition-layer="media"]');
-      const consultingCopy = consulting?.querySelector<HTMLElement>('[data-transition-layer="copy"]');
-      const partners = document.querySelector<HTMLElement>('[data-transition="heatvision-partners"]');
-
-      if (heatVision) {
-        const mobile = window.matchMedia('(max-width: 868px)').matches;
-
-        if (heatCopy) {
-          animated.add(heatCopy);
-          stops.push(
-            scroll(
-              animate(
-                heatCopy,
-                mobile
-                  ? {
-                      opacity: [0, 1],
-                      clipPath: ['inset(100% 0 0 0)', 'inset(0 0 0 0)'],
-                      transform: ['translateY(20px)', 'translateY(0px)'],
-                    }
-                  : {
-                      opacity: [0, 1],
-                      clipPath: ['inset(0 100% 0 0)', 'inset(0 0 0 0)'],
-                      transform: ['translateX(-48px)', 'translateX(0px)'],
-                    },
-                { ease: 'linear' },
-              ),
-              { target: heatVision, offset: ['start end', 'start 30%'] },
-            ),
-          );
-        }
-
-        if (heatStage) {
-          animated.add(heatStage);
-          stops.push(
-            scroll(
-              animate(
-                heatStage,
-                mobile
-                  ? {
-                      opacity: [0, 1],
-                      clipPath: ['inset(100% 0 0 0)', 'inset(0 0 0 0)'],
-                      transform: ['translateY(20px)', 'translateY(0px)'],
-                    }
-                  : {
-                      opacity: [0.2, 1],
-                      clipPath: ['inset(0 0 0 100%)', 'inset(0 0 0 0)'],
-                      transform: ['translateX(48px)', 'translateX(0px)'],
-                    },
-                { ease: 'linear' },
-              ),
-              { target: heatVision, offset: ['start end', 'start 30%'] },
-            ),
-          );
-        }
-
-        if (heatEdge) {
-          animated.add(heatEdge);
-          stops.push(
-            scroll(
-              animate(
-                heatEdge,
-                { opacity: [0, 1, 0], transform: ['scaleX(0)', 'scaleX(1)', 'scaleX(1)'] },
-                { ease: 'linear' },
-              ),
-              { target: heatVision, offset: ['start 90%', 'start 36%'] },
-            ),
-          );
-        }
-
-        if (!mobile && consultingMedia && consultingCopy) {
-          animated.add(consultingMedia);
-          animated.add(consultingCopy);
-          stops.push(
-            scroll(
-              animate(
-                consultingMedia,
-                { opacity: [1, 0.66], transform: ['translateY(0px) scale(1)', 'translateY(-12px) scale(.985)'] },
-                { ease: 'linear' },
-              ),
-              { target: heatVision, offset: ['start 88%', 'start 28%'] },
-            ),
-            scroll(
-              animate(
-                consultingCopy,
-                { opacity: [1, 0.42], transform: ['translateY(0px)', 'translateY(-24px)'] },
-                { ease: 'linear' },
-              ),
-              { target: heatVision, offset: ['start 88%', 'start 34%'] },
-            ),
-          );
-        }
-
-        if (partners) {
-          animated.add(heatVision);
-          stops.push(
-            scroll(
-              animate(
-                heatVision,
-                {
-                  filter: ['brightness(1) saturate(1)', 'brightness(.56) saturate(.8)'],
-                },
-                { ease: 'linear' },
-              ),
-              { target: partners, offset: ['start end', 'start 22%'] },
-            ),
-          );
-        }
       }
     });
   });

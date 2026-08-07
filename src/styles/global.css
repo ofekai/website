@@ -314,6 +314,7 @@
   /* Hero ---------------------------------------------------------------- */
   .hero {
     position: relative;
+    z-index: 1;
     display: grid;
     height: 100vh;
     height: 100svh;
@@ -324,8 +325,6 @@
     background: var(--ink-950);
     color: #fff;
     isolation: isolate;
-    view-timeline-name: --hero-scroll;
-    view-timeline-axis: block;
   }
 
   .hero-media,
@@ -575,6 +574,100 @@
   /* Section transitions: each editorial plate owns its complete flow box.
      Motion is clipped inside that box, so adjacent scenes can exchange without
      leaking into one another's stable viewport. */
+  /*
+   * Zero-height flow markers sitting between scenes. Every scroll-driven
+   * transition hangs its view-timeline off one of these rather than off a
+   * section, because a sticky subject satisfies a view timeline's 0%/100%
+   * progress conditions over a *range* of scroll positions rather than one
+   * (scroll-animations-1 s3.1), so a pinned section's own timeline stalls.
+   * A zero-height subject's `cover` range is exactly one viewport, which
+   * makes `cover 0% -> cover 100%` mean "the incoming scene crosses the
+   * screen" identically at every boundary. Do not use entry/exit here --
+   * both degenerate to zero length for a zero-height box.
+   */
+  .scene-seam {
+    display: block;
+    height: 0;
+  }
+
+  /*
+   * Applied by nav.ts for a single synchronous measurement pass. A pinned
+   * element reports its shifted position through both offsetTop and
+   * getBoundingClientRect (Chromium reports .about-section at 900 at rest and
+   * 2068 while pinned), so the only reliable way to read a scene's layout
+   * position is to switch the stack off while measuring. Sticky is
+   * layout-neutral, so nothing reflows visibly and document height is
+   * unchanged. Absolutely positioned descendants are out of flow, so losing
+   * their containing block here cannot affect any measured height.
+   */
+  html.is-measuring-layout :is(
+    .hero,
+    .about-section,
+    .expertise-section,
+    .expertise-heading-band,
+    .consulting-stripe,
+    .heatvision-stripe,
+    .partners-section
+  ) {
+    position: static !important;
+  }
+
+  /* ---- Scene stack ------------------------------------------------------
+     Each page-level scene is a sticky sibling inside `main`, opaque, on an
+     ascending z-index. Scene N pins under the nav; scene N+1 arrives in
+     normal flow on a higher layer and covers it. That relative motion IS
+     the transition: the outgoing scene's screen velocity drops to zero
+     while the incoming scene keeps travelling at 1:1 with the wheel.
+
+     No negative margins (tried in 4fbd629, reverted in eb56fb7 for leaking
+     layout) and no scroll runway (removed in 8cdd59f as dead scroll).
+     Sticky is layout-neutral, so page height is unchanged.
+
+     INVARIANT: a scene pinned by `top` MUST fit inside --scene-h, or the
+     part below the fold becomes permanently unreachable while it is pinned.
+     Not expressible in CSS; the min-height gate below is the blunt guard and
+     checkSceneStack() in scripts/visual-diff.mjs is the real assertion.
+     Re-run visual-diff after any About copy change.
+
+     Expertise is ~2.2 viewports tall and self-pinning, so it pins by its
+     BOTTOM edge via a negative top. Given
+       panel-h = 100dvh - nav-h - heading-h
+     the offset that parks its bottom edge on the viewport bottom is
+       100dvh - (heading-h + 2*panel-h) = nav-h - panel-h.
+
+     Partners is deliberately NOT pinned: it is shorter than a viewport, so
+     pinning it would leave a strip of Expertise visible below it. It does
+     not need to be. Expertise stays pinned until `main`'s bottom edge (which
+     is Partners' bottom edge) reaches the viewport bottom, so Partners still
+     travels over a frozen HeatVision for its own height.                  */
+  @media (min-width: 869px) and (min-height: 820px) and (prefers-reduced-motion: no-preference) {
+    main > .hero {
+      position: sticky;
+      top: 0;
+    }
+
+    main > .about-section {
+      position: sticky;
+      top: var(--nav-h-scrolled);
+    }
+
+    main > .expertise-section {
+      position: sticky;
+      top: calc(var(--nav-h-scrolled) - var(--expertise-panel-h));
+    }
+
+    /* Expertise's internal stack, folded into the same positive gate so the
+       no-JS, mobile and reduced-motion un-pinning branches can all go. The
+       descendant selector is deliberate: it has to outrank the `position:
+       relative` on the stripes themselves, which is declared later in the
+       file and which they need whenever this gate does not apply. */
+    .expertise-story > .consulting-stripe,
+    .expertise-story > .heatvision-stripe {
+      position: sticky;
+      top: calc(var(--nav-h-scrolled) + var(--expertise-heading-h));
+    }
+  }
+
   .transition-panel {
     position: relative;
     overflow: clip;
@@ -620,8 +713,8 @@
 
   /* About: hard-edged editorial bands --------------------------------- */
   .about-section {
-    z-index: 3;
-    min-height: calc(100dvh - var(--nav-h-scrolled));
+    z-index: 2;
+    min-height: var(--scene-h);
     background: var(--paper-50);
   }
 
@@ -758,6 +851,19 @@
     scroll-margin-top: var(--expertise-heading-h);
   }
 
+  /*
+   * The background is load-bearing: it is what occludes the pinned About
+   * section as this scene travels over it. `isolation` scopes the heading
+   * band's z-index, which without this rule resolved in the root stacking
+   * context and painted above Partners and the footer.
+   */
+  .expertise-section {
+    position: relative;
+    z-index: 3;
+    background: #fff;
+    isolation: isolate;
+  }
+
   .expertise-heading-band {
     position: sticky;
     z-index: 10;
@@ -783,13 +889,13 @@
     grid-template-columns: minmax(0, 48%) minmax(0, 52%);
   }
 
-  .consulting-stripe,
-  .heatvision-stripe {
-    position: sticky;
-    top: calc(var(--nav-h-scrolled) + var(--expertise-heading-h));
-  }
-
+  /* Sticky positioning for these two lives in the scene-stack gate above.
+     They stay positioned even when that gate does not apply: z-index is
+     inert on a static box, and .heatvision-transition-edge is absolutely
+     positioned against its stripe -- left static it anchors to
+     .expertise-story instead and lands a whole panel too high. */
   .consulting-stripe {
+    position: relative;
     z-index: 1;
   }
 
@@ -883,6 +989,7 @@
   }
 
   .heatvision-stripe {
+    position: relative;
     z-index: 2;
     height: var(--expertise-panel-h);
     min-height: 0;
@@ -1543,45 +1650,15 @@
     to { opacity: 0; }
   }
 
-  @keyframes transition-scene-enter {
-    from { opacity: 0.94; clip-path: inset(0 0 8% 0); }
-    to { opacity: 1; clip-path: inset(0 0 0 0); }
-  }
-
-  @keyframes transition-about-exit {
-    from { opacity: 1; transform: translateY(0) scale(1); }
-    to { opacity: 0.5; transform: translateY(calc(-1 * var(--transition-depth-sm))) scale(0.99); }
-  }
-
-  @keyframes transition-about-intro-exit {
-    from { opacity: 1; transform: translateY(0) scale(1); }
-    to {
-      opacity: 0;
-      transform: translateY(calc(-1 * var(--transition-depth-md))) scale(0.985);
-    }
-  }
-
-  @keyframes transition-heading-plate-enter {
-    from {
-      opacity: 0.72;
-      clip-path: inset(72% 0 0 0);
-      transform: translateY(var(--transition-depth-md));
-    }
-    to {
-      opacity: 1;
-      clip-path: inset(0 0 0 0);
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes transition-expertise-exit {
-    from { filter: brightness(1) saturate(1); }
-    to { filter: brightness(0.56) saturate(0.8); }
-  }
-
-  @keyframes transition-partners-enter {
-    from { clip-path: inset(0 0 18% 0); }
-    to { clip-path: inset(0 0 0 0); }
+  /*
+   * The outgoing scene clears out while the incoming one climbs over it.
+   * The occlusion carries the transition; this keeps the covered scene from
+   * competing for attention in the strip still visible above the incoming
+   * scene's leading edge.
+   */
+  @keyframes scene-fade-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(calc(-1 * var(--transition-depth-sm))); }
   }
 
   @keyframes transition-seam-draw {
@@ -1647,14 +1724,63 @@
 
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
+      /*
+       * Every rule in this block MUST use animation longhands only. Lightning
+       * CSS merges an `animation:` shorthand back together with a sibling
+       * `animation-timeline`, producing e.g.
+       *   animation: linear both my-keyframes --my-timeline
+       * `animation-timeline` was removed from the shorthand by the CSSWG, so
+       * two idents land in one name slot, the declaration is invalid, and the
+       * browser drops it -- animation-name computes to `none`. The failure is
+       * completely silent. scripts/check-css.mjs guards the build against it.
+       *
+       * Ranges are all `cover` on a .scene-seam marker, whose cover range is
+       * exactly one viewport. So `cover 0%` is "the incoming scene's leading
+       * edge touches the bottom of the screen" and `cover 100%` is "it
+       * reaches the top", at every boundary. A scene pinned under the nav
+       * locks at cover (viewport - nav) / viewport, i.e. ~92% -- stable
+       * across viewport heights, which is why the handoffs resolve just
+       * under 92% rather than at 100%.
+       */
       main {
-        timeline-scope: --expertise-heading, --partners-panel;
+        timeline-scope:
+          --seam-hero-about,
+          --seam-about-expertise,
+          --seam-heatvision-partners;
       }
 
+      [data-seam='hero-about'] {
+        view-timeline-name: --seam-hero-about;
+        view-timeline-axis: block;
+      }
+
+      [data-seam='about-expertise'] {
+        view-timeline-name: --seam-about-expertise;
+        view-timeline-axis: block;
+      }
+
+      [data-seam='heatvision-partners'] {
+        view-timeline-name: --seam-heatvision-partners;
+        view-timeline-axis: block;
+      }
+
+      .expertise-story {
+        timeline-scope: --seam-consulting-heatvision;
+      }
+
+      [data-seam='consulting-heatvision'] {
+        view-timeline-name: --seam-consulting-heatvision;
+        view-timeline-axis: block;
+      }
+
+      /* ---- Hero -> About ---- */
       .hero-visual {
-        animation: hero-arrive 1.8s var(--ease-out-expo) both, hero-depth linear both;
-        animation-timeline: auto, --hero-scroll;
-        animation-range: normal, exit 0% exit 100%;
+        animation-name: hero-arrive, hero-depth;
+        animation-duration: 1.8s, auto;
+        animation-timing-function: var(--ease-out-expo), linear;
+        animation-fill-mode: both, both;
+        animation-timeline: auto, --seam-hero-about;
+        animation-range: normal, cover 0% cover 100%;
       }
 
       .hero-content {
@@ -1662,124 +1788,139 @@
         animation-duration: auto;
         animation-timing-function: linear;
         animation-fill-mode: both;
-        animation-timeline: --hero-scroll;
-        animation-range: exit 0% exit 68%;
-      }
-
-      .about-section {
-        view-timeline-name: --about-panel;
-        view-timeline-axis: block;
-        animation: transition-scene-enter linear both;
-        animation-timeline: --about-panel;
-        animation-range: entry 0% entry 36%;
+        animation-timeline: --seam-hero-about;
+        animation-range: cover 0% cover 68%;
       }
 
       .about-section > .transition-seam {
-        animation: transition-seam-draw linear both;
-        animation-timeline: --about-panel;
-        animation-range: entry 10% entry 48%;
+        animation-name: transition-seam-draw;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-hero-about;
+        animation-range: cover 30% cover 78%;
       }
 
-      .about-intro-band {
-        view-timeline-name: --about-intro-exit;
-        view-timeline-axis: block;
-        view-timeline-inset: var(--nav-h-scrolled) 0px;
-        animation: transition-about-intro-exit linear both;
-        animation-timeline: --about-intro-exit;
-        animation-range: exit 0% exit 34%;
+      /* ---- About -> Expertise ----
+         About is pinned under the nav here, so the only thing moving is the
+         Expertise plate climbing over it. The band fade resolves at 88%,
+         just before the plate locks at ~92%, so the section is never blank
+         white for long. The teal rule is the boundary marker: with the
+         palette unchanged both surfaces are white, so it is what makes the
+         arrival legible. */
+      .about-intro-band,
+      .about-features-band {
+        animation-name: scene-fade-out;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-about-expertise;
+        animation-range: cover 10% cover 88%;
         transform-origin: top center;
       }
 
-      .about-features-band {
-        animation: transition-about-exit linear both;
-        animation-timeline: --expertise-heading;
-        animation-range: entry 0% entry 92%;
+      /* The chevron points at a boundary that is already resolving. */
+      .about-scroll {
+        animation-name: scene-fade-out;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-about-expertise;
+        animation-range: cover 0% cover 18%;
       }
 
-      .expertise-heading-band {
-        view-timeline-name: --expertise-heading;
-        view-timeline-axis: block;
-        animation: transition-heading-plate-enter linear both;
-        animation-timeline: --expertise-heading;
-        animation-range: entry 0% entry 92%;
-      }
-
+      /* Runs the full width of the climb rather than resolving early: the
+         rule draws in by ~44% and then dissolves exactly as the plate locks
+         under the nav at ~92%. With the palette unchanged this is the only
+         thing marking a white plate arriving over a white section, so it
+         must not disappear while the plate is still travelling. */
       .expertise-heading-band > .transition-seam {
-        animation: transition-seam-draw linear both;
-        animation-timeline: --expertise-heading;
-        animation-range: entry 0% entry 42%;
+        animation-name: transition-seam-draw;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-about-expertise;
+        animation-range: cover 4% cover 92%;
       }
 
-      .expertise-story {
-        timeline-scope: --heatvision-entry;
-      }
-
-      .heatvision-stripe {
-        view-timeline-name: --heatvision-entry;
-        view-timeline-axis: block;
-      }
-
+      /* ---- Consulting -> HeatVision ----
+         This marker freezes at cover ~74% when the Expertise section reaches
+         its own pin, so every range here stays well inside that. The
+         percentages are the previous entry-range fractions rescaled: the old
+         subject was the HeatVision stripe (height --expertise-panel-h), the
+         new one is a viewport-length cover range. */
       .consulting-stripe [data-transition-layer='media'] {
-        animation: transition-consulting-media-recede linear both;
-        animation-timeline: --heatvision-entry;
-        animation-range: entry 0% entry 76%;
+        animation-name: transition-consulting-media-recede;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-consulting-heatvision;
+        animation-range: cover 0% cover 56%;
       }
 
       .consulting-stripe [data-transition-layer='copy'] {
-        animation: transition-consulting-copy-recede linear both;
-        animation-timeline: --heatvision-entry;
-        animation-range: entry 0% entry 68%;
+        animation-name: transition-consulting-copy-recede;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-consulting-heatvision;
+        animation-range: cover 0% cover 50%;
       }
 
       .heatvision-stripe [data-transition-layer='copy'] {
-        animation: transition-heatvision-copy-enter linear both;
-        animation-timeline: --heatvision-entry;
-        animation-range: entry 8% entry 66%;
+        animation-name: transition-heatvision-copy-enter;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-consulting-heatvision;
+        animation-range: cover 6% cover 49%;
       }
 
       .heatvision-stripe [data-transition-layer='stage'] {
-        animation: transition-heatvision-stage-enter linear both;
-        animation-timeline: --heatvision-entry;
-        animation-range: entry 0% entry 72%;
+        animation-name: transition-heatvision-stage-enter;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-consulting-heatvision;
+        animation-range: cover 0% cover 53%;
       }
 
       .heatvision-transition-edge {
-        animation: transition-heatvision-edge-draw linear both;
-        animation-timeline: --heatvision-entry;
-        animation-range: entry 12% entry 58%;
+        animation-name: transition-heatvision-edge-draw;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-consulting-heatvision;
+        animation-range: cover 9% cover 43%;
       }
 
-      .heatvision-stripe {
-        animation: transition-expertise-exit linear both;
-        animation-timeline: --partners-panel;
-        animation-range: entry 0% entry 78%;
-        transform-origin: top center;
-      }
-
-      .partners-section {
-        view-timeline-name: --partners-panel;
-        view-timeline-axis: block;
-        animation: transition-partners-enter linear both;
-        animation-timeline: --partners-panel;
-        animation-range: entry 0% entry 34%;
-      }
-
+      /* ---- HeatVision -> Partners ----
+         Expertise stays pinned until main's bottom edge (Partners' bottom)
+         reaches the viewport bottom, so Partners crosses a frozen HeatVision
+         for its own height. */
       .partners-section > .transition-seam {
-        animation: transition-seam-draw linear both;
-        animation-timeline: --partners-panel;
-        animation-range: entry 10% entry 50%;
+        animation-name: transition-seam-draw;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-heatvision-partners;
+        animation-range: cover 4% cover 40%;
       }
 
+      /* ---- Partners -> Footer ----
+         Partners is not pinned (it is shorter than a viewport), so this
+         boundary stays 1:1 and is marked by the rule alone. The footer is a
+         sibling of `main`, so it keeps its own timeline rather than a seam. */
       .footer {
         view-timeline-name: --footer-panel;
         view-timeline-axis: block;
-        animation: transition-scene-enter linear both;
-        animation-timeline: --footer-panel;
-        animation-range: entry 0% entry 42%;
       }
 
       .footer > .transition-seam {
-        animation: transition-seam-draw linear both;
+        animation-name: transition-seam-draw;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: --footer-panel;
         animation-range: entry 10% entry 54%;
       }
@@ -1788,11 +1929,6 @@
 
   html.js .partners-section:not(.is-transition-settled) .partners-track {
     animation-play-state: paused;
-  }
-
-  html:not(.js) :is(.about-section, .partners-section, .footer) {
-    animation: none;
-    transform: none;
   }
 
   html:not(.js) :is(.transition-seam, .heatvision-transition-edge) {
@@ -1809,25 +1945,35 @@
     transform: none;
   }
 
-  html:not(.js) :is(.consulting-stripe, .heatvision-stripe) {
-    position: relative;
-    top: auto;
-  }
-
+  /* Phones get the same choreographic language at lower intensity: the same
+     teal rule and the same fades, but nothing freezes. The scene stack is
+     gated off below 869px (short screens cannot hold a full scene without
+     hiding content, and 100dvh fights the URL bar), so the outgoing scene
+     travels at 1:1 and its fade has to resolve inside the crossing itself
+     rather than tracking a plate that climbs. */
   @supports (animation-timeline: view()) {
     @media (max-width: 868px) and (prefers-reduced-motion: no-preference) {
+      .about-intro-band,
+      .about-features-band {
+        animation-range: cover 28% cover 72%;
+      }
+
+      .expertise-heading-band > .transition-seam {
+        animation-range: cover 18% cover 58%;
+      }
+
       .consulting-stripe [data-transition-layer] {
         animation: none;
       }
 
       .heatvision-stripe [data-transition-layer='stage'] {
         animation-name: transition-heatvision-mobile-enter;
-        animation-range: entry 0% entry 54%;
+        animation-range: cover 8% cover 52%;
       }
 
       .heatvision-stripe [data-transition-layer='copy'] {
         animation-name: transition-heatvision-mobile-enter;
-        animation-range: entry 28% entry 78%;
+        animation-range: cover 30% cover 74%;
       }
     }
   }
@@ -2030,12 +2176,6 @@
       grid-template-columns: 1fr;
     }
 
-    .consulting-stripe,
-    .heatvision-stripe {
-      position: relative;
-      top: auto;
-    }
-
     .stripe-media {
       height: clamp(16rem, 62vw, 30rem);
       min-height: 0;
@@ -2169,16 +2309,15 @@
       transform: none !important;
     }
 
+    /* .about-features-band, not its .feature-grid child: the scene fade is
+       applied to the band itself. Targeting the grid was a silent no-op. */
     [data-transition-layer],
-    .about-features-band .feature-grid {
+    .about-intro-band,
+    .about-features-band,
+    .about-scroll {
       opacity: 1 !important;
       clip-path: none !important;
       transform: none !important;
-    }
-
-    :is(.consulting-stripe, .heatvision-stripe) {
-      position: relative !important;
-      top: auto !important;
     }
 
     .hero-media img,

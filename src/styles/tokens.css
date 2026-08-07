@@ -112,10 +112,14 @@
     --transition-depth-sm: clamp(1rem, 2.2vw, 1.75rem);
     --transition-depth-md: clamp(2rem, 4vw, 3.5rem);
     --transition-line: clamp(5rem, 8vw, 7rem);
+    /* The screen a pinned scene occupies: everything below the sticky nav.
+       Every page-level scene in the stack must fit inside this, or the part
+       below the fold becomes unreachable while the scene is pinned. */
+    --scene-h: calc(100dvh - var(--nav-h-scrolled));
     --expertise-heading-h: clamp(9.5rem, 18dvh, 12.5rem);
     --expertise-panel-h: max(
       32rem,
-      calc(100dvh - var(--nav-h-scrolled) - var(--expertise-heading-h))
+      calc(var(--scene-h) - var(--expertise-heading-h))
     );
   }
 

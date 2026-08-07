@@ -2037,12 +2037,14 @@
         animation: none;
       }
 
-      .heatvision-stripe [data-transition-layer='stage'] {
+      /* Copy sits first past the seam here and the stage follows it, so the
+         two ranges are the reverse of the reading order on wider screens. */
+      .heatvision-stripe [data-transition-layer='copy'] {
         animation-name: transition-heatvision-mobile-enter;
         animation-range: cover 8% cover 52%;
       }
 
-      .heatvision-stripe [data-transition-layer='copy'] {
+      .heatvision-stripe [data-transition-layer='stage'] {
         animation-name: transition-heatvision-mobile-enter;
         animation-range: cover 30% cover 74%;
       }
@@ -2076,11 +2078,34 @@
       --nav-h: 72px;
       --nav-h-scrolled: 64px;
       --section-y: clamp(3.5rem, 8vw, 5rem);
-      --expertise-heading-h: clamp(9.5rem, 24dvh, 11rem);
-      --expertise-panel-h: clamp(48rem, 130vw, 62rem);
       --section-y-compact: clamp(3rem, 7vw, 4.5rem);
       --transition-depth-sm: clamp(0.75rem, 4vw, 1.25rem);
       --transition-depth-md: clamp(1.25rem, 6vw, 2rem);
+    }
+
+    /* The band pins as the heading of a scene that is being scrolled past.
+       With the scene stack gated off it pins against nothing and costs
+       --expertise-heading-h + the nav on every screen for the whole section
+       (240px of an 844px phone). Let it scroll away instead.
+
+       `relative`, not `static`: .transition-seam-start inside is
+       `position: absolute; top: 0` and would otherwise anchor to
+       .expertise-section and draw a whole band too high -- the same trap the
+       comment above .consulting-stripe documents for the HeatVision edge.
+       `top` must be reset with it: a relative box still honours the sticky
+       rule's offset and would paint a nav-height lower than it lays out,
+       overlapping the first stripe. */
+    .expertise-heading-band {
+      position: relative;
+      top: auto;
+      height: auto;
+      padding-block: clamp(2.5rem, 8vw, 3.5rem) clamp(1.75rem, 5vw, 2.5rem);
+    }
+
+    /* Offsets the anchor jump by the band it used to park under; now only the
+       nav is sticky. */
+    #heatVision {
+      scroll-margin-top: var(--nav-h-scrolled);
     }
 
     .menu-toggle {
@@ -2215,9 +2240,15 @@
       padding-bottom: 4.75rem;
     }
 
-    .about-scroll,
-    .stripe-scroll {
+    .about-scroll {
       bottom: 1rem;
+    }
+
+    /* The stripe chevrons are a scene-stack affordance: they point at the next
+       pinned panel. The stack is gated off here, the page scrolls 1:1, and on a
+       content-sized stripe the absolute cue lands on top of the copy. */
+    .stripe-scroll {
+      display: none;
     }
 
     .feature-grid {
@@ -2241,11 +2272,27 @@
       border-bottom: 0;
     }
 
+    /* --expertise-panel-h exists to make each stripe exactly one pinned
+       viewport tall for the scene stack. Nothing pins here, and a definite
+       height with auto rows never shrinks to its content: Consulting stranded
+       ~470px of empty paper and HeatVision overflowed its copy into
+       .expertise-story's `overflow: clip`. Size to content instead. */
     .expertise-stripe,
     .heatvision-stripe {
-      height: var(--expertise-panel-h);
+      height: auto;
       min-height: 0;
       grid-template-columns: 1fr;
+    }
+
+    /* Copy before its image in both stripes. Consulting's DOM is media-first
+       so it needs explicit rows; HeatVision's is already copy-first, so it
+       just needs the desktop row assignments left off. */
+    .consulting-stripe .stripe-content {
+      grid-row: 1;
+    }
+
+    .consulting-stripe .stripe-media {
+      grid-row: 2;
     }
 
     .stripe-media {
@@ -2260,9 +2307,9 @@
 
     .heatvision-stage {
       height: auto;
-      min-height: clamp(29rem, 72vw, 39rem);
-      grid-row: 1;
-      border-bottom: 1px solid var(--color-hairline);
+      min-height: clamp(24rem, 62vw, 32rem);
+      border-bottom: 0;
+      border-block-start: 1px solid var(--color-hairline);
       border-inline-start: 0;
     }
 
@@ -2270,8 +2317,10 @@
       --heatvision-top-trim: 0rem;
     }
 
-    .heatvision-stripe .stripe-content {
-      grid-row: 2;
+    /* 7 of 12 columns is a 191px box on a 375px screen -- the heading wraps
+       while two thirds of the row sits empty. */
+    .partners-title {
+      grid-column: 1 / -1;
     }
 
     .footer-main {
@@ -2288,12 +2337,10 @@
   }
 
   @media (max-width: 520px) {
-    :root {
-      --expertise-panel-h: clamp(62rem, 235vw, 70rem);
-    }
-
+    /* Taller than the >=521px value because the support rail stacks to one
+       column below here; the step at the boundary is intentional. */
     .heatvision-stage {
-      min-height: clamp(42rem, 180vw, 50rem);
+      min-height: clamp(30rem, 133vw, 36rem);
     }
 
     .heatvision-gallery {

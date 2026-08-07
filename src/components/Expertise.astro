@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import SectionTitle from './SectionTitle.astro';
 import EditorialMedia from './EditorialMedia.astro';
+import IconArrow from '../icons/arrow.svg';
 import type { Messages } from '../i18n';
 import consultingTree from '../assets/images/consulting-tree-v2.png';
 import iconHeatVision from '../assets/images/heatVision.png';
@@ -50,6 +51,11 @@ const { messages } = Astro.props;
             {messages.consultingBody}
           </p>
       </div>
+    </div>
+    <div class="stripe-scroll consulting-scroll">
+      <a href="#heatVision" aria-label={messages.consultingScrollLabel}>
+        <IconArrow class="floating-arrow" aria-hidden="true" />
+      </a>
     </div>
   </div>
 
@@ -140,6 +146,11 @@ const { messages } = Astro.props;
           </figure>
         </div>
       </div>
+    </div>
+    <div class="stripe-scroll heatvision-scroll">
+      <a href="#partners" aria-label={messages.heatVisionScrollLabel}>
+        <IconArrow class="floating-arrow" aria-hidden="true" />
+      </a>
     </div>
   </div>
   </div>

@@ -54,8 +54,10 @@ export const en = {
     consultingTitleBold: 'Services',
     consultingBody:
       'We leverage our technical knowledge and local ecosystem insights to drive manufacturing improvements. Building long-term partnerships based on trust and transparency, creating lasting value.',
+    consultingScrollLabel: 'Continue to HeatVision',
     heatVisionBody:
       'Our software brings real-time clarity from manufacturing to data center through big data analytics and machine learning, anticipating failures and eliminating the underlying causes.',
+    heatVisionScrollLabel: 'Continue to Our Partners',
     heatVisionGraphLabels: {
       surfaceMountTechnology: 'Surface-Mount Technology',
       pickAndPlace: 'Pick & Place',

@@ -56,7 +56,9 @@ export interface Messages {
     consultingTitleLight: string;
     consultingTitleBold: string;
     consultingBody: string;
+    consultingScrollLabel: string;
     heatVisionBody: string;
+    heatVisionScrollLabel: string;
     heatVisionGraphLabels: {
       surfaceMountTechnology: string;
       pickAndPlace: string;

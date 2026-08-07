@@ -791,6 +791,29 @@
     pointer-events: auto;
   }
 
+  /* Same bottom-of-scene chevron as .about-scroll, anchored to each Expertise
+     stripe's own box (both are position: relative regardless of the sticky
+     gate) rather than to .expertise-story, so it stays correctly placed
+     whether or not the sticky stack is active. */
+  .stripe-scroll {
+    position: absolute;
+    right: 0;
+    bottom: clamp(1rem, 2.5vh, 2rem);
+    left: 0;
+    z-index: 11;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .stripe-scroll a {
+    display: grid;
+    width: 96px;
+    height: 44px;
+    place-items: center;
+    pointer-events: auto;
+  }
+
   .feature-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1904,6 +1927,31 @@
         animation-range: cover 0% cover 42%;
       }
 
+      /* The chevron points at a boundary that is already resolving -- same
+         intent as .about-scroll's fade, kept inside the 0-44% band the rest
+         of this stretched seam resolves by (see the comment above). */
+      .consulting-scroll {
+        animation-name: scene-fade-out;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-consulting-heatvision;
+        animation-range: cover 0% cover 18%;
+      }
+
+      /* Unlike the seam above, this marker sits outside any pinned box (it is
+         a direct child of `main`, between .expertise-section and Partners),
+         so its cover range is a normal, unstretched 0-100% -- safe to mirror
+         .about-scroll's range exactly. */
+      .heatvision-scroll {
+        animation-name: scene-fade-out;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --seam-heatvision-partners;
+        animation-range: cover 0% cover 18%;
+      }
+
       .heatvision-transition-edge {
         animation-name: transition-heatvision-edge-draw;
         animation-duration: auto;
@@ -2163,7 +2211,8 @@
       padding-bottom: 4.75rem;
     }
 
-    .about-scroll {
+    .about-scroll,
+    .stripe-scroll {
       bottom: 1rem;
     }
 
@@ -2333,7 +2382,8 @@
     [data-transition-layer],
     .about-intro-band,
     .about-features-band,
-    .about-scroll {
+    .about-scroll,
+    .stripe-scroll {
       opacity: 1 !important;
       clip-path: none !important;
       transform: none !important;

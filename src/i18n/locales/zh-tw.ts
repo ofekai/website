@@ -54,8 +54,10 @@ export const zhTw = {
     consultingTitleBold: '服務',
     consultingBody:
       '我們結合技術知識與在地產業生態洞察，推動製造改善，並以信任與透明為基礎建立長期合作關係，持續創造價值。',
+    consultingScrollLabel: '繼續前往 HeatVision',
     heatVisionBody:
       '我們的軟體透過大數據分析與機器學習，提供從製造現場到資料中心的即時洞察，預測故障並消除根本原因。',
+    heatVisionScrollLabel: '繼續前往合作夥伴',
     heatVisionGraphLabels: {
       surfaceMountTechnology: '表面黏著技術',
       pickAndPlace: '元件貼裝',

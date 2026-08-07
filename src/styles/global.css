@@ -1037,7 +1037,11 @@
   }
 
   .heatvision-stripe .stripe-content {
-    background: var(--ink-900);
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 85% 60% at 100% 0%, rgb(255 255 255 / 12%), transparent 65%),
+      var(--ink-900);
   }
 
   .heatvision-stripe .card-title,

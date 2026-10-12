@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import { site } from '../data/site';
 import type { Messages } from '../i18n';
 import logoOfek from '../assets/images/Logo_Ofek_o.png';
@@ -12,6 +12,8 @@ interface Props {
 }
 
 const { messages } = Astro.props;
+// Same transform as Nav.astro, so the browser fetches it once.
+const logo = await getImage({ src: logoOfek, width: 150, format: 'webp' });
 ---
 
 <footer
@@ -24,10 +26,10 @@ const { messages } = Astro.props;
     <div class="footer-main">
       <div class="footer-brand" data-reveal="rise">
         <div class="footer-logo">
-          <Image src={logoOfek} alt="Ofek" width={150} height={75} format="png" />
+          <img src={logo.src} alt="Ofek" width="150" height="75" loading="lazy" decoding="async" />
           <span
             class="logo-tip"
-            style={`--logo-mask: url("${logoOfek.src}")`}
+            style={`--logo-mask: url("${logo.src}")`}
             aria-hidden="true"
           ></span>
         </div>
@@ -65,6 +67,6 @@ const { messages } = Astro.props;
         </div>
       </div>
     </div>
-    <div class="copyright" data-reveal="line">{messages.copyright}</div>
+    <div class="copyright" data-reveal="line">{messages.copyright(new Date().getFullYear())}</div>
   </div>
 </footer>

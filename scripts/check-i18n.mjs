@@ -11,9 +11,10 @@ const DIST_DIR = path.join(SCRIPT_DIR, '..', 'dist');
  * build that actually ran rather than a hardcoded domain. Hardcoded, it passed
  * an ofek.ai build only by never being reached, then failed every canonical.
  */
-const { resolveProfile } = await import('../src/data/site-profiles.ts');
+const { resolveProfile, CANONICAL_DOMAIN } = await import('../src/data/site-profiles.ts');
 const PROFILE = resolveProfile(process.env.SITE_PROFILE ?? process.env.GITHUB_REPOSITORY_OWNER);
-const ORIGIN = `https://${PROFILE.domain}`;
+// Every build points search engines at the canonical domain; only CNAME is per-profile.
+const ORIGIN = `https://${CANONICAL_DOMAIN}`;
 
 const locales = [
   { locale: 'en', file: 'index.html', path: '/', lang: 'en', dir: 'ltr', marker: 'TRUSTED INSIGHTS INTO' },
@@ -49,6 +50,16 @@ for (const definition of locales) {
   expectIncludes(html, `data-locale="${definition.locale}"`, definition.locale);
   expectIncludes(html, `<link rel="canonical" href="${ORIGIN}${definition.path}">`, definition.locale);
   expectIncludes(html, definition.marker, definition.locale);
+  expectIncludes(html, `<meta property="og:url" content="${ORIGIN}${definition.path}">`, definition.locale);
+  const jsonLd = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  try {
+    const graph = JSON.parse(jsonLd ?? '')['@graph'];
+    const org = graph.find((node) => node['@type'] === 'Organization');
+    if (org?.url !== ORIGIN) problems.push(`${definition.locale}: JSON-LD Organization url is ${org?.url}`);
+    if (org?.contactPoint?.email !== PROFILE.email) problems.push(`${definition.locale}: JSON-LD email is not ${PROFILE.email}`);
+  } catch {
+    problems.push(`${definition.locale}: JSON-LD missing or unparsable`);
+  }
   for (const alternate of alternates) {
     expectIncludes(
       html,
@@ -112,4 +123,4 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log('i18n output validation passed: 2 localized pages, canonical alternates, and sitemap');
+console.log(`i18n output validation passed: 2 localized pages, canonical alternates, and sitemap (canonical ${CANONICAL_DOMAIN}, CNAME ${PROFILE.domain})`);

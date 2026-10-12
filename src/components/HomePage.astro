@@ -24,7 +24,7 @@ const messages = getMessages(locale);
     section-to-section transition. They sit between scenes so they are never
     descendants of a pinned box -- see the .scene-seam comment in global.css.
   */}
-  <main>
+  <main id="main" tabindex="-1">
     <Hero messages={messages.hero} />
     <span class="scene-seam" data-seam="hero-about" aria-hidden="true"></span>
     <About messages={messages.about} />

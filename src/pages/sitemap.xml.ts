@@ -5,7 +5,9 @@ import { site } from '../data/site';
 const escapeXml = (value: string) =>
   value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
-const absoluteUrl = (path: string) => new URL(path, site.url).href;
+// Canonical URLs on both builds; see CANONICAL_DOMAIN in src/data/site-profiles.ts.
+const absoluteUrl = (path: string) => new URL(path, site.canonicalUrl).href;
+const lastmod = new Date().toISOString().slice(0, 10);
 
 const alternateLinks = localeOrder
   .map((locale) => {
@@ -18,7 +20,7 @@ const alternateLinks = localeOrder
 const urls = localeOrder
   .map((locale) => {
     const definition = locales[locale];
-    return `<url><loc>${escapeXml(absoluteUrl(definition.path))}</loc>${alternateLinks}<changefreq>monthly</changefreq><priority>${locale === 'en' ? '1.0' : '0.9'}</priority></url>`;
+    return `<url><loc>${escapeXml(absoluteUrl(definition.path))}</loc><lastmod>${lastmod}</lastmod>${alternateLinks}<changefreq>monthly</changefreq><priority>${locale === 'en' ? '1.0' : '0.9'}</priority></url>`;
   })
   .join('');
 

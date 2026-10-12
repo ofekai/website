@@ -18,13 +18,13 @@
     "visual-diff": "node scripts/visual-diff.mjs"
   },
   "dependencies": {
-    "astro": "^7.1.6",
+    "astro": "^7.3.8",
     "motion": "^12.43.0",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "playwright": "^1.62.1",
+    "playwright": "^1.64.0",
     "typescript": "^5.9.2"
   }
 }

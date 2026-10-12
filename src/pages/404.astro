@@ -1,0 +1,20 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import ButtonOutline from '../components/ButtonOutline.astro';
+import { getMessages } from '../i18n';
+import logoOfek from '../assets/images/Logo_Ofek_o.png';
+
+// GitHub Pages serves one 404.html for every locale, so it stays bilingual.
+const en = getMessages('en');
+const messages = { ...en, seo: { ...en.seo, title: 'Page not found | Ofek' } };
+---
+
+<Layout locale="en" messages={messages} noindex>
+  <main id="main" class="not-found">
+    <a href="/"><Image src={logoOfek} alt="Ofek" width={150} height={75} format="webp" loading="eager" /></a>
+    <h1>Page not found</h1>
+    <p lang="zh-TW">找不到此頁面</p>
+    <ButtonOutline href="/" label="Back to home" />
+  </main>
+</Layout>

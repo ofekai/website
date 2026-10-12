@@ -33,6 +33,13 @@ export default defineConfig({
   },
 
   output: 'static',
+
+  // A one-page site gains nothing from caching CSS separately, and the external
+  // file was render-blocking (~150 ms on mobile Lighthouse). check-css.mjs reads
+  // the inlined <style> blocks.
+  build: {
+    inlineStylesheets: 'always',
+  },
   trailingSlash: 'ignore',
 
   i18n: {

@@ -28,10 +28,11 @@ const DIST_DIR = path.join(SCRIPT_DIR, '..', 'dist');
    which is excluded by requiring whitespace rather than `(` before it. */
 const MERGED_TIMELINE = /animation:[^;}]*\s(--[A-Za-z][\w-]*)/g;
 
+// CSS is inlined into the HTML (build.inlineStylesheets), so read both.
 const cssFiles = async (dir) => {
   const found = [];
   for (const entry of await readdir(dir, { withFileTypes: true, recursive: true })) {
-    if (entry.isFile() && entry.name.endsWith('.css')) {
+    if (entry.isFile() && /\.(css|html)$/.test(entry.name)) {
       found.push(path.join(entry.parentPath ?? entry.path, entry.name));
     }
   }
@@ -40,9 +41,13 @@ const cssFiles = async (dir) => {
 
 const problems = [];
 const files = await cssFiles(DIST_DIR);
+const extractCss = (file, source) =>
+  file.endsWith('.css') ? source : [...source.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
 
+let scanned = 0;
 for (const file of files) {
-  const css = await readFile(file, 'utf8');
+  const css = extractCss(file, await readFile(file, 'utf8'));
+  if (css.includes('animation')) scanned += 1;
   for (const match of css.matchAll(MERGED_TIMELINE)) {
     problems.push(`${path.relative(DIST_DIR, file)}: ${match[0].trim()}`);
   }
@@ -58,4 +63,10 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-console.log(`check-css: ${files.length} file(s) clean.`);
+// Finding no CSS at all would mean this guard silently checks nothing.
+if (scanned === 0) {
+  console.error('check-css: no stylesheet with animations found in dist/ — the guard has nothing to check.');
+  process.exit(1);
+}
+
+console.log(`check-css: ${scanned} file(s) clean.`);

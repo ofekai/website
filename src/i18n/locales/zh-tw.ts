@@ -11,13 +11,15 @@ export const zhTw = {
     current: '語言：繁體中文',
     switchTo: '切換語言至',
   },
-  menu: { open: '開啟選單', close: '關閉選單' },
+  menu: { open: '開啟選單', close: '關閉選單', skipToContent: '跳至主要內容' },
   nav: {
     about: '關於我們',
     consulting: '顧問服務',
     heatVision: 'HeatVision®',
     partners: '合作夥伴',
     contact: '聯絡我們',
+    ariaLabel: '主要導覽',
+    home: 'Ofek，回到頁首',
   },
   hero: {
     headline: '前沿運算製造的可信洞見',
@@ -64,11 +66,19 @@ export const zhTw = {
       automaticOpticalInspection: '自動光學檢測',
       reflow: '回焊',
     },
+    heatVisionImageAlts: {
+      surfaceMountTechnology: 'HeatVision 錫膏檢測：錫膏體積分布直方圖，以及電路板錫膏體積的 3D 熱力圖',
+      pickAndPlace: 'HeatVision 元件貼裝圖，呈現伺服器主機板上的元件配置',
+      automaticOpticalInspection: 'HeatVision 桑基圖，追蹤自動光學檢測結果從板面到缺陷類型的流向',
+      reflow: 'HeatVision 回焊爐各溫區溫度隨時間變化圖',
+    },
   },
   partners: {
     titleLight: '值得信賴的',
     titleBold: '合作夥伴',
-    ariaLabel: '值得信賴的合作夥伴。將焦點移至標誌即可暫停輪播。',
+    ariaLabel: '值得信賴的合作夥伴。將焦點移至此區即可暫停輪播。',
+    pause: '暫停',
+    play: '播放',
   },
   footer: {
     offices: [
@@ -85,6 +95,6 @@ export const zhTw = {
     emailPrefix: '電子郵件：',
     contactButton: '聯絡我們',
     linkedInLabel: 'LinkedIn 上的 Ofek',
-    copyright: '© 2026 Ofek。保留所有權利。',
+    copyright: (year) => `© ${year} Ofek。保留所有權利。`,
   },
 } satisfies Messages;

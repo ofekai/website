@@ -44,6 +44,57 @@
     outline-offset: 4px;
   }
 
+  .skip-link {
+    position: fixed;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 2000;
+    padding: 0.75rem 1.1rem;
+    background: var(--ink-950);
+    color: #fff;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transform: translateY(calc(-100% - 1rem));
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  main:focus {
+    outline: none;
+  }
+
+  .logo a {
+    display: flex;
+  }
+
+  .not-found {
+    display: grid;
+    min-height: 100dvh;
+    padding: var(--gutter);
+    background: var(--ink-950);
+    color: #fff;
+    place-content: center;
+    justify-items: start;
+    gap: 1.5rem;
+  }
+
+  .not-found img {
+    width: 100px;
+    height: auto;
+    filter: brightness(0) invert(1);
+  }
+
+  .not-found h1 {
+    font-family: var(--font-lato), Arial, sans-serif;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
   .container {
     width: min(calc(100% - (2 * var(--gutter))), var(--container));
     margin-inline: auto;
@@ -520,8 +571,8 @@
   .btn-outline:hover,
   .btn-outline:focus-visible,
   .btn-primary {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
+    border-color: var(--color-accent-active);
+    background: var(--color-accent-active);
     color: #fff;
   }
 
@@ -1331,8 +1382,48 @@
   }
 
   .partners-strip:hover .partners-track,
-  .partners-strip:focus-within .partners-track {
+  .partners-strip:focus-within .partners-track,
+  .partners-strip.is-paused .partners-track {
     animation-play-state: paused;
+  }
+
+  /* WCAG 2.2.2: touch users cannot hover, so the loop needs an explicit stop. */
+  .partners-toggle {
+    display: inline-flex;
+    grid-column: 1 / -1;
+    justify-self: end;
+    align-items: center;
+    gap: 0.5rem;
+    /* Pulls the control up under the strip, against the grid's row-gap. */
+    margin-top: calc(0.5rem - clamp(3rem, 4vw, 5rem));
+    padding: 0.5rem 0.25rem;
+    border: 0;
+    background: transparent;
+    color: var(--ink-500);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .partners-toggle svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+  }
+
+  .partners-toggle [data-icon='play'],
+  .partners-toggle[aria-pressed='true'] [data-icon='pause'] {
+    display: none;
+  }
+
+  .partners-toggle[aria-pressed='true'] [data-icon='play'] {
+    display: block;
+  }
+
+  html:not(.js) .partners-toggle {
+    display: none;
   }
 
   .partners-group {
@@ -1551,8 +1642,8 @@
 
   .footer-mail-button:hover,
   .footer-mail-button:focus-visible {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
+    border-color: var(--color-accent-active);
+    background: var(--color-accent-active);
     transform: translateY(-1px);
   }
 
@@ -1573,8 +1664,8 @@
 
   .footer-link-outer:hover,
   .footer-link-outer:focus-visible {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
+    border-color: var(--color-accent-active);
+    background: var(--color-accent-active);
   }
 
   .icon-linkedin {
@@ -2133,6 +2224,28 @@
       opacity: 1;
     }
 
+    html:not(.js) .menu-toggle,
+    html:not(.js) .nav-links > a {
+      display: none;
+    }
+
+    html:not(.js) .nav-links {
+      position: static;
+      visibility: visible;
+      background: none;
+      color: inherit;
+      opacity: 1;
+    }
+
+    html:not(.js) .language-switcher ul {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline-end: 0;
+      min-width: 0;
+      grid-template-columns: 1fr;
+      background: var(--ink-950);
+    }
+
     .nav-links a {
       font-family: var(--font-lato), Arial, sans-serif;
       font-size: clamp(1.4rem, 6vw, 2.4rem);
@@ -2464,6 +2577,10 @@
       width: 100%;
       animation: none;
       will-change: auto;
+    }
+
+    .partners-toggle {
+      display: none;
     }
 
     .partners-group {

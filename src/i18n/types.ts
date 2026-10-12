@@ -24,6 +24,7 @@ export interface Messages {
   menu: {
     open: string;
     close: string;
+    skipToContent: string;
   };
   nav: {
     about: string;
@@ -31,6 +32,8 @@ export interface Messages {
     heatVision: string;
     partners: string;
     contact: string;
+    ariaLabel: string;
+    home: string;
   };
   hero: {
     headline: string;
@@ -65,11 +68,19 @@ export interface Messages {
       automaticOpticalInspection: string;
       reflow: string;
     };
+    heatVisionImageAlts: {
+      surfaceMountTechnology: string;
+      pickAndPlace: string;
+      automaticOpticalInspection: string;
+      reflow: string;
+    };
   };
   partners: {
     titleLight: string;
     titleBold: string;
     ariaLabel: string;
+    pause: string;
+    play: string;
   };
   footer: {
     offices: readonly [
@@ -82,6 +93,6 @@ export interface Messages {
     emailPrefix: string;
     contactButton: string;
     linkedInLabel: string;
-    copyright: string;
+    copyright: (year: number) => string;
   };
 }

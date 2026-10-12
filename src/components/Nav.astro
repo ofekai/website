@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import type { Locale, Messages } from '../i18n';
 import logoOfek from '../assets/images/Logo_Ofek_o.png';
@@ -10,6 +10,8 @@ interface Props {
 }
 
 const { locale, messages } = Astro.props;
+// One WebP serves both the <img> and the logo-tip mask.
+const logo = await getImage({ src: logoOfek, width: 150, format: 'webp' });
 const navLinks = [
   { label: messages.nav.about, href: '#about' },
   { label: messages.nav.consulting, href: '#consulting' },
@@ -19,14 +21,17 @@ const navLinks = [
 ];
 ---
 
-<nav id="navbar" class="navbar">
+<header>
+<nav id="navbar" class="navbar" aria-label={messages.nav.ariaLabel}>
   <div class="nav-progress" aria-hidden="true"><span data-scroll-progress></span></div>
   <div class="nav-container container">
     <div class="logo">
-      <Image src={logoOfek} alt="Ofek" width={150} height={75} format="png" />
+      <a href="#" aria-label={messages.nav.home}>
+        <img src={logo.src} alt="Ofek" width="150" height="75" />
+      </a>
       <span
         class="logo-tip"
-        style={`--logo-mask: url("${logoOfek.src}")`}
+        style={`--logo-mask: url("${logo.src}")`}
         aria-hidden="true"
       ></span>
     </div>
@@ -49,3 +54,4 @@ const navLinks = [
     </div>
   </div>
 </nav>
+</header>

@@ -79,17 +79,17 @@ const { messages } = Astro.props;
           </p>
       </div>
     </div>
-    <div class="heatvision-stage" data-transition-layer="stage" aria-hidden="true">
+    <div class="heatvision-stage" data-transition-layer="stage">
       <div class="heatvision-gallery">
         <figure class="heatvision-shot heatvision-shot-primary">
-          <span class="heatvision-graph-label heatvision-graph-label-primary">
+          <span class="heatvision-graph-label heatvision-graph-label-primary" aria-hidden="true">
             {messages.heatVisionGraphLabels.surfaceMountTechnology}
           </span>
           <div class="heatvision-primary-composition">
             <Image
               class="heatvision-primary-chart"
               src={heatVisionSpi}
-              alt=""
+              alt={messages.heatVisionImageAlts.surfaceMountTechnology}
               widths={[640, 960, 1280, 1920, 2560]}
               sizes="(min-width: 869px) 46vw, (min-width: 521px) 82vw, 82vw"
               loading="lazy"
@@ -104,41 +104,41 @@ const { messages } = Astro.props;
             />
           </div>
         </figure>
-        <span class="heatvision-gallery-separator"></span>
+        <span class="heatvision-gallery-separator" aria-hidden="true"></span>
         <div class="heatvision-support-rail">
           <figure class="heatvision-shot heatvision-shot-support heatvision-shot-unified-bg">
-            <span class="heatvision-graph-label">
+            <span class="heatvision-graph-label" aria-hidden="true">
               {messages.heatVisionGraphLabels.pickAndPlace}
             </span>
             <Image
               src={heatVisionBoardMap}
-              alt=""
+              alt={messages.heatVisionImageAlts.pickAndPlace}
               widths={[320, 480, 640]}
               sizes="(min-width: 869px) 18vw, (min-width: 521px) 31vw, 88vw"
               loading="lazy"
             />
           </figure>
-          <span class="heatvision-rail-separator"></span>
+          <span class="heatvision-rail-separator" aria-hidden="true"></span>
           <figure class="heatvision-shot heatvision-shot-support">
-            <span class="heatvision-graph-label">
+            <span class="heatvision-graph-label" aria-hidden="true">
               {messages.heatVisionGraphLabels.automaticOpticalInspection}
             </span>
             <Image
               src={heatVisionAoi}
-              alt=""
+              alt={messages.heatVisionImageAlts.automaticOpticalInspection}
               widths={[320, 480, 640, 960]}
               sizes="(min-width: 869px) 18vw, (min-width: 521px) 31vw, 88vw"
               loading="lazy"
             />
           </figure>
-          <span class="heatvision-rail-separator"></span>
+          <span class="heatvision-rail-separator" aria-hidden="true"></span>
           <figure class="heatvision-shot heatvision-shot-support heatvision-shot-unified-bg">
-            <span class="heatvision-graph-label">
+            <span class="heatvision-graph-label" aria-hidden="true">
               {messages.heatVisionGraphLabels.reflow}
             </span>
             <Image
               src={heatVisionTemperature}
-              alt=""
+              alt={messages.heatVisionImageAlts.reflow}
               widths={[320, 480, 640, 960]}
               sizes="(min-width: 869px) 18vw, (min-width: 521px) 31vw, 88vw"
               loading="lazy"

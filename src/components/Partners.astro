@@ -9,11 +9,9 @@ import logoGoldtek from '../assets/images/logo_Goldtek.svg';
 import logoAccton from '../assets/images/logo_Accton.png';
 import logoInventec from '../assets/images/logo_Inventec.svg';
 import logoAWS from '../assets/images/logo_AWS.svg';
-
-// Exact blue lockup supplied in the design reference. Wikimedia Commons hosts
-// the published SVG under CC BY-SA 3.0; keeping it remote avoids committing a
-// separately licensed copy to this repository.
-const logoUSI = 'https://upload.wikimedia.org/wikipedia/commons/7/7e/USI_Logo_blue_1200x750_20230808.svg';
+// Source: Wikimedia Commons, File:USI_Logo_blue_1200x750_20230808.svg
+// (CC BY-SA 3.0). Self-hosted so the page has no third-party requests.
+import logoUSI from '../assets/images/logo_USI.svg';
 
 interface Props {
   messages: Messages['partners'];
@@ -26,8 +24,7 @@ const { messages } = Astro.props;
 type Partner = {
   alt: string;
   scale: number;
-  local?: ImageMetadata;
-  remote?: string;
+  local: ImageMetadata;
 };
 
 const partners: Partner[] = [
@@ -35,7 +32,7 @@ const partners: Partner[] = [
   { local: logoHipcam, alt: 'Hipcam', scale: 1.05 },
   { local: logoGoldtek, alt: 'Goldtek', scale: 1.08 },
   { local: logoAccton, alt: 'Accton', scale: 1 },
-  { remote: logoUSI, alt: 'USI', scale: 1.05 },
+  { local: logoUSI, alt: 'USI', scale: 1.05 },
   { local: logoInventec, alt: 'Inventec', scale: 1.12 },
   { local: logoAWS, alt: 'Amazon Web Services', scale: 0.88 },
 ];
@@ -67,22 +64,9 @@ const groups = [false, true];
               <div
                 class="logo-item"
                 role={duplicate ? undefined : 'listitem'}
-                tabindex={duplicate ? undefined : '0'}
                 style={`--logo-scale: ${p.scale}`}
               >
-                {p.remote ? (
-                  <img
-                    src={p.remote}
-                    alt={duplicate ? '' : p.alt}
-                    width="240"
-                    height="120"
-                    loading="lazy"
-                    decoding="async"
-                    referrerpolicy="no-referrer"
-                  />
-                ) : p.local ? (
-                  <Image src={p.local} alt={duplicate ? '' : p.alt} height={100} />
-                ) : null}
+                <Image src={p.local} alt={duplicate ? '' : p.alt} height={100} />
               </div>
             ))}
           </div>
@@ -90,5 +74,29 @@ const groups = [false, true];
       }
       </div>
     </div>
+    <button
+      type="button"
+      class="partners-toggle"
+      aria-pressed="false"
+      data-partners-toggle
+      data-label-pause={messages.pause}
+      data-label-play={messages.play}
+    >
+      <svg data-icon="pause" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" /><rect x="7" y="1" width="3" height="10" /></svg>
+      <svg data-icon="play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z" /></svg>
+      <span data-partners-toggle-label>{messages.pause}</span>
+    </button>
   </div>
 </section>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-partners-toggle]');
+  const strip = document.querySelector<HTMLElement>('.partners-strip');
+  const label = toggle?.querySelector<HTMLElement>('[data-partners-toggle-label]');
+  toggle?.addEventListener('click', () => {
+    const paused = toggle.getAttribute('aria-pressed') !== 'true';
+    toggle.setAttribute('aria-pressed', String(paused));
+    strip?.classList.toggle('is-paused', paused);
+    if (label) label.textContent = (paused ? toggle.dataset.labelPlay : toggle.dataset.labelPause) ?? '';
+  });
+</script>

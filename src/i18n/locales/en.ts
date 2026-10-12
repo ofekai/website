@@ -4,20 +4,22 @@ export const en = {
   seo: {
     title: 'Ofek | Trusted Insights into Frontier Compute Manufacturing',
     description:
-      'Ofek partners with top S&P 100 companies to optimize technology-focused manufacturing operations in Taiwan, drawing on deep supply-chain knowledge and HeatVision, our real-time manufacturing intelligence platform.',
+      'Ofek helps S&P 100 companies optimize manufacturing in Taiwan with supply-chain expertise and HeatVision, our real-time manufacturing intelligence platform.',
   },
   language: {
     select: 'Select language',
     current: 'Language: English',
     switchTo: 'Switch language to',
   },
-  menu: { open: 'Open Menu', close: 'Close Menu' },
+  menu: { open: 'Open Menu', close: 'Close Menu', skipToContent: 'Skip to content' },
   nav: {
     about: 'ABOUT US',
     consulting: 'CONSULTING',
     heatVision: 'HeatVision®',
     partners: 'PARTNERS',
     contact: 'TALK TO US',
+    ariaLabel: 'Main',
+    home: 'Ofek, back to top',
   },
   hero: {
     headline: 'TRUSTED INSIGHTS INTO FRONTIER COMPUTE MANUFACTURING',
@@ -64,11 +66,21 @@ export const en = {
       automaticOpticalInspection: 'Automatic Optical Inspection',
       reflow: 'Reflow',
     },
+    heatVisionImageAlts: {
+      surfaceMountTechnology:
+        'HeatVision solder paste inspection: a volume histogram beside a 3D heatmap of paste volume across a circuit board',
+      pickAndPlace: 'HeatVision pick-and-place map showing component placement across a server board',
+      automaticOpticalInspection:
+        'HeatVision Sankey diagram tracing automatic optical inspection results from board side to defect type',
+      reflow: 'HeatVision reflow oven chart of zone temperatures over time',
+    },
   },
   partners: {
     titleLight: 'TRUSTED',
     titleBold: 'PARTNERS',
     ariaLabel: 'Trusted partners. Focus to pause the moving logos.',
+    pause: 'Pause',
+    play: 'Play',
   },
   footer: {
     offices: [
@@ -84,6 +96,6 @@ export const en = {
     emailPrefix: 'Email us at',
     contactButton: 'Contact us',
     linkedInLabel: 'Ofek on LinkedIn',
-    copyright: '© 2026 Ofek. All rights reserved.',
+    copyright: (year) => `© ${year} Ofek. All rights reserved.`,
   },
 } satisfies Messages;

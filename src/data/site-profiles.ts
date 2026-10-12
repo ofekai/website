@@ -23,6 +23,15 @@ export const PROFILES = {
 
 export type SiteProfile = (typeof PROFILES)[keyof typeof PROFILES];
 
+/**
+ * Both sites publish the same content, so both point search engines at one
+ * copy: canonical, hreflang, og:url, JSON-LD, sitemap and robots.txt all use
+ * this domain, whichever profile is building. CNAME and the contact email stay
+ * per-profile. GitHub Pages cannot 301 one custom domain to another, so the
+ * cross-domain canonical is what keeps the two from competing in search.
+ */
+export const CANONICAL_DOMAIN = PROFILES.ofekai.domain;
+
 export const DEFAULT_PROFILE_KEY = 'ofektaiwan';
 
 /** Unknown owners fall back rather than throwing: a fork should still build. */

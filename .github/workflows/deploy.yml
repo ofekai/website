@@ -1,9 +1,9 @@
 name: Deploy to GitHub Pages
 
-# NOT ACTIVE until the Pages source is switched from branch-serving to
-# "GitHub Actions" in Settings → Pages. After the first Actions run, re-check
-# that the custom domain is still www.ofektaiwan.com and that "Enforce HTTPS"
-# is still ticked — switching the source can silently clear both.
+# Live since 2026-08-07 in both ofektaiwan/website and ofekai/website; this file
+# is byte-identical in each. The site profile (domain, contact email) comes from
+# GITHUB_REPOSITORY_OWNER, see src/data/site-profiles.ts. After any change to
+# the Pages source, re-check the custom domain and "Enforce HTTPS" (DEPLOY.md).
 
 on:
   push:

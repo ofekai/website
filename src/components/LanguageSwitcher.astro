@@ -13,7 +13,7 @@ const current = locales[locale];
 ---
 
 <details class="language-switcher" data-language-switcher>
-  <summary aria-label={messages.select}>
+  <summary aria-label={`${current.shortLabel}, ${messages.select}`}>
     <IconLanguage aria-hidden="true" />
     <span>{current.shortLabel}</span>
     <svg class="language-chevron" viewBox="0 0 12 8" aria-hidden="true">

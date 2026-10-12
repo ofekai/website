@@ -208,9 +208,15 @@ export function initNav(): void {
   window.addEventListener('scroll', requestProgress, { passive: true });
   updateProgress();
 
+  /* measureLayout() forces a synchronous layout, so wait for resizing (or a
+     rotation) to settle instead of running it on every event. */
+  let resizeTimer = 0;
   window.addEventListener('resize', () => {
-    measureLayout();
-    requestProgress();
     if (window.innerWidth > 868 && isOpen()) closeMenu();
+    clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      measureLayout();
+      requestProgress();
+    }, 150);
   }, { passive: true });
 }

@@ -671,8 +671,11 @@
      while the incoming scene keeps travelling at 1:1 with the wheel.
 
      No negative margins (tried in 4fbd629, reverted in eb56fb7 for leaking
-     layout) and no scroll runway (removed in 8cdd59f as dead scroll).
-     Sticky is layout-neutral, so page height is unchanged.
+     layout). Each pinned scene does get a --scene-hold of runway, as a
+     margin-bottom that delays the next scene's arrival: without it a scene
+     was fully visible for ~45px of scroll, less than one wheel notch. The
+     .scene-seam that follows sits after that margin, so every transition
+     still starts when the incoming scene actually moves.
 
      INVARIANT: a scene pinned by `top` MUST fit inside --scene-h, or the
      part below the fold becomes permanently unreachable while it is pinned.
@@ -684,7 +687,8 @@
      BOTTOM edge via a negative top. Given
        panel-h = 100dvh - nav-h - heading-h
      the offset that parks its bottom edge on the viewport bottom is
-       100dvh - (heading-h + 2*panel-h) = nav-h - panel-h.
+       100dvh - (heading-h + 2*panel-h + hold) = nav-h - panel-h - hold,
+     where hold is Consulting's margin-bottom inside the section.
 
      Partners is deliberately NOT pinned: it is shorter than a viewport, so
      pinning it would leave a strip of Expertise visible below it. It does
@@ -703,11 +707,15 @@
     main > .about-section {
       position: sticky;
       top: var(--nav-h-scrolled);
+      margin-bottom: var(--scene-hold);
     }
 
+    /* The margin here is HeatVision's hold: it is the last thing in the
+       section, so this delays Partners. */
     main > .expertise-section {
       position: sticky;
-      top: calc(var(--nav-h-scrolled) - var(--expertise-panel-h));
+      top: calc(var(--nav-h-scrolled) - var(--expertise-panel-h) - var(--scene-hold));
+      margin-bottom: var(--scene-hold);
     }
 
     /* Expertise's internal stack, folded into the same positive gate so the
@@ -719,6 +727,10 @@
     .expertise-story > .heatvision-stripe {
       position: sticky;
       top: calc(var(--nav-h-scrolled) + var(--expertise-heading-h));
+    }
+
+    .expertise-story > .consulting-stripe {
+      margin-bottom: var(--scene-hold);
     }
   }
 

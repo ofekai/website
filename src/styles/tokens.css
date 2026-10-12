@@ -141,6 +141,11 @@
        Every page-level scene in the stack must fit inside this, or the part
        below the fold becomes unreachable while the scene is pinned. */
     --scene-h: calc(100dvh - var(--nav-h-scrolled));
+    /* How far a pinned scene stays fully on screen before the next one starts
+       to cover it. Without it the hold was ~45px, under one wheel notch, so
+       the wheel could not stop on a scene. Only applied inside the
+       scene-stack gate in global.css. */
+    --scene-hold: calc(var(--scene-h) * 0.7);
     --expertise-heading-h: clamp(9.5rem, 18dvh, 12.5rem);
     --expertise-panel-h: max(
       32rem,

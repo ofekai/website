@@ -95,6 +95,8 @@ export const en = {
     headingBold: 'conversation',
     emailPrefix: 'Email us at',
     contactButton: 'Contact us',
+    copyEmail: 'Copy',
+    emailCopied: 'Copied',
     linkedInLabel: 'Ofek on LinkedIn',
     copyright: (year) => `© ${year} Ofek. All rights reserved.`,
   },

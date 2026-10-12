@@ -92,6 +92,8 @@ export interface Messages {
     headingBold: string;
     emailPrefix: string;
     contactButton: string;
+    copyEmail: string;
+    emailCopied: string;
     linkedInLabel: string;
     copyright: (year: number) => string;
   };

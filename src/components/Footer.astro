@@ -53,9 +53,18 @@ const logo = await getImage({ src: logoOfek, width: 150, format: 'webp' });
           <span>{messages.headingLight}</span>
           <strong>{messages.headingBold}</strong>
         </h2>
-        <a class="footer-email-link" href={`mailto:${site.email}`}>
-          <span class="footer-email">{messages.emailPrefix} <bdi>{site.email}</bdi></span>
-        </a>
+        <p class="footer-email-line">
+          <span class="footer-email" id="footer-email">{messages.emailPrefix} <bdi data-copy-source>{site.email}</bdi></span>
+          <button
+            type="button"
+            class="footer-copy-button"
+            aria-describedby="footer-email"
+            data-copy={site.email}
+            data-label-copy={messages.copyEmail}
+            data-label-copied={messages.emailCopied}
+          >{messages.copyEmail}</button>
+          <span class="footer-copy-status" aria-live="polite" data-copy-status></span>
+        </p>
         <div class="footer-actions">
           <a class="footer-mail-button" href={`mailto:${site.email}`}>
             <span>{messages.contactButton}</span>
@@ -70,3 +79,37 @@ const logo = await getImage({ src: logoOfek, width: 150, format: 'webp' });
     <div class="copyright" data-reveal="line">{messages.copyright(new Date().getFullYear())}</div>
   </div>
 </footer>
+
+<script>
+  const copyButton = document.querySelector<HTMLButtonElement>('.footer-copy-button');
+  const copyStatus = document.querySelector<HTMLElement>('[data-copy-status]');
+  const copySource = document.querySelector<HTMLElement>('[data-copy-source]');
+  let resetTimer = 0;
+
+  // Clipboard unavailable or denied: select the address so it can be copied by hand.
+  const selectAddress = () => {
+    if (!copySource) return;
+    const range = document.createRange();
+    range.selectNodeContents(copySource);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  };
+
+  copyButton?.addEventListener('click', async () => {
+    const { copy = '', labelCopy = '', labelCopied = '' } = copyButton.dataset;
+    try {
+      await navigator.clipboard.writeText(copy);
+    } catch {
+      selectAddress();
+      return;
+    }
+    copyButton.textContent = labelCopied;
+    if (copyStatus) copyStatus.textContent = labelCopied;
+    clearTimeout(resetTimer);
+    resetTimer = window.setTimeout(() => {
+      copyButton.textContent = labelCopy;
+      if (copyStatus) copyStatus.textContent = '';
+    }, 2000);
+  });
+</script>

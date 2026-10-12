@@ -94,6 +94,8 @@ export const zhTw = {
     headingBold: '對話',
     emailPrefix: '電子郵件：',
     contactButton: '聯絡我們',
+    copyEmail: '複製',
+    emailCopied: '已複製',
     linkedInLabel: 'LinkedIn 上的 Ofek',
     copyright: (year) => `© ${year} Ofek。保留所有權利。`,
   },

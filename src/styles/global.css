@@ -692,9 +692,9 @@
 
      Partners is deliberately NOT pinned: it is shorter than a viewport, so
      pinning it would leave a strip of Expertise visible below it. It does
-     not need to be. Expertise stays pinned until `main`'s bottom edge (which
-     is Partners' bottom edge) reaches the viewport bottom, so Partners still
-     travels over a frozen HeatVision for its own height.
+     not need to be. Expertise stays pinned until `main`'s bottom edge, less
+     its hold, reaches the viewport bottom, so Partners still travels over a
+     frozen HeatVision. See the main::after spacer below.
 
      869px = the mobile breakpoint + 1; see MOBILE_MAX_WIDTH in
      src/scripts/breakpoints.ts and the note above `@media (max-width: 868px)`. */
@@ -716,6 +716,31 @@
       position: sticky;
       top: calc(var(--nav-h-scrolled) - var(--expertise-panel-h) - var(--scene-hold));
       margin-bottom: var(--scene-hold);
+    }
+
+    /* A sticky box's margin must stay inside `main`, which ends at Partners.
+       Partners alone is shorter than the hold above, so Expertise used to
+       unpin before Partners arrived and the pinned Hero showed in the gap.
+       This spacer lengthens `main` by the footer's min-height, and the
+       footer is pulled up over it, so nothing moves and the page is no
+       longer. Partners' min-height + 27rem = --scene-h > --scene-hold. */
+    main::after {
+      display: block;
+      height: 27rem;
+      content: '';
+    }
+
+    main + .footer {
+      margin-top: -27rem;
+    }
+
+    /* The spacer keeps Expertise pinned 27rem longer, and this seam freezes
+       while it is pinned, so its cover range would end 27rem later and the
+       Consulting -> HeatVision handoff would stop short of done at the
+       HeatVision anchor. Insetting the top edge by the same 27rem ends the
+       range at the same scroll position as before. */
+    [data-seam='consulting-heatvision'] {
+      view-timeline-inset: 27rem 0;
     }
 
     /* Expertise's internal stack, folded into the same positive gate so the

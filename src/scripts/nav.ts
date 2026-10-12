@@ -211,14 +211,20 @@ export function initNav(): void {
   updateProgress();
 
   /* measureLayout() forces a synchronous layout, so wait for resizing (or a
-     rotation) to settle instead of running it on every event. */
+     rotation) to settle instead of running it on every event. The first
+     measurement runs before web fonts swap in, which grows the page by
+     ~650px, so any change to the page's own size re-measures too. */
   let resizeTimer = 0;
-  window.addEventListener('resize', () => {
-    if (!isMobileViewport() && isOpen()) closeMenu();
+  const scheduleMeasure = () => {
     clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
       measureLayout();
       requestProgress();
     }, 150);
+  };
+  new ResizeObserver(scheduleMeasure).observe(document.body);
+  window.addEventListener('resize', () => {
+    if (!isMobileViewport() && isOpen()) closeMenu();
+    scheduleMeasure();
   }, { passive: true });
 }

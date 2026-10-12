@@ -1355,13 +1355,32 @@
 
   /* Partners ----------------------------------------------------------- */
   .partners-section {
+    --partners-gap: clamp(3rem, 4vw, 5rem);
     z-index: 4;
     padding-block: var(--section-y);
     background: var(--paper-50);
   }
 
   .partners-section > .grid {
-    row-gap: clamp(3rem, 4vw, 5rem);
+    row-gap: var(--partners-gap);
+  }
+
+  /* Desktop: Partners and the footer share the last screen. The spacing
+     scales with viewport height so both fit under the nav, and Partners
+     takes whatever the footer leaves, so the page never ends with a strip of
+     the pinned HeatVision scene showing above it. */
+  @media (min-width: 869px) {
+    .partners-section {
+      --partners-gap: clamp(2rem, 4dvh, 5rem);
+      display: grid;
+      align-content: center;
+      min-height: calc(var(--scene-h) - 27rem);
+      padding-block: clamp(2rem, 4dvh, var(--section-y));
+    }
+
+    .partners-section .logo-item {
+      min-height: clamp(120px, 14dvh, 180px);
+    }
   }
 
   .partners-title {
@@ -1420,7 +1439,7 @@
     align-items: center;
     gap: 0.5rem;
     /* Pulls the control up under the strip, against the grid's row-gap. */
-    margin-top: calc(0.5rem - clamp(3rem, 4vw, 5rem));
+    margin-top: calc(0.5rem - var(--partners-gap));
     padding: 0.5rem 0.25rem;
     border: 0;
     background: transparent;
@@ -1498,6 +1517,13 @@
     background: var(--ink-900);
     color: var(--color-on-dark);
     isolation: isolate;
+  }
+
+  /* Desktop: Partners fills the rest of the last screen instead. */
+  @media (min-width: 869px) {
+    .footer {
+      min-height: 27rem;
+    }
   }
 
   .footer-container {

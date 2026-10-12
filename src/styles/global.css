@@ -14,7 +14,7 @@
     overflow-x: clip;
     background: var(--paper-50);
     color: var(--color-text);
-    font-family: var(--font-open-sans), Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: var(--step-1);
     font-weight: 400;
     line-height: 1.75;
@@ -51,7 +51,7 @@
     z-index: 2000;
     padding: 0.75rem 1.1rem;
     background: var(--ink-950);
-    color: #fff;
+    color: var(--color-on-dark);
     font-size: 0.85rem;
     text-decoration: none;
     transform: translateY(calc(-100% - 1rem));
@@ -74,7 +74,7 @@
     min-height: 100dvh;
     padding: var(--gutter);
     background: var(--ink-950);
-    color: #fff;
+    color: var(--color-on-dark);
     place-content: center;
     justify-items: start;
     gap: 1.5rem;
@@ -87,7 +87,7 @@
   }
 
   .not-found h1 {
-    font-family: var(--font-lato), Arial, sans-serif;
+    font-family: var(--font-display);
     font-size: clamp(2rem, 6vw, 3.5rem);
     font-weight: 300;
     letter-spacing: 0.08em;
@@ -115,7 +115,7 @@
     z-index: 1000;
     height: var(--nav-h);
     border-bottom: 1px solid transparent;
-    color: #fff;
+    color: var(--color-on-dark);
     transition:
       height var(--dur-base) var(--ease-out-quart),
       background-color var(--dur-base) var(--ease-out-quart),
@@ -126,9 +126,9 @@
 
   .navbar.nav-scrolled {
     height: var(--nav-h-scrolled);
-    border-color: rgb(20 23 25 / 10%);
-    background: #fff;
-    box-shadow: 0 3px 14px rgb(0 0 0 / 6%);
+    border-color: var(--color-nav-border);
+    background: var(--paper-50);
+    box-shadow: 0 3px 14px var(--overlay-dark-6);
     color: var(--ink-900);
   }
 
@@ -171,7 +171,7 @@
   .logo img {
     width: 100px;
     height: auto;
-    filter: brightness(0) invert(1) drop-shadow(0 1px 5px rgb(0 0 0 / 45%));
+    filter: brightness(0) invert(1) drop-shadow(0 1px 5px var(--overlay-dark-45));
     opacity: 0.96;
     transition:
       filter var(--dur-base) var(--ease-out-quart),
@@ -208,7 +208,7 @@
   .nav-links a {
     position: relative;
     padding-block: 0.4rem;
-    font-family: var(--font-open-sans), Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 400;
     letter-spacing: 0.16em;
@@ -296,8 +296,8 @@
     margin: 0;
     padding: 0.4rem;
     border: 1px solid var(--color-hairline-ink);
-    background: #fff;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 14%);
+    background: var(--paper-50);
+    box-shadow: 0 8px 24px var(--overlay-dark-14);
     color: var(--ink-900);
     list-style: none;
   }
@@ -309,7 +309,7 @@
   .nav-links .language-switcher a {
     display: block;
     padding: 0.65rem 0.75rem;
-    font-family: var(--font-open-sans), Arial, sans-serif;
+    font-family: var(--font-body);
     font-size: 0.8rem;
     font-weight: 400;
     letter-spacing: 0;
@@ -374,7 +374,7 @@
     overflow: hidden;
     place-items: center;
     background: var(--ink-950);
-    color: #fff;
+    color: var(--color-on-dark);
     isolation: isolate;
   }
 
@@ -451,13 +451,13 @@
   .hero-scrim {
     z-index: -2;
     background:
-      radial-gradient(ellipse 58% 42% at 50% 51%, rgb(5 7 8 / 42%), transparent 74%),
+      radial-gradient(ellipse 58% 42% at 50% 51%, var(--overlay-scrim-42), transparent 74%),
       linear-gradient(
         to bottom,
-        rgb(5 7 8 / 30%) 0%,
-        rgb(5 7 8 / 8%) 25%,
-        rgb(5 7 8 / 14%) 68%,
-        rgb(5 7 8 / 24%) 100%
+        var(--overlay-scrim-30) 0%,
+        var(--overlay-scrim-8) 25%,
+        var(--overlay-scrim-14) 68%,
+        var(--overlay-scrim-24) 100%
       );
   }
 
@@ -474,8 +474,8 @@
 
   .hero-title {
     margin: 0 0 clamp(2rem, 4vw, 3.5rem);
-    color: #fff;
-    font-family: var(--font-lato), Arial, sans-serif;
+    color: var(--color-on-dark);
+    font-family: var(--font-display);
     font-size: clamp(2.125rem, 1.5rem + 2.8vw, 4rem);
     font-weight: 300;
     letter-spacing: 0.12em;
@@ -530,7 +530,7 @@
     display: grid;
     width: 96px;
     height: 44px;
-    color: #fff;
+    color: var(--color-on-dark);
     place-items: center;
   }
 
@@ -549,7 +549,7 @@
     gap: 1rem;
     padding: 0.85rem 1.55rem;
     border: 1px solid currentColor;
-    color: #fff;
+    color: var(--color-on-dark);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.13em;
@@ -573,7 +573,7 @@
   .btn-primary {
     border-color: var(--color-accent-active);
     background: var(--color-accent-active);
-    color: #fff;
+    color: var(--color-on-dark);
   }
 
   .btn-outline:hover .btn-arrow,
@@ -600,7 +600,7 @@
     margin: 0;
     padding-inline-start: clamp(1.25rem, 2.5vw, 2rem);
     color: var(--ink-900);
-    font-family: var(--font-lato), Arial, sans-serif;
+    font-family: var(--font-display);
     font-size: var(--step-3);
     font-weight: 300;
     letter-spacing: 0.02em;
@@ -690,7 +690,10 @@
      pinning it would leave a strip of Expertise visible below it. It does
      not need to be. Expertise stays pinned until `main`'s bottom edge (which
      is Partners' bottom edge) reaches the viewport bottom, so Partners still
-     travels over a frozen HeatVision for its own height.                  */
+     travels over a frozen HeatVision for its own height.
+
+     869px = the mobile breakpoint + 1; see MOBILE_MAX_WIDTH in
+     src/scripts/breakpoints.ts and the note above `@media (max-width: 868px)`. */
   @media (min-width: 869px) and (min-height: 820px) and (prefers-reduced-motion: no-preference) {
     main > .hero {
       position: sticky;
@@ -726,7 +729,7 @@
   }
 
   .transition-panel-light {
-    background: #fff;
+    background: var(--paper-50);
   }
 
   .transition-panel-dark {
@@ -772,7 +775,7 @@
   .about-intro-band {
     position: relative;
     padding-block: var(--section-y);
-    background: #fff;
+    background: var(--paper-50);
   }
 
   .about-intro {
@@ -934,7 +937,7 @@
   .expertise-section {
     position: relative;
     z-index: 3;
-    background: #fff;
+    background: var(--paper-50);
     isolation: isolate;
   }
 
@@ -946,7 +949,7 @@
     height: var(--expertise-heading-h);
     padding-block: 0;
     align-items: center;
-    background: #fff;
+    background: var(--paper-50);
   }
 
   .expertise-story {
@@ -1015,7 +1018,7 @@
   .card-title {
     margin: 0 0 1.75rem;
     color: var(--ink-900);
-    font-family: var(--font-lato), Arial, sans-serif;
+    font-family: var(--font-display);
     font-size: clamp(2.1rem, 3.4vw, 4rem);
     font-weight: 300;
     letter-spacing: 0.01em;
@@ -1091,13 +1094,13 @@
     position: relative;
     overflow: hidden;
     background:
-      radial-gradient(ellipse 85% 60% at 100% 0%, rgb(255 255 255 / 12%), transparent 65%),
+      radial-gradient(ellipse 85% 60% at 100% 0%, var(--overlay-light-12), transparent 65%),
       var(--ink-900);
   }
 
   .heatvision-stripe .card-title,
   .heatvision-stripe .card-text {
-    color: #fff;
+    color: var(--color-on-dark);
   }
 
   .heatvision-stage {
@@ -1106,7 +1109,7 @@
     overflow: hidden;
     border-inline-start: 1px solid var(--color-hairline);
     container-type: inline-size;
-    background: #000;
+    background: var(--black);
   }
 
   .heatvision-gallery {
@@ -1132,7 +1135,7 @@
     position: relative;
     margin: 0;
     overflow: hidden;
-    background: #000;
+    background: var(--black);
   }
 
   .heatvision-shot-primary {
@@ -1147,14 +1150,14 @@
     z-index: 8;
     top: clamp(0.45rem, 0.7cqw, 0.7rem);
     left: clamp(0.45rem, 0.7cqw, 0.7rem);
-    color: rgb(255 255 255 / 88%);
-    font-family: var(--font-lato), Arial, sans-serif;
+    color: var(--color-on-dark-88);
+    font-family: var(--font-display);
     font-size: clamp(0.72rem, 0.78cqw, 0.9rem);
     font-weight: 400;
     letter-spacing: 0.035em;
     line-height: 1.2;
     pointer-events: none;
-    text-shadow: 0 1px 4px rgb(0 0 0 / 75%);
+    text-shadow: 0 1px 4px var(--overlay-dark-75);
     white-space: nowrap;
   }
 
@@ -1251,7 +1254,7 @@
 
   .heatvision-stripe .heatvision-title {
     color: var(--color-accent);
-    font-family: var(--font-lato), Arial, sans-serif;
+    font-family: var(--font-display);
     font-size: clamp(2.25rem, 4vw, 5rem);
     font-weight: 300;
     letter-spacing: -0.04em;
@@ -1327,7 +1330,7 @@
 
   .consulting-stripe .stripe-media,
   .consulting-stripe .editorial-media {
-    background: #000;
+    background: var(--black);
   }
 
   .consulting-stripe .stripe-media {
@@ -1342,7 +1345,7 @@
   .partners-section {
     z-index: 4;
     padding-block: var(--section-y);
-    background: #fff;
+    background: var(--paper-50);
   }
 
   .partners-section > .grid {
@@ -1481,7 +1484,7 @@
     padding-block: clamp(3rem, calc(1.5vw + 2vh), 4rem) 1.5rem;
     border-top: 1px solid var(--color-hairline);
     background: var(--ink-900);
-    color: #fff;
+    color: var(--color-on-dark);
     isolation: isolate;
   }
 
@@ -1508,7 +1511,7 @@
   .footer-logo img {
     width: 132px;
     height: auto;
-    filter: brightness(0) invert(1) drop-shadow(0 1px 5px rgb(0 0 0 / 38%));
+    filter: brightness(0) invert(1) drop-shadow(0 1px 5px var(--overlay-dark-38));
     opacity: 0.94;
   }
 
@@ -1540,7 +1543,7 @@
 
   .footer-location p {
     margin: 0;
-    color: rgb(255 255 255 / 65%);
+    color: var(--color-on-dark-65);
     font-size: 0.8rem;
     line-height: 1.7;
   }
@@ -1548,7 +1551,7 @@
   .footer-office {
     display: block;
     margin-bottom: 0.15rem;
-    color: rgb(255 255 255 / 88%);
+    color: var(--color-on-dark-88);
     font-size: 0.67rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -1574,7 +1577,7 @@
 
   .footer-header {
     margin: 0 0 1rem;
-    font-family: var(--font-lato), Arial, sans-serif;
+    font-family: var(--font-display);
     font-size: var(--step-3);
     font-weight: 300;
     letter-spacing: 0.02em;
@@ -1604,7 +1607,7 @@
     display: block;
     width: fit-content;
     margin-bottom: 1.25rem;
-    color: rgb(255 255 255 / 70%);
+    color: var(--color-on-dark-70);
     font-size: 0.88rem;
     text-decoration: none;
     transition: color var(--dur-fast) var(--ease-out-quart);
@@ -1612,7 +1615,7 @@
 
   .footer-email-link:hover,
   .footer-email-link:focus-visible {
-    color: #fff;
+    color: var(--color-on-dark);
   }
 
   .footer-actions {
@@ -1630,7 +1633,7 @@
     padding-inline: 1.15rem;
     border: 1px solid currentColor;
     border-radius: 0;
-    color: #fff;
+    color: var(--color-on-dark);
     font-size: 0.94rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -1663,7 +1666,7 @@
     height: 54px;
     border: 1px solid currentColor;
     border-radius: 0;
-    color: #fff;
+    color: var(--color-on-dark);
     text-decoration: none;
     place-items: center;
     transition:
@@ -1687,7 +1690,7 @@
     margin-top: clamp(2.5rem, 4vw, 3.5rem);
     padding-top: 1.1rem;
     border-top: 1px solid var(--color-hairline);
-    color: rgb(255 255 255 / 45%);
+    color: var(--color-on-dark-45);
     font-size: 0.7rem;
     letter-spacing: 0.05em;
   }
@@ -2174,6 +2177,10 @@
     }
   }
 
+  /* Mobile breakpoint: 868px / 869px. The single source for scripts is
+     MOBILE_MAX_WIDTH in src/scripts/breakpoints.ts (media queries can't read
+     custom properties). Also repeated in the media queries above and below
+     and in the <img sizes> of Expertise.astro; change them all together. */
   @media (max-width: 868px) {
     :root {
       --nav-h: 72px;
@@ -2224,7 +2231,7 @@
       gap: 1.5rem;
       visibility: hidden;
       background: var(--ink-950);
-      color: #fff;
+      color: var(--color-on-dark);
       opacity: 0;
       transition: opacity var(--dur-base) var(--ease-out-quart);
     }
@@ -2257,7 +2264,7 @@
     }
 
     .nav-links a {
-      font-family: var(--font-lato), Arial, sans-serif;
+      font-family: var(--font-display);
       font-size: clamp(1.4rem, 6vw, 2.4rem);
       font-weight: 300;
       letter-spacing: 0.09em;
@@ -2283,13 +2290,13 @@
       border-color: var(--color-hairline);
       background: transparent;
       box-shadow: none;
-      color: #fff;
+      color: var(--color-on-dark);
     }
 
     .nav-links .language-switcher a {
       padding: 0.65rem;
-      color: #fff;
-      font-family: var(--font-open-sans), Arial, sans-serif;
+      color: var(--color-on-dark);
+      font-family: var(--font-body);
       font-size: 0.9rem;
       letter-spacing: 0;
       text-align: center;
@@ -2298,8 +2305,8 @@
     .language-switcher a:hover,
     .language-switcher a:focus-visible,
     .language-switcher a[aria-current='page'] {
-      background: rgb(255 255 255 / 10%);
-      color: #fff;
+      background: var(--overlay-light-10);
+      color: var(--color-on-dark);
     }
 
     .nav-links a::after {
@@ -2307,7 +2314,7 @@
     }
 
     .nav-open .navbar {
-      color: #fff;
+      color: var(--color-on-dark);
     }
 
     .nav-open .logo {
@@ -2315,7 +2322,7 @@
     }
 
     .nav-open .logo img {
-      filter: brightness(0) invert(1) drop-shadow(0 1px 5px rgb(0 0 0 / 45%));
+      filter: brightness(0) invert(1) drop-shadow(0 1px 5px var(--overlay-dark-45));
       opacity: 0.96;
     }
 
@@ -2530,8 +2537,8 @@
     *::before,
     *::after {
       animation-duration: 1ms !important;
-      animation-iteration-count: 1 !important;
-      scroll-behavior: auto !important;
+      animation-iteration-count: 1;
+      scroll-behavior: auto;
       transition-duration: 1ms !important;
     }
 

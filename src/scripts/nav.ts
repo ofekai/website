@@ -1,3 +1,5 @@
+import { isMobileViewport } from './breakpoints';
+
 /**
  * Nav behaviour — ported from the pre-Astro static site's script.js.
  *
@@ -212,7 +214,7 @@ export function initNav(): void {
      rotation) to settle instead of running it on every event. */
   let resizeTimer = 0;
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 868 && isOpen()) closeMenu();
+    if (!isMobileViewport() && isOpen()) closeMenu();
     clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
       measureLayout();

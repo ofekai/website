@@ -21,6 +21,7 @@
     --ink-300: #9ca3af;
     --ink-150: #b8b8b8;
     --ink-100: #d9d9d9;
+    --black: #000;
 
     /* --- Color, semantic --- */
     --paper-100: #f2f2f2;
@@ -37,6 +38,30 @@
     --color-hairline: rgb(255 255 255 / 16%);
     --color-hairline-ink: rgb(26 27 31 / 14%);
     --color-focus: var(--teal-600);
+    --color-on-dark: var(--paper-50); /* text and icons on dark surfaces */
+    --color-on-dark-88: rgb(255 255 255 / 88%);
+    --color-on-dark-70: rgb(255 255 255 / 70%);
+    --color-on-dark-65: rgb(255 255 255 / 65%);
+    --color-on-dark-45: rgb(255 255 255 / 45%);
+    --color-nav-border: rgb(20 23 25 / 10%);
+
+    /* --- Overlays: translucent washes, shadows, scrims --- */
+    --overlay-light-12: rgb(255 255 255 / 12%);
+    --overlay-light-10: rgb(255 255 255 / 10%);
+    --overlay-dark-75: rgb(0 0 0 / 75%);
+    --overlay-dark-45: rgb(0 0 0 / 45%);
+    --overlay-dark-38: rgb(0 0 0 / 38%);
+    --overlay-dark-14: rgb(0 0 0 / 14%);
+    --overlay-dark-6: rgb(0 0 0 / 6%);
+    --overlay-scrim-42: rgb(5 7 8 / 42%);
+    --overlay-scrim-30: rgb(5 7 8 / 30%);
+    --overlay-scrim-24: rgb(5 7 8 / 24%);
+    --overlay-scrim-14: rgb(5 7 8 / 14%);
+    --overlay-scrim-8: rgb(5 7 8 / 8%);
+
+    /* --- Font stacks (--font-lato / --font-open-sans come from the Astro fonts API) --- */
+    --font-display: var(--font-lato), Arial, sans-serif;
+    --font-body: var(--font-open-sans), Arial, sans-serif;
 
     /* --- Type, fluid scale ---
        Only the two sizes the plan calls out (hero, section title) need to be

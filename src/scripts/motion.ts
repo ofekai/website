@@ -1,4 +1,5 @@
 import { animate } from 'motion/mini';
+import { isMobileViewport } from './breakpoints';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -163,7 +164,7 @@ function initScrollFallback(): VoidFunction | undefined {
 
       /* ---- Consulting -> HeatVision ---- */
       const consultingHeatVision = seam('consulting-heatvision');
-      const mobile = window.matchMedia('(max-width: 868px)').matches;
+      const mobile = isMobileViewport();
       const heatVision = find('[data-transition-panel="heatvision"]');
       const consulting = find('[data-transition-panel="consulting"]');
 

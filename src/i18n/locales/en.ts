@@ -81,6 +81,7 @@ export const en = {
     ariaLabel: 'Trusted partners. Focus to pause the moving logos.',
     pause: 'Pause',
     play: 'Play',
+    acceleratedBy: 'Accelerated by',
   },
   footer: {
     offices: [

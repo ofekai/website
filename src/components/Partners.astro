@@ -12,6 +12,9 @@ import logoAWS from '../assets/images/logo_AWS.svg';
 // Source: Wikimedia Commons, File:USI_Logo_blue_1200x750_20230808.svg
 // (CC BY-SA 3.0). Self-hosted so the page has no third-party requests.
 import logoUSI from '../assets/images/logo_USI.svg';
+import logoAppWorks from '../assets/images/logo_AppWorks.png';
+// NVIDIA brand rules: badge colours must not be changed.
+import logoNvidiaInception from '../assets/images/logo_NVIDIA_Inception.svg';
 
 interface Props {
   messages: Messages['partners'];
@@ -86,6 +89,13 @@ const groups = [false, true];
       <svg data-icon="play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z" /></svg>
       <span data-partners-toggle-label>{messages.pause}</span>
     </button>
+    <div class="accelerators" data-reveal="line">
+      <p class="accelerators-label">{messages.acceleratedBy}</p>
+      <ul class="accelerators-list">
+        <li><Image src={logoAppWorks} alt="AppWorks Accelerator #33" height={48} class="logo-appworks" /></li>
+        <li><Image src={logoNvidiaInception} alt="NVIDIA Inception program member" class="logo-nvidia-inception" /></li>
+      </ul>
+    </div>
   </div>
 </section>
 

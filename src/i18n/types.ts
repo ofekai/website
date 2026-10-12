@@ -81,6 +81,7 @@ export interface Messages {
     ariaLabel: string;
     pause: string;
     play: string;
+    acceleratedBy: string;
   };
   footer: {
     offices: readonly [

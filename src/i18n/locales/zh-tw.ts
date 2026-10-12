@@ -79,6 +79,7 @@ export const zhTw = {
     ariaLabel: '值得信賴的合作夥伴。將焦點移至此區即可暫停輪播。',
     pause: '暫停',
     play: '播放',
+    acceleratedBy: '加速計畫',
   },
   footer: {
     offices: [

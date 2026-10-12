@@ -76,7 +76,14 @@ const logo = await getImage({ src: logoOfek, width: 150, format: 'webp' });
         </div>
       </div>
     </div>
-    <div class="copyright" data-reveal="line">{messages.copyright(new Date().getFullYear())}</div>
+    <div class="copyright" data-reveal="line">
+      {messages.copyright(new Date().getFullYear())}
+      {/* NVIDIA's required legal line, verbatim in every locale. */}
+      <span class="legal-line" lang="en">
+        © {new Date().getFullYear()} NVIDIA, the NVIDIA logo, and NVIDIA Inception are trademarks and/or registered
+        trademarks of NVIDIA Corporation in the U.S. and other countries.
+      </span>
+    </div>
   </div>
 </footer>
 

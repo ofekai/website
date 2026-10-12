@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import SectionTitle from './SectionTitle.astro';
 import EditorialMedia from './EditorialMedia.astro';
 import IconArrow from '../icons/arrow.svg';
@@ -86,7 +86,9 @@ const { messages } = Astro.props;
             {messages.heatVisionGraphLabels.surfaceMountTechnology}
           </span>
           <div class="heatvision-primary-composition">
-            <Image
+            <Picture
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
               class="heatvision-primary-chart"
               src={heatVisionSpi}
               alt={messages.heatVisionImageAlts.surfaceMountTechnology}
@@ -94,7 +96,9 @@ const { messages } = Astro.props;
               sizes="(min-width: 869px) 46vw, (min-width: 521px) 82vw, 82vw"
               loading="lazy"
             />
-            <Image
+            <Picture
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
               class="heatvision-primary-scale"
               src={heatVisionVolumeScale}
               alt=""
@@ -110,7 +114,9 @@ const { messages } = Astro.props;
             <span class="heatvision-graph-label" aria-hidden="true">
               {messages.heatVisionGraphLabels.pickAndPlace}
             </span>
-            <Image
+            <Picture
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
               src={heatVisionBoardMap}
               alt={messages.heatVisionImageAlts.pickAndPlace}
               widths={[320, 480, 640]}
@@ -123,7 +129,9 @@ const { messages } = Astro.props;
             <span class="heatvision-graph-label" aria-hidden="true">
               {messages.heatVisionGraphLabels.automaticOpticalInspection}
             </span>
-            <Image
+            <Picture
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
               src={heatVisionAoi}
               alt={messages.heatVisionImageAlts.automaticOpticalInspection}
               widths={[320, 480, 640, 960]}
@@ -136,7 +144,9 @@ const { messages } = Astro.props;
             <span class="heatvision-graph-label" aria-hidden="true">
               {messages.heatVisionGraphLabels.reflow}
             </span>
-            <Image
+            <Picture
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
               src={heatVisionTemperature}
               alt={messages.heatVisionImageAlts.reflow}
               widths={[320, 480, 640, 960]}

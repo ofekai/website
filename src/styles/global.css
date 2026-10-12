@@ -1187,6 +1187,16 @@
     aspect-ratio: 2.05 / 1;
   }
 
+  /* <Picture> wrapper: keep the <img> as the flex/sizing child. Its <source>s
+     would otherwise become empty flex items and add extra gaps. */
+  .heatvision-shot picture {
+    display: contents;
+  }
+
+  .heatvision-shot source {
+    display: none;
+  }
+
   .heatvision-shot img {
     display: block;
     width: 100%;

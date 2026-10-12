@@ -1925,11 +1925,6 @@
     to { transform: translateY(50%) scale(1.06); }
   }
 
-  @keyframes hero-content-exit {
-    from { opacity: 1; }
-    to { opacity: 0; }
-  }
-
   /*
    * The outgoing scene clears out while the incoming one climbs over it.
    * The occlusion carries the transition; this keeps the covered scene from
@@ -1945,16 +1940,6 @@
     0% { opacity: 0; transform: scaleX(0); }
     45% { opacity: 1; transform: scaleX(1); }
     100% { opacity: 0; transform: scaleX(1); }
-  }
-
-  @keyframes transition-consulting-media-recede {
-    from { opacity: 1; transform: translateY(0) scale(1); }
-    to { opacity: 0.66; transform: translateY(calc(-0.45 * var(--transition-depth-sm))) scale(0.985); }
-  }
-
-  @keyframes transition-consulting-copy-recede {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0.42; transform: translateY(calc(-1 * var(--transition-depth-sm))); }
   }
 
   @keyframes transition-heatvision-copy-enter {
@@ -2064,12 +2049,12 @@
       }
 
       .hero-content {
-        animation-name: hero-content-exit;
+        animation-name: scene-fade-out;
         animation-duration: auto;
         animation-timing-function: linear;
         animation-fill-mode: both;
         animation-timeline: --seam-hero-about;
-        animation-range: cover 0% cover 68%;
+        animation-range: cover 10% cover 88%;
       }
 
       .about-section > .transition-seam {
@@ -2078,7 +2063,7 @@
         animation-timing-function: linear;
         animation-fill-mode: both;
         animation-timeline: --seam-hero-about;
-        animation-range: cover 30% cover 78%;
+        animation-range: cover 4% cover 92%;
       }
 
       /* ---- About -> Expertise ----
@@ -2142,50 +2127,47 @@
          53% left the stage at 95% -- clip-path: inset(0 0 0 4.6%), shearing
          ~40px off the gallery's left edge.
 
-         Measured pin, in timeline %, across the scene-stack band:
-           1512x830 49.9 | 1512x900 51.0 | 1440x900 51.5
-           1280x860 52.0 | 1512x1000 53.1 | 1920x1080 54.0
-         Everything below therefore resolves by 44%, keeping ~5% clear of the
-         shortest viewport that still pins. scripts/visual-diff.mjs asserts the
+         Measured pin, in timeline %, across the scene-stack band (with the
+         view-timeline-inset on this seam, see the main::after spacer):
+           1512x830 50.4 | 1512x900 51.7 | 1440x900 51.8
+           1280x860 51.5 | 1512x1000 50.4 | 1920x1080 49.5
+         Everything below therefore resolves by 46%, keeping ~3.5% clear of
+         the lowest pin. Consulting's 5-46% fade is the same curve over the
+         HeatVision climb as every other scene's 10-88% fade over its own. scripts/visual-diff.mjs asserts the
          parked state is fully resolved, because nothing static can catch this. */
-      .consulting-stripe [data-transition-layer='media'] {
-        animation-name: transition-consulting-media-recede;
+      .consulting-stripe [data-transition-layer] {
+        animation-name: scene-fade-out;
         animation-duration: auto;
         animation-timing-function: linear;
         animation-fill-mode: both;
         animation-timeline: --seam-consulting-heatvision;
-        animation-range: cover 0% cover 44%;
+        animation-range: cover 5% cover 46%;
       }
 
-      .consulting-stripe [data-transition-layer='copy'] {
-        animation-name: transition-consulting-copy-recede;
-        animation-duration: auto;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: --seam-consulting-heatvision;
-        animation-range: cover 0% cover 40%;
-      }
-
+      /* Each HeatVision layer runs two animations: its enter on the
+         Consulting seam, then the shared scene-fade-out on the Partners seam.
+         The fade fills forwards only, so before its range it leaves the
+         enter's opacity and transform alone. */
       .heatvision-stripe [data-transition-layer='copy'] {
-        animation-name: transition-heatvision-copy-enter;
-        animation-duration: auto;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: --seam-consulting-heatvision;
-        animation-range: cover 5% cover 39%;
+        animation-name: transition-heatvision-copy-enter, scene-fade-out;
+        animation-duration: auto, auto;
+        animation-timing-function: linear, linear;
+        animation-fill-mode: both, forwards;
+        animation-timeline: --seam-consulting-heatvision, --seam-heatvision-partners;
+        animation-range: cover 5% cover 39%, cover 10% cover 88%;
       }
 
       .heatvision-stripe [data-transition-layer='stage'] {
-        animation-name: transition-heatvision-stage-enter;
-        animation-duration: auto;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: --seam-consulting-heatvision;
-        animation-range: cover 0% cover 42%;
+        animation-name: transition-heatvision-stage-enter, scene-fade-out;
+        animation-duration: auto, auto;
+        animation-timing-function: linear, linear;
+        animation-fill-mode: both, forwards;
+        animation-timeline: --seam-consulting-heatvision, --seam-heatvision-partners;
+        animation-range: cover 0% cover 42%, cover 10% cover 88%;
       }
 
       /* The chevron points at a boundary that is already resolving -- same
-         intent as .about-scroll's fade, kept inside the 0-44% band the rest
+         intent as .about-scroll's fade, kept inside the 0-46% band the rest
          of this stretched seam resolves by (see the comment above). */
       .consulting-scroll {
         animation-name: scene-fade-out;
@@ -2219,16 +2201,15 @@
       }
 
       /* ---- HeatVision -> Partners ----
-         Expertise stays pinned until main's bottom edge (Partners' bottom)
-         reaches the viewport bottom, so Partners crosses a frozen HeatVision
-         for its own height. */
+         Partners climbs over a pinned HeatVision, whose layers run the shared
+         scene-fade-out on this seam (see the HeatVision layers above). */
       .partners-section > .transition-seam {
         animation-name: transition-seam-draw;
         animation-duration: auto;
         animation-timing-function: linear;
         animation-fill-mode: both;
         animation-timeline: --seam-heatvision-partners;
-        animation-range: cover 4% cover 40%;
+        animation-range: cover 4% cover 92%;
       }
 
       /* ---- Partners -> Footer ----
@@ -2277,29 +2258,28 @@
      rather than tracking a plate that climbs. */
   @supports (animation-timeline: view()) {
     @media (max-width: 868px) and (prefers-reduced-motion: no-preference) {
+      .hero-content,
       .about-intro-band,
-      .about-features-band {
+      .about-features-band,
+      .consulting-stripe [data-transition-layer] {
         animation-range: cover 28% cover 72%;
       }
 
+      :is(.about-section, .partners-section) > .transition-seam,
       .expertise-heading-band > .transition-seam {
         animation-range: cover 18% cover 58%;
-      }
-
-      .consulting-stripe [data-transition-layer] {
-        animation: none;
       }
 
       /* Copy sits first past the seam here and the stage follows it, so the
          two ranges are the reverse of the reading order on wider screens. */
       .heatvision-stripe [data-transition-layer='copy'] {
-        animation-name: transition-heatvision-mobile-enter;
-        animation-range: cover 8% cover 52%;
+        animation-name: transition-heatvision-mobile-enter, scene-fade-out;
+        animation-range: cover 8% cover 52%, cover 28% cover 72%;
       }
 
       .heatvision-stripe [data-transition-layer='stage'] {
-        animation-name: transition-heatvision-mobile-enter;
-        animation-range: cover 30% cover 74%;
+        animation-name: transition-heatvision-mobile-enter, scene-fade-out;
+        animation-range: cover 30% cover 74%, cover 28% cover 72%;
       }
     }
   }
